@@ -1,0 +1,69 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Office Locations Map</title>
+    <style>
+        #map {
+            height: 500px;
+            width: 100%;
+        }
+    </style>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBdVcqhnHGVbIhGC8ibeDUbGi1uA3oAPn8&callback=initMap" async defer></script>
+
+    <!-- <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBdVcqhnHGVbIhGC8ibeDUbGi1uA3oAPn8" async defer></script> -->
+</head>
+<body>
+    <h1>Office Locations</h1>
+    <div id="map" style="height: 600px; width: 100%;"></div>
+
+    <!-- Include the JSON data in a script element using the json_script filter -->
+    <script type="application/json" id="office-locations-data">
+        {{ office_locations|safe }}
+    </script>
+    
+    <script>
+     function initMap() {
+    // Create the map centered on a default location (e.g., Dhaka)
+    const map = new google.maps.Map(document.getElementById('map'), {
+        center: { lat: 23.8191441, lng: 90.4525954 }, // Default center coordinates
+        zoom: 15 // Adjust zoom level as needed
+    });
+
+    // Get the office locations data from the JSON script element
+    const officeLocationsData = document.getElementById('office-locations-data').textContent;
+    const officeLocations = JSON.parse(officeLocationsData);
+
+    // Define the custom icon URL
+    const customIcon = 'C:/Users/dell/Desktop/icon_voice_clip/report.png'; // Replace with the URL of your custom icon
+
+    // Iterate over each location and add a marker to the map
+    officeLocations.forEach(function(location) {
+        const marker = new google.maps.Marker({
+            position: { lat: location.lat, lng: location.lng },
+            map: map,
+            title: location.name, // Set the marker title to the office name
+            icon: customIcon // Set the custom icon for the marker
+        });
+
+        // Optionally, you can add an info window to display the office name when the marker is clicked
+        const infowindow = new google.maps.InfoWindow({
+            content: location.name
+        });
+
+        // Add a click event listener to the marker to open the info window
+        marker.addListener('click', function() {
+            infowindow.open(map, marker);
+        });
+    });
+}
+
+// Call initMap when the window loads
+window.onload = initMap;
+
+    </script>
+
+    
+    
+</body>
+</html>

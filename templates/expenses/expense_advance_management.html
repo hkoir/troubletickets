@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% load static %}
+
+
+{% block content %}
+
+
+
+    <style>
+
+    html, body { 
+       font-family: Verdana, sans-serif; 
+    
+  }
+
+
+  
+  table {
+            border-collapse: collapse;
+            width: 100%;
+      
+        }
+
+        th, td {
+            border: 1px solid rgb(227, 87, 7); /* Set border color for individual cells */
+            text-align: left;
+            padding: 0px;
+        }
+        th{
+        background-color: rgb(52, 232, 100);
+      }
+      
+
+    table thead th {
+    white-space: normal;
+        }
+
+    </style>
+
+<h4 class=" text-center" style="margin-top:10px">DOPS DASHBOARD</h4>
+
+
+
+ <div class="container-fluid">
+    <div class="row row-cols-3 row-cols-md-6 p-2">
+     
+
+        <div class="card" style="background-color: white;">
+            <a class="text-center" style="text-decoration: none;" href="{% url 'dailyexpense:money_requisition' %}">
+                <img class="rounded-pill" src="{% static 'images/money.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
+                <br>Create Advance Requisition</a>
+        </div>
+    
+        <div class="card" style="background-color: white;">
+            <a class="text-center" style="text-decoration: none;" href="{% url 'dailyexpense:all_approval_status' %}">
+                <img class="rounded-pill" src="{% static 'images/money.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
+                <br>Advance Requisition Status</a>
+        </div>
+    
+    
+        <div class="card" style="background-color: white;">
+            <a class="text-center" style="text-decoration: none;" href="{% url 'dailyexpense:create_expense_requisition' %}">
+                <img class="rounded-pill" src="{% static 'images/expenses.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
+                <br>Create daily Expense Requisition</a>
+        </div>
+    
+        <div class="card" style="background-color: white;">
+            <a class="text-center" style="text-decoration: none;" href="{% url 'dailyexpense:expense_approval_status' %}">
+                <img class="rounded-pill" src="{% static 'images/expenses.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
+                <br>Daily Expense Requisition Status</a>
+        </div>
+    
+        <div class="card" style="background-color: white;">
+            <a class="text-center" style="text-decoration: none;" href="{% url 'dailyexpense:daily_expense_summary' %}">
+                <img class="rounded-pill" src="{% static 'images/expenses.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
+                <br>Daily Expense data analysis</a>
+        </div>
+    
+    
+        <!-- grand summary data compilation -->
+       
+        <div class="card" style="background-color: white;">
+            <a class="text-center" style="text-decoration: none;" href="{% url 'dailyexpense:summary_expenses_form_view' %}">
+                <img class="rounded-pill" src="{% static 'images/money.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
+                <br>Create Grand Summary Expenses</a>
+        </div>
+        <div class="card" style="background-color: white;">
+            <a class="text-center" style="text-decoration: none;" href="{% url 'dailyexpense:zone_wise_expenses_view' %}">
+                <img class="rounded-pill" src="{% static 'images/money.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
+                <br>View Grand summary Expenses</a>
+        </div>
+
+
+
+        <div class="card" style="background-color: white;">
+            <a class="text-center" style="text-decoration: none;" href="{% url 'dailyexpense:create_adhoc_requisition' %}">
+                <img class="rounded-pill" src="{% static 'images/expenses.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
+                <br>Adhoc Requisition application</a>
+        </div>
+    
+        <div class="card" style="background-color: white;">
+            <a class="text-center" style="text-decoration: none;" href="{% url 'dailyexpense:adhoc_approval_status' %}">
+                <img class="rounded-pill" src="{% static 'images/expenses.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
+                <br>Adhoc requisition approval status</a>
+        </div>
+       
+    
+
+    </div>
+ </div>
+
+
+
+    <div class="col" style="height:1200px"></div>
+
+    
+{% endblock %}
+
+
+

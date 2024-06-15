@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+{% load static %}
+
+
+{% block content %}
+
+
+
+    <style>
+
+    html, body { 
+       font-family: Verdana, sans-serif; 
+    
+  }
+
+
+  
+  table {
+            border-collapse: collapse;
+            width: 100%;
+      
+        }
+
+        th, td {
+            border: 1px solid rgb(227, 87, 7); /* Set border color for individual cells */
+            text-align: left;
+            padding: 0px;
+        }
+        th{
+        background-color: rgb(52, 232, 100);
+      }
+      
+
+    table thead th {
+    white-space: normal;
+        }
+
+    </style>
+
+<h4 class=" text-center" style="margin-top:10px">DOPS DASHBOARD</h4>
+
+
+
+ <div class="container-fluid">
+    <div class="row row-cols-3 row-cols-md-6 p-2">
+     
+
+
+        <!-- Vehicle data -->
+
+    <div class="card" style="background-color: white;">
+        <a class="text-center" style="text-decoration: none;" href="{% url 'vehicle:create_vehicle'%}">
+            <img class="rounded-pill" src="{% static 'images/pickup.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
+            <br>Create Vehicle</a>
+    </div>
+           
+
+    <div class="card" style="background-color: white;">
+        <a class="text-center" style="text-decoration: none;" href="{% url 'vehicle:view_vehicle_info' %}">
+            <img class="rounded-pill" src="{% static 'images/pickup.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
+            <br>View Vehicle database</a>
+    </div>
+
+    <div class="card" style="background-color: white;">
+        <a class="text-center" style="text-decoration: none;" href="{% url 'vehicle:create_vehicle_expenses' %}">
+            <img class="rounded-pill" src="{% static 'images/pickup.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
+            <br>Add vehicle running Mileage</a>
+    </div>
+
+    
+    <div class="card" style="background-color: white;">
+        <a class="text-center" style="text-decoration: none;" href="{% url 'vehicle:view_vehicle_travel_data' %}">
+            <img class="rounded-pill" src="{% static 'images/pickup.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
+            <br>View vehicle travel data</a>
+    </div>
+
+    <div class="card" style="background-color: white;">
+        <a class="text-center" style="text-decoration: none;" href="{% url 'vehicle:create_fuel_refill' %}">
+            <img class="rounded-pill" src="{% static 'images/pickup.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
+            <br>Create refill fuel</a>
+    </div>
+
+    
+    <div class="card" style="background-color: white;">
+        <a class="text-center" style="text-decoration: none;" href="{% url 'vehicle:view_fuel_refill' %}">
+            <img class="rounded-pill" src="{% static 'images/pickup.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
+            <br>View refill fuel</a>
+    </div>
+
+     
+    
+
+    <div class="card" style="background-color: white;">
+        <a class="text-center" style="text-decoration: none;" href="{% url 'vehicle:create_vehicle_fault' %}">
+            <img class="rounded-pill" src="{% static 'images/pickup.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
+            <br> Add Vehicle incident </a>
+    </div>
+
+    <div class="card" style="background-color: white;">
+        <a class="text-center" style="text-decoration: none;" href="{% url 'vehicle:view_vehicle_fault' %}">
+            <img class="rounded-pill" src="{% static 'images/pickup.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
+            <br>View vehicle incident</a>
+    </div>
+
+    <div class="card" style="background-color: white;">
+        <a class="text-center" style="text-decoration: none;" href="{% url 'vehicle:create_vehicle_payment' %}">
+            <img class="rounded-pill" src="{% static 'images/pickup.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
+            <br> Add Vehicle payment </a>
+    </div>
+
+    <div class="card" style="background-color: white;">
+        <a class="text-center" style="text-decoration: none;" href="{% url 'vehicle:view_vehicle_payment' %}">
+            <img class="rounded-pill" src="{% static 'images/pickup.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
+            <br>View vehicle payment</a>
+    </div>
+
+  
+
+    <div class="card" style="background-color: white;">
+        <a class="text-center" style="text-decoration: none;" href="{% url 'vehicle:vehicle_overtime_calc' %}">
+            <img class="rounded-pill" src="{% static 'images/pickup.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
+            <br>Cost performance by Vehicle Datewise</a>
+    </div>
+
+
+    <div class="card" style="background-color: white;">
+        <a class="text-center" style="text-decoration: none;" href="{% url 'vehicle:vehicle_grand_summary' %}">
+            <img class="rounded-pill" src="{% static 'images/pickup.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
+            <br>Cost performance summary</a>
+    </div>
+
+ 
+     
+    <div class="card" style="background-color: white;">
+        <a class="text-center" style="text-decoration: none;" href="{% url 'vehicle:vehicle_summary_report' %}">
+            <img class="rounded-pill" src="{% static 'images/pickup.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
+            <br>OPS performance by vehicle </a>
+    </div>
+   
+    
+    <div class="card" style="background-color: white;">
+        <a class="text-center" style="text-decoration: none;" href="{% url 'vehicle:management_summary_report' %}">
+            <img class="rounded-pill" src="{% static 'images/pickup.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
+            <br>OPS performance Summary</a>
+    </div>
+
+
+
+    </div>
+ </div>
+
+
+
+    <div class="col" style="height:1200px"></div>
+
+    
+{% endblock %}
+
+
+

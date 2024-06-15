@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+{% load static %}
+{% load duration_filters %}
+
+
+{% block content %}
+
+<title>View Ticket</title>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+   
+<style>
+
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    
+    }
+    
+    th,td{
+        border: 1px solid black; /* Set border color for individual cells */
+        text-align: left;
+        padding: 0px;
+    }
+    
+    th {
+        background-color: rgb(38, 233, 129);
+        
+    }
+    
+    table thead th {
+    white-space: normal;
+    }
+    
+    #main-content {   
+    overflow-y: auto;
+    margin-left:0px;
+    position: absolute;
+    width: 100%;
+    left: 0;
+  
+}
+    
+    </style>
+
+
+
+
+
+
+
+
+<div class="container-fluid" id ="main-content">
+    <h1>Vehicle daily travelling record</h1>
+    <table>
+        <thead>
+            <tr>
+                <!-- Add headers from the AddVehicleExpenses model -->
+                <th class="text-center p-2">Vehicle</th>
+                <th class="text-center p-2">Requester</th>
+                <th class="text-center p-2">Expense ID</th>        
+                
+                <th class="text-center p-2">Region</th>   
+                <th class="text-center p-2">Zone</th>   
+                <th class="text-center p-2">MP</th>   
+     
+                <th class="text-center p-2">Start Reading</th>
+                <th class="text-center p-2">Stop Reading</th>
+                <th class="text-center p-2">Start Location</th>
+                <th class="text-center p-2">End Location</th>
+                <th class="text-center p-2">Travel Purpose</th>
+                <th class="text-center p-2">Travel Date</th>
+                <th class="text-center p-2">Kilometer Run</th>    
+                <th class="text-center p-2">Fuel consumed</th>               
+                <th class="text-center p-2">Running hours</th>  
+             
+                <th class="text-center p-2">Coments</th>           
+                <th class="text-center p-2">Created At</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for expense in vehicle_expenses %}
+                <tr>
+                    <td class="text-center p-2" style="white-space: nowrap;">{{ expense.vehicle }}</td>
+                    <td class="text-center p-2" style="white-space: nowrap;">{{ expense.vehicle_expense_add_requester }}</td>
+                    <td class="text-center p-2" style="white-space: nowrap;">{{ expense.vehicle_expense_id }}</td>
+
+                    <td class="text-center p-2" style="white-space: nowrap;">{{ expense.region }}</td>
+                    <td class="text-center p-2" style="white-space: nowrap;">{{ expense.zone }}</td>
+                    <td class="text-center p-2" style="white-space: nowrap;">{{ expense.mp }}</td>
+                                     
+
+                    <td class="text-center p-2" style="white-space: nowrap;">{{ expense.vehicle_start_reading }}</td>
+                    <td class="text-center p-2" style="white-space: nowrap;">{{ expense.vehicle_stop_reading }}</td>
+                    <td class="text-center p-2" style="white-space: nowrap;">{{ expense.vehicle_start_location }}</td>
+                    <td class="text-center p-2" style="white-space: nowrap;">{{ expense.vehicle_end_location }}</td>
+                    <td class="text-center p-2" style="white-space: nowrap;">{{ expense.travel_purpose }}</td>
+                    <td class="text-center p-2" style="white-space: nowrap;">{{ expense.travel_date }}</td>
+                    <td class="text-center p-2" style="white-space: nowrap;">{{ expense.total_kilometer_run }}</td>
+                    <td class="text-center p-2" style="white-space: nowrap;">{{ expense.total_fuel_consumed }}</td>
+                     <td class="text-center p-2" style="white-space: nowrap;">{{ expense.running_hours }}</td>      
+                    <td class="text-center p-2" style="white-space: nowrap;">{{ expense.comments }}</td>                   
+                    <td class="text-center p-2" style="white-space: nowrap;">{{ expense.created_at }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+
+    <!-- Pagination -->
+<div class="pagination" style="padding: 10px;">
+    <span class="step-links">
+        {% if vehicle_expenses.has_previous %}
+            <a href="?page=1">&laquo; First</a>
+            <a href="?page={{ vehicle_expenses.previous_page_number }}">Previous</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ vehicle_expenses.number }} of {{ vehicle_expenses.paginator.num_pages }}.
+        </span>
+
+        {% if vehicle_expenses.has_next %}
+            <a href="?page={{ vehicle_expenses.next_page_number }}">Next</a>
+            <a href="?page={{ vehicle_expenses.paginator.num_pages }}">Last &raquo;</a>
+        {% endif %}
+    </span>
+</div>
+
+</div>
+
+
+<div class="col" style="height:1200px"></div>
+
+{% endblock %}

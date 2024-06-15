@@ -1,0 +1,10 @@
+{% extends "./sub_base.html" %}
+
+{% load static% }
+
+
+<form action="{% url 'logout' %}" method="POST">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-primary">Logout</button>
+</form>
+{% endblock %}

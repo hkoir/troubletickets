@@ -1,0 +1,153 @@
+
+{% extends "base.html" %}
+{% load static %}
+
+{% load duration_filters %}
+
+{% block content %}
+
+<style>
+
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    
+    }
+    
+    th,td{
+        border: 1px solid black; /* Set border color for individual cells */
+        text-align: left;
+        padding: 0px;
+    }
+    
+    th {
+        background-color: rgb(38, 233, 129);
+        
+    }
+    
+    table thead th {
+    white-space: normal;
+    }
+    
+    .main-content {   
+    overflow-y: auto;
+    margin-left:0px;
+    position: absolute;
+    width: 100%;
+    left: 0;
+  
+}
+    
+    </style>
+
+
+<h4 class="text-center">Vehicle over time bill account</h4>
+
+<form method="GET" action="{% url 'vehicle:vehicle_overtime_calc' %}">
+
+    <div class="container-fluid">
+        <div class="row row-cols-1 row-cols-md-4">
+
+         <div class="col" style="padding:5px; margin:5px">  Start Date:  {{ form.start_date }} </div>
+         <div class="col" style="padding:5px; margin:5px">  End Date:  {{ form.end_date }} </div>
+         <div class="col" style="padding:5px; margin:5px"> No of days {{ form.days }} </div>
+         <div class="col" style="padding:5px; margin:5px">  Region:{{ form.region }} </div>  
+         <div class="col" style="padding:5px; margin:5px">  Zone:{{ form.zone }} </div>    
+         <div class="col" style="padding:5px; margin:5px">  mp:{{ form.mp }} </div>    
+
+         <div class="col" style="padding:5px; margin:5px"> <button type="submit" class='btn btn-primary'>Generate Data</button></div>
+           
+        </div>
+    </div>
+      
+    </form>
+
+
+
+
+<div style="left:0px; margin-left:0px">
+    <h4 style="margin-top:40px; margin-left:0px">Data for
+        {% if days %}
+            the last {{ days }} days
+        {% elif start_date and end_date %}
+            from: {{ start_date }} to {{ end_date }}
+        {% endif %}
+    </h4>
+        
+</div>
+
+
+
+
+
+
+
+
+
+
+    <div class="container">
+        <div class="row">     
+            <div class="col">
+              
+                {% for vehicle_reg_number, x in datewise_running_data.object_list %}
+                        <h4 style="margin-top:20px">Vehicle Registration Number: {{ vehicle_reg_number }}</h4>
+                       
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th class="text-center p-2">Date</th>
+                                    <th class="text-center p-2">Travel day</th>
+                                    <th class="text-center p-2">Total Running Hours</th>
+                                    <th class="text-center p-2">Overtime hours</th>
+                                    <th class="text-center p-2">Overtime rate</th>
+                                    <th class="text-center p-2">Overtime bill amount</th>
+                                    <th class="text-center p-2">Vehicle body rent/day</th>
+                                    <th class="text-center p-2">Rental type</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for date, data in x.items %}
+                                    <tr>
+                                        <td class="text-center p-2" style="white-space:nowrap;">{{ date }}</td>
+                                        <td class="text-center p-2" style="white-space:nowrap;">{{ data.remarks}}</td>
+                                        <td class="text-center p-2">{{ data.total_running_hours|floatformat:'2' }}</td>
+                                        <td class="text-center p-2">{{ data.overtime_running_hours|floatformat:'2' }}</td>
+                                        <td class="text-center p-2">{{ data.overtime_rate|floatformat:'2' }}</td>
+                                        <td class="text-center p-2">{{ data.overtime_cost|floatformat:'2' }}</td>
+                                        <td class="text-center p-2">{{ data.vehicle_rent_per_day|floatformat:'2' }}</td>
+                                        <td class="text-center p-2">{{ data.vehicle_rental_category }}</td>
+
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% endfor %}
+
+            </div>
+        </div>
+
+        <div class="pagination" style="padding:10px">
+            {% if datewise_running_data.has_previous %}
+                <a style="margin:10px; font-size: 14px;" href="?page={{ datewise_running_data.previous_page_number }}">Previous</a>
+            {% endif %}
+            
+            {% for num in datewise_running_data.paginator.page_range %}
+                {% if datewise_running_data.number == num %}
+                    <span style="margin:10px; font-size:14px">{{ num }}</span>
+                {% else %}
+                    <a style="margin:10px; font-size:14px" href="?page={{ num }}">{{ num }}</a>
+                {% endif %}
+            {% endfor %}
+            
+            {% if datewise_running_data.has_next %}
+                <a style="margin:10px; font-size:14px" href="?page={{ datewise_running_data.next_page_number }}">Next</a>
+            {% endif %}
+        </div>
+        
+
+    </div>
+
+
+    <div class="col" style="height:800px"></div>
+
+{% endblock %}

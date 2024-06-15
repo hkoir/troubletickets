@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+{% load static %}
+{% load duration_filters %}
+
+
+{% block content %}
+
+<title>View fuel refill</title>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+   
+<style>
+
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    
+    }
+    
+    th,td{
+        border: 1px solid black; /* Set border color for individual cells */
+        text-align: left;
+        padding: 0px;
+    }
+    
+    th {
+        background-color: rgb(38, 233, 129);
+        
+    }
+    
+    table thead th {
+    white-space: normal;
+    }
+    
+
+    .main-content {   
+    overflow-y: auto;
+    margin-left:0px;
+    position: absolute;
+    width: 100%;
+    left: 0;
+  
+}
+    
+    
+    </style>
+
+
+
+
+<div class="container-fluid main-content">
+    <h1>PG fault status</h1>
+    
+    <form method="GET" action="{% url 'generator:view_pg_fuel' %}">        
+        <button type="submit" name="download_csv" class="btn btn-primary">Export CSV</button>
+    </form>
+    
+
+
+    <form method="GET" action="{% url 'generator:view_pg_fault' %}">
+        <div class="container-fluid main-content2">
+            <div class="row row-cols-1 row-cols-md-4">
+    
+            <div class="col" style="padding:5px; margin:5px">  Start Date:  {{ form.start_date }} </div>
+            <div class="col" style="padding:5px; margin:5px">  End Date:  {{ form.end_date }} </div>
+            <div class="col" style="padding:5px; margin:5px"> No of days {{ form.days }} </div>
+            <div class="col" style="padding:5px; margin:5px">  Region:{{ form.region }} </div>  
+            <div class="col" style="padding:5px; margin:5px">  Zone:{{ form.zone }} </div>    
+            <div class="col" style="padding:5px; margin:5px">  mp:{{ form.mp }} </div>  
+            <div class="col" style="padding:5px; margin:5px"> <button type="submit" class='btn btn-primary'>Generate Data</button></div>
+            
+            </div>
+        </div>                    
+    </form>          
+
+        <h4 class="text-center">Data for
+            {% if days %}
+                the last {{ days }} days
+            {% elif start_date and end_date %}
+                from: {{ start_date }} to {{ end_date }}
+            {% endif %}
+        </h4>       
+
+
+
+<h4> <a href="{% url 'generator:view_pg_details_fault'%}">View fault details</a></h4>
+
+
+
+    <table>
+        <thead>
+            <tr>
+
+                <th class="text-center p-2">Update repair </th>               
+                <th class="text-center p-2">Created at </th>
+                <th class="text-center p-2">Updated at </th>
+                <th class="text-center p-2">Region</th>
+                <th class="text-center p-2">Zone</th>
+                <th class="text-center p-2">MP</th>
+                <th class="text-center p-2">PG Number</th>
+                <th class="text-center p-2">Fault Date</th>
+                <th class="text-center p-2">Repair date</th>
+                <th class="text-center p-2" style="white-space:normal;">Fault Description</th>
+                <th class="text-center p-2" style="white-space:normal;">Action taken</th>
+                <th class="text-center p-2">Fault duration</th>
+
+                <th class="text-center p-2">Repair by</th>
+                <th class="text-center p-2">Repair cost</th>
+              
+            </tr>
+        </thead>
+        <tbody>
+            {% for fuel in pg_fault_data %}
+
+
+            {% if fuel.repair_date is None %}
+            <tr style="background-color: yellow;">
+                {% else %}
+                <tr style="background-color: rgb(41, 240, 51);">
+            {% endif %}
+                <td class="text-center p-2"style="white-space: nowrap;"><a href="{% url 'generator:update_pg_fault_record' fuel.id %}">Update repair</a></td>
+                <td class="text-center p-2"style="white-space: nowrap;">{{ fuel.created_at }}</td>
+                <td class="text-center p-2"style="white-space: nowrap;">{{ fuel.updated_at }}</td> 
+                <td class="text-center p-2"style="white-space: nowrap;">{{ fuel.region }}</td>
+                <td class="text-center p-2"style="white-space: nowrap;">{{ fuel.zone }}</td>
+                <td class="text-center p-2"style="white-space: nowrap;">{{ fuel.mp }}</td>
+                <td class="text-center p-2" style="white-space: nowrap;">{{ fuel.pgnumber.PGNumber }}</td>
+                <td class="text-center p-2" style="white-space: nowrap;">{{ fuel.fault_date }}</td>
+                <td class="text-center p-2" style="white-space: nowrap;">{{ fuel.repair_date }}</td>
+                <td class="text-center p-2" style="white-space: nowrap;">{{ fuel.fault_description }}</td>
+                <td class="text-center p-2" style="white-space: nowrap;">{{ fuel.action_taken }}</td>
+                <td class="text-center p-2" style="white-space: nowrap;">{{ fuel.fault_duration }}</td>
+                <td class="text-center p-2" style="white-space: nowrap;">{{ fuel.repair_by }}</td>
+                <td class="text-center p-2" style="white-space: nowrap;">{{ fuel.repair_cost }}</td>
+                
+            </tr> 
+            {% endfor %} 
+        </tbody>
+    </table>
+
+
+<!-- Pagination -->
+<div class="pagination" style="padding: 10px;">
+    <span class="step-links">
+        {% if page_obj.has_previous %}
+            <a href="?page=1">&laquo; First</a>
+            <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+        </span>
+
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">Next</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}">Last &raquo;</a>
+        {% endif %}
+    </span>
+</div>
+
+
+</div>
+</div>
+
+
+
+
+
+<div class="col" style="height:1200px"></div>
+
+
+{% endblock %}

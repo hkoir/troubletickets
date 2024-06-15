@@ -1,0 +1,246 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<title>Aggregate TT and Run Hour Trend</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
+
+<style>
+    html, body {
+        background-color: beige;
+    }
+
+    #main-content {   
+    overflow-y: auto;
+    margin-left:0px;
+    position: absolute;
+    width: 100%;
+    left: 0;
+  
+}
+
+
+
+</style>
+
+
+<p><h4>Combined zone summary chart</h4>(Select no of days or date range)</p>
+
+
+    <form method="GET" action="{% url 'tickets:zone_wise_tt_run_hour_trend' %}">
+
+        <div class="container-fluid">
+            <div class="row row-cols-1 row-cols-md-3">
+
+                <div class="col"> Start Date:  {{ form.start_date }} </div>
+                <div class="col"> End Date:  {{ form.end_date }} </div>
+                <div class="col">  or Select no of days:  {{ form.days }}   </div>
+                <div class="col">  <button type="submit" class='btn btn-primary'>Generate Data</button>  </div>
+                                                                   
+                      
+                 </div>      
+             </div>      
+    </form>
+
+
+
+
+<h4 style="margin-top:40px">Report for
+    {% if days %}
+        the last {{ days }} days
+    {% elif start_date and end_date %}
+        from: {{ start_date }} to {{ end_date }}
+    {% endif %}
+</h4>
+
+
+
+
+<div class="container-fluid overflow-auto"  style="margin-top: 50px;">
+    <div class="row overflow-auto" id="main-content" style="white-space: nowrap">     
+        <div class="col" id="canvas-container"style="height: 800px; width:1200px;overflow-x: auto; white-space:nowrap">
+            
+        </div>
+    </div>
+</div>
+
+<div style="height:1200px"></div>
+
+
+
+
+
+<script type="application/json" id="data-json">
+    {{ json_data|safe }}
+</script>
+
+<script>
+
+document.addEventListener('DOMContentLoaded', function() {
+    const data = JSON.parse(document.getElementById('data-json').textContent);
+    const zoneDateMap = {};
+
+    data.forEach(item => {
+        const zone = item.zone;
+        const date = item.created_at;
+        const troubleTickets = item.trouble_tickets;
+        const runHours = item.run_hours;
+        const avgRunHour = item.avg_run_hour_per_tt;
+
+        if (!zoneDateMap[zone]) {
+            zoneDateMap[zone] = {};
+        }
+
+        if (!zoneDateMap[zone][date]) {
+            zoneDateMap[zone][date] = {
+                troubleTickets: 0,
+                runHours: 0,
+                avgRunHour: 0,
+                count: 0  
+            };
+        }
+
+        zoneDateMap[zone][date].troubleTickets += troubleTickets;
+        zoneDateMap[zone][date].runHours += runHours;
+        zoneDateMap[zone][date].avgRunHour += avgRunHour * troubleTickets;
+        zoneDateMap[zone][date].count += troubleTickets;
+    });
+
+    const allDates = Array.from(new Set(data.map(item => item.created_at)));
+
+    const datasets = [];
+    const colors = ['red', 'blue', 'green', 'orange', 'purple', 'yellow', 'pink', 'teal', 'brown', 'gray', 'cyan', 'magenta'];
+    let colorIndex = 0;
+
+    for (const zone in zoneDateMap) {
+        const zoneData = zoneDateMap[zone];
+
+        const troubleTicketsData = [];
+        const runHoursData = [];
+        const avgRunHoursData = [];
+
+        allDates.forEach(date => {
+            if (zoneData[date]) {
+                troubleTicketsData.push(zoneData[date].troubleTickets);
+                runHoursData.push(zoneData[date].runHours);
+                avgRunHoursData.push(zoneData[date].avgRunHour / zoneData[date].count); // Calculate average run hours per trouble ticket
+            } else {
+                troubleTicketsData.push(0);
+                runHoursData.push(0);
+                avgRunHoursData.push(0);
+            }
+        });
+
+        datasets.push({
+            label:`${zone.slice(0, 3)}- TT`,
+            data: troubleTicketsData,
+            backgroundColor: colors[colorIndex % colors.length],
+            borderColor: colors[colorIndex % colors.length],
+            borderWidth: 1
+        });
+
+        datasets.push({
+            label:`${zone.slice(0, 3)} - RH`,
+            data: runHoursData,
+            backgroundColor: colors[(colorIndex + 1) % colors.length],
+            borderColor: colors[(colorIndex + 1) % colors.length],
+            borderWidth: 1
+        });
+
+        datasets.push({
+            label:`${zone.slice(0, 3)} - AVGRH`,
+            data: avgRunHoursData,
+            backgroundColor: colors[(colorIndex + 2) % colors.length],
+            borderColor: colors[(colorIndex + 2) % colors.length],
+            borderWidth: 1
+        });
+
+        colorIndex += 3;  
+    }
+
+    const canvasContainer = document.getElementById('canvas-container');
+    const canvas = document.createElement('canvas');
+    canvas.id = 'aggregate_charts';
+    canvas.style.width = '100%';
+    canvas.style.height = '100%';
+    canvasContainer.appendChild(canvas);
+
+    const ctx = canvas.getContext('2d');
+    const summaryChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: allDates,
+            datasets: datasets
+        },
+        options: {
+            responsive: true,
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Date',
+                        color: '#000578',
+                        font: {
+                            size: 25,
+                            weight: 'bold'
+                        }
+                    },
+                    ticks: {
+                        color: '#000578',
+                        font: {
+                            size: 16,
+                            weight: 'normal'
+                        }
+                    }
+                },
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Value',
+                        color: '#000578',
+                        font: {
+                            size: 25,
+                            weight: 'bold'
+                        }
+                    },
+                    ticks: {
+                        color: '#000578',
+                        font: {
+                            size: 16,
+                            weight: 'normal'
+                        }
+                    }
+                }
+            },
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Zone Summary Chart',
+                    color: '#000578',
+                    font: {
+                        size: 25,
+                        weight: 'bold'
+                    }
+                },
+                legend: {
+                labels: {
+                    font: {
+                        size: 16, // Adjust the font size here
+                        weight: 'normal',
+                        family: 'Arial' // Adjust the font family here if needed
+                    },
+                    color: '#000578' // Adjust the color here if needed
+                }
+            }
+            }
+        }
+    });
+});
+
+
+</script>
+
+{% endblock %}

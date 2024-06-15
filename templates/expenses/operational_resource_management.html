@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% load static %}
+
+
+{% block content %}
+
+
+
+    <style>
+
+    html, body { 
+       font-family: Verdana, sans-serif; 
+    
+  }
+
+
+  
+  table {
+            border-collapse: collapse;
+            width: 100%;
+      
+        }
+
+        th, td {
+            border: 1px solid rgb(227, 87, 7); /* Set border color for individual cells */
+            text-align: left;
+            padding: 0px;
+        }
+        th{
+        background-color: rgb(52, 232, 100);
+      }
+      
+
+    table thead th {
+    white-space: normal;
+        }
+
+    </style>
+
+<h4 class=" text-center" style="margin-top:10px">DOPS DASHBOARD</h4>
+
+
+
+ <div class="container-fluid">
+    <div class="row row-cols-3 row-cols-md-6 p-2">
+     
+
+    <!-- operational resources -->
+
+    <div class="card" style="background-color: white;">
+        <a class="text-center" style="text-decoration: none;" href="{% url 'employee:create_resource' %}">
+            <i class="fas fa-tools"></i>
+            <br>Create operational resource</a>
+    </div>
+
+    <div class="card" style="background-color: white;">
+        <a class="text-center" style="text-decoration: none;" href="{% url 'employee:view_resource' %}">
+            <i class="fas fa-eye"></i>
+            <br>View Operational Resource</a>
+    </div>
+
+    <div class="card" style="background-color: white;">
+        <a class="text-center" style="text-decoration: none;" href="{% url 'employee:view_resource_summary' %}">
+            <i class="fas fa-eye"></i>
+            <br>Operational resource summary</a>
+    </div>
+
+    <div class="card" style="background-color: white;">
+        <a class="text-center" style="text-decoration: none;" href="{% url 'generator:create_region_zone_database' %}">
+            <i class="fas fa-tools"></i>
+            <br>Create Region, Zone, Mp list</a>
+    </div>
+
+    <div class="card" style="background-color: white;">
+        <a class="text-center" style="text-decoration: none;" href="{% url 'tickets:create_pgr' %}">
+            <i class="fas fa-tools"></i>
+            <br>Create PGR database</a>
+    </div>
+    <div class="card" style="background-color: white;">
+        <a class="text-center" style="text-decoration: none;" href="{% url 'tickets:view_pgr_database' %}">
+            <i class="fas fa-eye"></i>
+            <br>View PGR database</a>
+    </div>
+
+    <div class="card" style="background-color: white;">
+        <a class="text-center" style="text-decoration: none;" href="{% url 'tickets:pgr_summary' %}">
+            <i class="fas fa-eye"></i>
+            <br>Summary PGR </a>
+    </div>
+
+    
+
+    </div>
+ </div>
+
+
+
+    <div class="col" style="height:1200px"></div>
+
+    
+{% endblock %}
+
+
+

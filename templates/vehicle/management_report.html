@@ -1,0 +1,141 @@
+
+{% extends "base.html" %}
+{% load static %}
+
+{% load duration_filters %}
+
+{% block content %}
+
+<style>
+
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    
+    }
+    
+    th,td{
+        border: 1px solid black; /* Set border color for individual cells */
+        text-align: left;
+        padding: 0px;
+    }
+    
+    th {
+        background-color: rgb(38, 233, 129);
+        
+    }
+    
+    table thead th {
+    white-space: normal;
+    }
+    
+    .main-content {   
+    overflow-y: auto;
+    margin-left:0px;
+    position: absolute;
+    width: 100%;
+    left: 0;
+  
+}
+    
+    </style>
+
+
+
+<form method="GET" action="{% url 'vehicle:management_summary_report' %}">
+
+    <div class="container-fluid">
+        <div class="row row-cols-1 row-cols-md-4">
+
+         <div class="col" style="padding:5px; margin:5px">  Start Date:  {{ form.start_date }} </div>
+         <div class="col" style="padding:5px; margin:5px">  End Date:  {{ form.end_date }} </div>
+         <div class="col" style="padding:5px; margin:5px"> No of days {{ form.days }} </div>
+         
+
+         <div class="col" style="padding:5px; margin:5px"> <button type="submit" class='btn btn-primary'>Generate Data</button></div>
+           
+        </div>
+    </div>
+      
+    </form>
+
+
+
+
+<div style="left:0px; margin-left:0px">
+    <h4 style="margin-top:40px; margin-left:0px">Data for
+        {% if days %}
+            the last {{ days }} days
+        {% elif start_date and end_date %}
+            from: {{ start_date }} to {{ end_date }}
+        {% endif %}
+    </h4>
+    
+    
+
+
+    <h4 class="text-center">Vehicle OPS performance Summary</h4>
+    <table>
+        <tr>
+            <th class="text-center p-2">Region</th>
+            <th class="text-center p-2">Zone</th>
+            <th class="text-center p-2">Total Refill Amount</th>
+            <th class="text-center p-2">Total fuel cash advance</th>
+            <th class="text-center p-2">Total Fuel Consumed Run</th>
+            <th class="text-center p-2">Total Fuel Consumed refill</th>
+            <th class="text-center p-2">Total Kilometer Run</th>
+            <th class="text-center p-2">Total TT</th>
+            <th class="text-center p-2">Fuel consumed/TT</th>
+            <th class="text-center p-2">Vehicle kilometer/litre</th>
+        
+           
+        </tr>
+        {% for data in combined_data %}
+        <tr>
+            <td class="text-center p-2">{{ data.region }}</td>
+            <td class="text-center p-2">{{ data.zone }}</td>
+            <td class="text-center p-2">{{ data.total_refill_amount }}</td>
+            <td class="text-center p-2">{{ data.total_requisition_amount }}</td>
+            <td class="text-center p-2">{{ data.total_fuel_consumed|floatformat:'2' }}</td>
+            <td class="text-center p-2">{{ data.total_fuel_consumed_refill|floatformat:'2' }}</td>
+            <td class="text-center p-2">{{ data.total_kilometer_run }}</td>
+            <td class="text-center p-2">{{ data.total_ticket }}</td> 
+            <td class="text-center p-2">{{ data.fuel_consumed_per_ticket|floatformat:'2' }}</td> 
+            <td class="text-center p-2">{{ data.kilometer_run_per_litre|floatformat:'2' }}</td> 
+         
+        </tr>
+        {% endfor %}
+    </table>
+
+
+
+
+
+
+
+    <!-- Pagination -->
+    <div class="pagination" style="padding: 10px;">
+        <span class="step-links">
+            {% if vehicle_running_data.has_previous %}
+                <a href="?page=1">&laquo; First</a>
+                <a href="?page={{ vehicle_running_data.previous_page_number }}">Previous</a>
+            {% endif %}
+    
+            <span class="current">
+                Page {{ vehicle_running_data.number }} of {{ vehicle_running_data.paginator.num_pages }}.
+            </span>
+    
+            {% if vehicle_running_data.has_next %}
+                <a href="?page={{ vehicle_running_data.next_page_number }}">Next</a>
+                <a href="?page={{ vehicle_running_data.paginator.num_pages }}">Last &raquo;</a>
+            {% endif %}
+        </span>
+    </div>
+
+</div>
+
+<div class="col" style="height:1200px"></div>
+
+
+
+{% endblock %}

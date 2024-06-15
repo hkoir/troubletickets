@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% load static %}
+
+
+
+{% block content %}
+
+<style>
+
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+
+}
+
+th, td {
+    border: 1px solid black; /* Set border color for individual cells */
+    text-align: center;
+    padding: 10px;
+}
+
+th {
+    background-color: black;
+    color:white;
+}
+
+table thead th {
+white-space: normal;
+}
+
+
+
+</style>
+
+
+
+
+
+
+<h4 class="text-center">Employee Database</h4>
+
+
+
+
+<div class="container-fluid">
+    <div class="row row-cols-2 row-cols-md-6 p-2">
+
+        
+            {% for employee in employee_records %}
+            <div class="col" style="padding:5px;">
+                <div class="card border-0 shadow">
+                    {% if employee.profile_picture %}
+                    <img src="{{ employee.profile_picture.url }}" class="card-img-top" alt="{{ employee.name }}" style="width:60px;height:60px">
+                    {% endif %}
+                    <div class="card-body">
+                        <p class="card-title">{{ employee.name }}<br>
+                       {{ employee.position }}<br>
+                       {{ employee.joining_date }}<br>
+                        <strong>Dept.</strong> {{ employee.department }}<br>    
+                        
+                        {% if request.user.manager_level == 'third_level' %}
+                        <a href="{% url 'employee:update_employee' employee.id %}">Update Record</a>
+                        <a href="{% url 'employee:delete_employee' employee.id %}">Delete Record</a>
+                    {% endif %}
+
+                        
+                       
+                     </p>
+
+                    </div>
+                </div>
+            </div>
+            {% endfor %}    
+        
+    </div>
+
+
+    <!-- Pagination -->
+    <div class="pagination" style="padding: 10px;">
+        <span class="step-links">
+            {% if employee_records.has_previous %}
+                <a href="?page=1">&laquo; First</a>
+                <a href="?page={{ employee_records.previous_page_number }}">Previous</a>
+            {% endif %}
+    
+            <span class="current">
+                Page {{ employee_records.number }} of {{ employee_records.paginator.num_pages }}.
+            </span>
+    
+            {% if employee_records.has_next %}
+                <a href="?page={{ employee_records.next_page_number }}">Next</a>
+                <a href="?page={{ employee_records.paginator.num_pages }}">Last &raquo;</a>
+            {% endif %}
+        </span>
+    </div>
+
+
+</div>
+
+
+
+
+
+
+<div style="height:600px"></div>
+
+{% endblock %}

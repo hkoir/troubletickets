@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% load static %}
+
+
+{% block content %}
+
+
+
+    <style>
+
+    html, body { 
+       font-family: Verdana, sans-serif; 
+    
+  }
+
+
+  
+  table {
+            border-collapse: collapse;
+            width: 100%;
+      
+        }
+
+        th, td {
+            border: 1px solid rgb(227, 87, 7); /* Set border color for individual cells */
+            text-align: left;
+            padding: 0px;
+        }
+        th{
+        background-color: rgb(52, 232, 100);
+      }
+      
+
+    table thead th {
+    white-space: normal;
+        }
+
+    </style>
+
+<h4 class=" text-center" style="margin-top:10px">DOPS DASHBOARD</h4>
+
+
+
+ <div class="container-fluid">
+    <div class="row row-cols-3 row-cols-md-6 p-2">
+     
+
+
+        
+        <div class="card" style="background-color: white;">
+            <a class="text-center" style="text-decoration: none;" href="{% url 'generator:create_pg' %}">
+                <img class="rounded-pill" src="{% static 'images/generator.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
+                <br>Create PG database</a>
+        </div>
+        <div class="card" style="background-color: white;">
+            <a class="text-center" style="text-decoration: none;" href="{% url 'generator:view_pg_info' %}">
+                <img class="rounded-pill" src="{% static 'images/generator.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
+                <br>View PG database</a>
+        </div>
+
+
+        <div class="card" style="background-color: white;">
+            <a class="text-center" style="text-decoration: none;" href="{% url 'generator:add_pg_fuel' %}">
+                <img class="rounded-pill" src="{% static 'images/generator.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
+                <br>Add PG fuel</a>
+        </div>
+        <div class="card" style="background-color: white;">
+            <a class="text-center" style="text-decoration: none;" href="{% url 'generator:view_pg_fuel' %}">
+                <img class="rounded-pill" src="{% static 'images/generator.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
+                <br>View PG fuel</a>
+        </div>
+
+        <div class="card" style="background-color: white;">
+            <a class="text-center" style="text-decoration: none;" href="{% url 'generator:faulty_pg_report' %}">
+                <img class="rounded-pill" src="{% static 'images/generator.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
+                <br>PG fault status</a>
+        </div>
+
+
+        <div class="card" style="background-color: white;">
+            <a class="text-center" style="text-decoration: none;" href="{% url 'generator:create_pg_fault_record' %}">
+                <img class="rounded-pill" src="{% static 'images/generator.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
+                <br>Add PG fault</a>
+        </div>
+        <div class="card" style="background-color: white;">
+            <a class="text-center" style="text-decoration: none;" href="{% url 'generator:view_pg_fault' %}">
+                <img class="rounded-pill" src="{% static 'images/generator.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
+                <br>View PG fault</a>
+        </div>
+
+        <div class="card" style="background-color: white;">
+            <a class="text-center" style="text-decoration: none;" href="{% url 'generator:pg_summary_report' %}">
+                <img class="rounded-pill" src="{% static 'images/generator.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
+                <br>View PG performance</a>
+        </div>
+
+
+
+    </div>
+ </div>
+
+
+
+    <div class="col" style="height:1200px"></div>
+
+    
+{% endblock %}
+
+
+

@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% load static %}
+
+
+{% block content %}
+
+
+
+    <style>
+
+    html, body { 
+       font-family: Verdana, sans-serif; 
+    
+  }
+
+
+  
+  table {
+            border-collapse: collapse;
+            width: 100%;
+      
+        }
+
+        th, td {
+            border: 1px solid rgb(227, 87, 7); /* Set border color for individual cells */
+            text-align: left;
+            padding: 0px;
+        }
+        th{
+        background-color: rgb(52, 232, 100);
+      }
+      
+
+    table thead th {
+    white-space: normal;
+        }
+
+    </style>
+
+<h4 class=" text-center" style="margin-top:10px">DOPS DASHBOARD</h4>
+
+
+
+ <div class="container-fluid">
+    <div class="row row-cols-3 row-cols-md-6 p-2">
+     
+
+
+    <!-- human resources -->
+
+    <div class="card" style="background-color: white;">
+        <a class="text-center" style="text-decoration: none;" href="{% url 'employee:add_employee' %}">
+            <img class="rounded-pill" src="{% static 'images/hr.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
+            <br>Enroll new employee</a>
+    </div>
+
+    <div class="card" style="background-color: white;">
+        <a class="text-center" style="text-decoration: none;" href="{% url 'employee:view_employee' %}">
+            <img class="rounded-pill" src="{% static 'images/hr.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
+            <br>View HR Database</a>
+    </div>
+
+   
+    <div class="card" style="background-color: white;">
+        <a class="text-center" style="text-decoration: none;" href="{% url 'employee:attendance_input' %}">
+            <img class="rounded-pill" src="{% static 'images/hr.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
+            <br>Attendance Input</a>
+    </div>
+   
+    <div class="card" style="background-color: white;">
+        <a class="text-center" style="text-decoration: none;" href="{% url 'employee:view_attendance' %}">
+            <img class="rounded-pill" src="{% static 'images/hr.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
+            <br> View Attendance</a>
+    </div>
+    <div class="card" style="background-color: white;">
+        <a class="text-center" style="text-decoration: none;" href="{% url 'employee:create_salary' %}">
+            <img class="rounded-pill" src="{% static 'images/hr.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
+            <br>create_salary sheet</a>
+    </div>
+
+    <div class="card" style="background-color: white;">
+        <a class="text-center" style="text-decoration: none;" href="{% url 'employee:view_employee_changes' %}">
+            <img class="rounded-pill" src="{% static 'images/hr.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
+            <br>view employee record history</a>
+    </div>
+
+    
+
+    </div>
+ </div>
+
+
+
+    <div class="col" style="height:1200px"></div>
+
+    
+{% endblock %}
+
+
+

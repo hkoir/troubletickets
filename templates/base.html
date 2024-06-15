@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>TT management</title>
+  
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css" rel="stylesheet">
+  
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <!--
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.9.2/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.min.js"></script>
+      -->
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+ 
+        <!-- Bootstrap Datepicker CSS -->
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css" rel="stylesheet">
+        <!-- Bootstrap Timepicker CSS -->
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-timepicker/0.5.2/css/bootstrap-timepicker.min.css" rel="stylesheet">
+    
+    
+
+
+    
+    </head>
+    
+    <body>
+        <!-- Your HTML content here -->
+    
+        <!-- Bootstrap Datepicker JavaScript -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+        <!-- Bootstrap Timepicker JavaScript -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-timepicker/0.5.2/js/bootstrap-timepicker.min.js"></script>
+    </body>
+    
+
+
+
+   <!-- Bootstrap Timepicker JavaScript for region zone mp searching and populating -->
+
+
+<style>
+
+html, body { 
+       font-family: Verdana, sans-serif; 
+      background: white;
+  }
+
+
+.custom_navbar{
+    background-color: orange;
+    padding:10px;
+
+    }
+
+    .navbar-brand {
+        font-size: 40px;
+        font-weight: 700;
+        color: #0AEDED;
+        -webkit-text-stroke: #fff 1px;
+
+    }
+
+    .navbar-brand:hover {
+        color: #f0d108;
+
+    }
+
+
+    .menu-color{
+        color:blue;
+        font-size: 20px;;
+    }
+  
+    .dropdown-menu {
+        background-color: white;
+        color:white;
+        font-size: 20px;
+        padding:10px;
+    }
+
+ .navbar-fixed-top {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000; /* Keep it on top of everything */
+}
+
+</style>
+
+</head>
+<body>
+    {% if user.is_authenticated %}   
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-light navbar-fixed-top">
+        <div class="container-fluid custom_navbar">
+            <a class="navbar-brand menu-color" style="color:blue; font-size:30px;font-family: Helvetica;" href="{% url 'tickets:dash_board' %}">HOPS</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">               
+        
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">  <!-- master ul start -->
+                    <li class="nav-item">
+                        <a class="nav-link active menu-color" style="color:white; font-weight: bold;" aria-current="page" href="{% url 'tickets:dash_board' %}">Home</a>
+                    </li>
+                  
+                    
+
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle menu-color"href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fa fa-desktop" aria-hidden="true"></i> Ticket Management
+                        </a>
+
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown" style="max-height: 400px; overflow-y: auto;">
+                          
+                            <li><a class="dropdown-item" href="{% url 'tickets:create_ticket_edotco' %}">Create TT</a></li>
+                            <li><a class="dropdown-item" href="{% url 'tickets:view_tt_edotco' %}">View TT</a></li>
+                            <li><a class="dropdown-item" href="{% url 'tickets:view_all_parent_tickets_with_children' %}">View child TT</a></li>
+                            <li><a class="dropdown-item" href="{% url 'tickets:summary_report_view' %}">all summary</a></li>
+                            <li><a class="dropdown-item" href="{% url 'tickets:summary_report_view_region' %}">summary by Region</a></li>
+                            <li><a class="dropdown-item" href="{% url 'tickets:summary_report_view_hourly' %}">summary by hour</a></li>
+                            <li><a class="dropdown-item" href="{% url 'tickets:mp_report_view' %}"> MP report view</a></li>
+                            <li><a class="dropdown-item" href="{% url 'tickets:zone_report_view' %}"> Zone report view</a></li>
+                            <li><a class="dropdown-item" href="{% url 'tickets:zone_wise_tt_run_hour_trend_summary' %}"> TT Trend Grand Summary Chart</a></li> 
+                            <li><a class="dropdown-item" href="{% url 'tickets:zone_wise_tt_run_hour_trend' %}"> Combined zone TT RH chart</a></li>                          
+                            <li><a class="dropdown-item" href="{% url 'tickets:zone_wise_tt_run_hour_trend2' %}"> Individual zone TT RH chart </a></li>
+                        </ul> 
+                    </li> 
+
+
+
+
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle menu-color"href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-coins"></i>  Expenses
+                        </a>
+
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown" style="max-height: 400px; overflow-y: auto;">
+                            <li><a class="dropdown-item" href="{% url 'dailyexpense:money_requisition' %}">Create Money Requisition</a></li>
+                          
+                            <li><a class="dropdown-item" href="{% url 'dailyexpense:all_approval_status' %}">View Requisition Status</a></li>
+                            <li><a class="dropdown-item" href="{% url 'dailyexpense:summary_expenses_form_view' %}">Create Summary Expenses</a></li>
+                            <li><a class="dropdown-item" href="{% url 'dailyexpense:zone_wise_expenses_view' %}">View Summary Expenses</a></li>
+                        </ul> 
+                    </li> 
+
+
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle menu-color"href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-tools"></i>  OPS
+                        </a>
+
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown" style="max-height: 400px; overflow-y: auto;">
+                            
+                            <li><a class="dropdown-item" href="#">Resurces</a></li>
+                            <li><a class="dropdown-item" href="#">Resurces</a></li>
+                        </ul> 
+                    </li> 
+
+
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle menu-color"href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-user-cog"></i>  HR
+                        </a>
+
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown" style="max-height: 400px; overflow-y: auto;">
+                            <li><hr class="dropdown-divider"style="background-color:red;"></li> 
+                            <li><a class="dropdown-item" href="{% url 'employee:add_employee' %}">Employee enrollment</a></li>
+                            <li><a class="dropdown-item" href="{% url 'employee:attendance_input' %}">Input attendance</a></li>
+                            <li><a class="dropdown-item" href="{% url 'employee:view_employee' %}">View employee</a></li>
+                            <li><a class="dropdown-item" href="{% url 'employee:view_attendance' %}">View attendance</a></li>
+                           
+                            <li><a class="dropdown-item" href="{% url 'employee:create_salary' %}">Create Monthly Salary Sheet</a></li>
+                        </ul> 
+                    </li> 
+
+
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle menu-color"href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-user"></i>  user                 
+                                      
+                        </a>                   
+                          
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown" style="max-height: 400px; overflow-y: auto;">
+                            {% if user.is_authenticated %}                                      
+                            <li><a  class="dropdown-item" href="{% url "account:logout" %}" style="text-decoration: none;">Logout</a></li>  
+                            <li><a  class="dropdown-item" href="{% url "account:pwdreset" %}" style="text-decoration: none;">Change Password</a></li>                                                    
+                                {% else %}
+                            <li><a  class="dropdown-item" href="{% url "account:login" %}" style="text-decoration: none;">Login</a></li>
+                            <li><a  class="dropdown-item" href="{% url "account:register" %}" style="text-decoration: none;" >Register</a></li>
+                            {% endif %}
+                                  
+                        </ul> 
+
+
+                    </li> 
+       
+
+                </ul>           
+                <!-- this master Ul end  -->
+
+            
+          
+                    {% if user.is_authenticated %}                     
+                    <a href="{% url 'account:update_profile_picture' user.id %}">
+                        {% if profile_picture_url %}
+                            <img src="{{ profile_picture_url }}" style="height: 30px; width: 30px; border-radius: 50%;">
+                        {% else %}
+                        <i class="fas fa-user-circle" aria-hidden="true" style="font-size: 25px; color:white"></i>
+                        {% endif %} </a>
+                        <br>
+                       Welcome {{ request.user.name }}
+                {% else %}
+                    <a href="{% url 'account:login' %}" style="color:white;">
+                        <i class="fas fa-user-circle" aria-hidden="true" style="font-size: 30px;"></i>
+                    </a>
+                {% endif %}  
+              
+
+              
+                    <form class="d-flex" method="GET" action="{% url 'tickets:search_all' %}" style="margin-left:20px">
+
+                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="q">
+                    <button class="btn btn-outline-success" type="submit" style="color:rgb(26, 7, 239);background:white">Search</button>
+                </form>
+            
+                
+            </div>
+        </div>
+    </nav>
+
+{% endif %}
+
+   <div class="col" style="height:120px"></div>
+    <div class="container">
+        {% block content %}
+        {% endblock %}
+    </div>
+
+</body>
+</html>
+

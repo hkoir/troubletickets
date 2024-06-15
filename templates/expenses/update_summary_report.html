@@ -1,0 +1,59 @@
+
+{% extends "base.html" %}
+{% load static %}
+
+
+{% block content %}
+
+    <title>Ad summary expenses</title>
+
+    <style>
+
+    html, body { 
+       font-family: Verdana, sans-serif; 
+    
+  }
+
+    </style>
+</head>
+<body>
+    
+    <h4 class="text-center" style="margin-top:10px">Add Summary Expenses</h4>
+
+
+    <div class="container-fluid">
+        <div class="row p-4">
+
+            <div class=" d-none d-md-block col-md-3"></div>
+            <div class="col-md-6 col-sm-12">
+                <div class="card" style="margin-top:20px;padding:10px;background-color: bisque;">
+                    <div class="card-body">
+                        <h5 class="card-title text-center">SUM as on today</h5>
+                        <form method="post">
+                            {% csrf_token %}
+                            {{ form.as_p }}
+                
+                            <div><button type="submit" class="btn btn-primary">Submit</button></div>
+                        </form>
+                    </div>
+                </div>                
+
+            </div>
+            <div class=" d-none d-md-block col-md-3"></div>
+        </div>
+    </div>
+
+
+
+
+
+
+    <div class="col" style="height:1200px"></div>
+
+
+
+
+{% endblock %}
+
+
+

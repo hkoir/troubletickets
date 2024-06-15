@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+{% load static %}
+{% load duration_filters %}
+
+
+{% block content %}
+
+<title>View fuel refill</title>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+   
+<style>
+
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    
+    }
+    
+    th,td{
+        border: 1px solid black; /* Set border color for individual cells */
+        text-align: left;
+        padding: 0px;
+    }
+    
+    th {
+        background-color: rgb(38, 233, 129);
+        
+    }
+    
+    table thead th {
+    white-space: normal;
+    }
+    
+
+    .main-content {   
+    overflow-y: auto;
+    margin-left:0px;
+    position: absolute;
+    width: 100%;
+    left: 0;
+  
+}
+    
+    
+    </style>
+
+
+
+
+<div class="container-fluid main-content">
+    <h1>Vehicle Fuel re_fill status</h1>
+    
+    <form method="GET" action="{% url 'vehicle:view_fuel_refill' %}">        
+        <button type="submit" name="download_csv" class="btn btn-primary">Export CSV</button>
+    </form>
+    
+    <table>
+        <thead>
+            <tr>
+               
+                <th class="text-center p-2">Date</th>
+                <th class="text-center p-2">User</th>
+                <th class="text-center p-2">fuel refill code</th>
+
+                <th class="text-center p-2">Region</th>
+                <th class="text-center p-2">Zone</th>
+                <th class="text-center p-2">MP</th>
+
+                <th class="text-center p-2">Refill Date</th>
+                <th class="text-center p-2">Vehicle Reg</th>
+                <th class="text-center p-2">Refill amount(litre)</th>
+                <th class="text-center p-2">Kilometer Reading</th>
+                <th class="text-center p-2">Kilometer run</th>
+                <th class="text-center p-2">Fuel consumed</th>
+                <th class="text-center p-2">Fuel balance</th>
+                <th class="text-center p-2">Total Fuel reserve</th>
+
+
+                <th class="text-center p-2"> refill supporting documents</th>
+                <th class="text-center p-2">fuel pump supplier name</th>
+                <th class="text-center p-2"> Fuel supplier Phone</th>
+                <th class="text-center p-2"> Fuel supplier address</th>
+            
+               
+                <th class="text-center p-2">Vehicle owner Name</th>           
+                <th class="text-center p-2">vehicle joining date</th>       
+                                
+               
+
+              
+               
+            </tr>
+        </thead>
+        <tbody>
+            {% for fuel in fuel_refill %}
+
+            <tr>
+                <td class="text-center p-2"style="white-space: nowrap;">{{ fuel.created_at }}</td>
+                <td class="text-center p-2"style="white-space: nowrap;">{{ fuel.refill_requester }}</td>              
+                <td class="text-center p-2"style="white-space: nowrap;">{{ fuel.fuel_refill_code }}</td>
+                <td class="text-center p-2"style="white-space: nowrap;">{{ fuel.region }}</td>
+
+                <td class="text-center p-2"style="white-space: nowrap;">{{ fuel.zone }}</td>
+                <td class="text-center p-2"style="white-space: nowrap;">{{ fuel.mp }}</td>
+
+                <td class="text-center p-2" style="white-space: nowrap;">{{ fuel.refill_date}}</td>
+                <td class="text-center p-2" style="white-space: nowrap;">{{ fuel.vehicle.vehicle_reg_number }}</td>
+                <td class="text-center p-2"style="white-space: nowrap;">{{ fuel.refill_amount }}</td>
+                <td class="text-center p-2"style="white-space: nowrap;">{{ fuel.vehicle_kilometer_reading }}</td>
+                <td class="text-center p-2"style="white-space: nowrap;">{{ fuel.vehicle_kilometer_run }}</td>
+                <td class="text-center p-2"style="white-space: nowrap;">{{ fuel.vehicle_fuel_consumed }}</td>
+                <td class="text-center p-2"style="white-space: nowrap;">{{ fuel.vehicle_fuel_balance }}</td>
+                <td class="text-center p-2"style="white-space: nowrap;">{{ fuel.vehicle_total_fuel_reserve }}</td>
+                <td class="text-center p-2"style="white-space: nowrap;">
+                    {% if fuel.refill_supporting_documents %}
+                    <a href="{{ fuel.refill_supporting_documents.url }}" target="_blank">
+                        <img src="{{ fuel.refill_supporting_documents.url }}" alt="Supporting Document" style="cursor: pointer; width: 50px; height: 50px;">
+                    </a>
+                    {% else %}
+                    No image available
+                    {% endif %}
+                </td>  
+                <td class="text-center p-2" style="white-space: nowrap;">{{ fuel.fuel_pump_supplier_name  }}</td> 
+                <td class="text-center p-2"style="white-space: nowrap;">{{ fuel.fuel_supplier_phone }}</td>
+                <td class="text-center p-2"style="white-space: nowrap;">{{ fuel.fuel_supplier_address }}</td>
+
+              
+                <td class="text-center p-2"style="white-space: nowrap;">{{ fuel.vehicle.vehicle_owner_name }}</td>
+                <td class="text-center p-2"style="white-space: nowrap;">{{ fuel.vehicle.vehicle_joining_date }}</td>
+                   
+              
+             
+
+                
+            </tr> 
+            {% endfor %} 
+        </tbody>
+    </table>
+
+
+
+    <!-- Pagination -->
+    <div class="pagination" style="padding: 10px;">
+        <span class="step-links">
+            {% if fuel_refill.has_previous %}
+                <a href="?page=1">&laquo; First</a>
+                <a href="?page={{ fuel_refill.previous_page_number }}">Previous</a>
+            {% endif %}
+    
+            <span class="current">
+                Page {{ fuel_refill.number }} of {{ fuel_refill.paginator.num_pages }}.
+            </span>
+    
+            {% if fuel_refill.has_next %}
+                <a href="?page={{ fuel_refill.next_page_number }}">Next</a>
+                <a href="?page={{ fuel_refill.paginator.num_pages }}">Last &raquo;</a>
+            {% endif %}
+        </span>
+    </div>
+
+
+</div>
+
+
+
+
+
+<div class="col" style="height:1200px"></div>
+
+
+{% endblock %}

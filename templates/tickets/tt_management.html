@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+{% load static %}
+
+
+{% block content %}
+
+
+
+    <style>
+
+    html, body { 
+       font-family: Verdana, sans-serif; 
+    
+  }
+
+
+  
+  table {
+            border-collapse: collapse;
+            width: 100%;
+      
+        }
+
+        th, td {
+            border: 1px solid rgb(227, 87, 7); /* Set border color for individual cells */
+            text-align: left;
+            padding: 0px;
+        }
+        th{
+        background-color: rgb(52, 232, 100);
+      }
+      
+
+    table thead th {
+    white-space: normal;
+        }
+
+    </style>
+
+<h4 class=" text-center" style="margin-top:10px">DOPS DASHBOARD</h4>
+
+
+
+ <div class="container-fluid">
+    <div class="row row-cols-3 row-cols-md-6 p-2">
+     
+
+        <div class="card" style="background-color: white;">
+            <a class="text-center" style="text-decoration: none;color:black" href="{% url 'tickets:create_ticket_edotco' %}">
+                <img class="rounded-pill" src="{% static 'images/add.jpeg' %}" style="width:50px;height:50px" alt="Logo" id="logo">             
+               <br> Create Ticket</a>
+        </div>
+    
+    
+        <div class="card" style="background-color: white;">
+            <a class="text-center" style="text-decoration: none;" href="{% url 'tickets:view_tt_edotco' %}">
+                <img class="rounded-pill" src="{% static 'images/view.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
+                <br>View Tickets</a>
+        </div>
+
+        <div class="card" style="background-color: white;">
+            <a class="text-center" style="text-decoration: none;" href="{% url 'tickets:view_all_parent_tickets_with_children' %}">
+                <img class="rounded-pill" src="{% static 'images/view.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
+                <br>View Tickets with children</a>
+        </div>
+    
+        <div class="card" style="background-color: white;">
+            <a class="text-center" style="text-decoration: none;" href="{% url 'tickets:summary_report_view' %}">
+                <img class="rounded-pill" src="{% static 'images/view.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
+                <br>Overall Ticket Summary</a>
+        </div>
+        <div class="card" style="background-color: white;">
+            <a class="text-center" style="text-decoration: none;" href="{% url 'tickets:summary_report_view_region' %}">
+                <img class="rounded-pill" src="{% static 'images/view.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
+                <br>Summary by Region</a>
+        </div>
+
+        <div class="card" style="background-color: white;">
+            <a class="text-center" style="text-decoration: none;" href="{% url 'tickets:summary_report_view_hourly' %}">
+                <img class="rounded-pill" src="{% static 'images/view.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
+                <br>Summary by region-hour</a>
+        </div>
+    
+        
+        <div class="card" style="background-color: white;">
+            <a class="text-center" style="text-decoration: none;" href="{% url 'tickets:zone_report_view' %}">
+                <img class="rounded-pill" src="{% static 'images/view.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
+                <br>report by Zone</a>
+        </div>
+    
+         
+        <div class="card" style="background-color: white;">
+            <a class="text-center" style="text-decoration: none;" href="{% url 'tickets:mp_report_view' %}">
+                <img class="rounded-pill" src="{% static 'images/view.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
+                <br>Report by MP</a>
+        </div>  
+    
+        
+    
+    
+        <div class="card" style="background-color: white;">
+            <a class="text-center" style="text-decoration: none;" href="{% url 'tickets:zone_wise_tt_run_hour_trend_summary' %}">
+                <img class="rounded-pill" src="{% static 'images/view.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
+                <br>TT RH Trend Grand sum chart</a>
+        </div>
+    
+        <div class="card" style="background-color: white;">
+            <a class="text-center" style="text-decoration: none;" href="{% url 'tickets:zone_wise_tt_run_hour_trend' %}">
+                <img class="rounded-pill" src="{% static 'images/view.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
+                <br>TT RH Trend combined Zone chart</a>
+        </div>
+    
+    
+        <div class="card" style="background-color: white;">
+            <a class="text-center" style="text-decoration: none;" href="{% url 'tickets:zone_wise_tt_run_hour_trend2' %}">
+                <img class="rounded-pill" src="{% static 'images/view.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
+                <br>TT RH Trend individual Zone chart </a>
+        </div>
+    
+        <div class="card" style="background-color: white;">
+            <a class="text-center" style="text-decoration: none;" href="{% url 'tickets:datewise_summary_edotco' %}">
+                <img class="rounded-pill" src="{% static 'images/view.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
+                <br>Datewise report</a>
+        </div>
+
+
+    </div>
+ </div>
+
+
+
+    <div class="col" style="height:1200px"></div>
+
+    
+{% endblock %}
+
+
+

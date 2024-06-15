@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+{% load static %}
+
+
+{% block content %}
+
+
+
+    <style>
+
+    html, body { 
+       font-family: Verdana, sans-serif; 
+    
+  }
+
+
+  
+  table {
+            border-collapse: collapse;
+            width: 100%;
+      
+        }
+
+        th, td {
+            border: 1px solid rgb(227, 87, 7); /* Set border color for individual cells */
+            text-align: left;
+            padding: 0px;
+        }
+        th{
+        background-color: rgb(52, 232, 100);
+      }
+      
+
+    table thead th {
+    white-space: normal;
+        }
+
+    </style>
+
+    
+    <h4 class="text-center" style="margin-top:10px">DOPS form</h4>
+    <div class="container-fluid">
+        <div class="row row-cols-1 row-cols-md-3 p-2">
+            <div class="col"></div>
+            <div class="col-md-6"> <!-- Adjust the width for medium screens -->
+                <div class="card" style="background-color: bisque; padding:10px;">
+                    <div class="card-body">
+                        <h4 class="card-title" style="margin-bottom:20px">Add start and end date</h4>
+                       
+                        <form method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            {{ form.as_p }}
+                           
+                            <div><button type="submit" class="btn btn-primary">Submit</button></div>
+                        </form>
+                        
+                    </div>
+                </div>
+            </div>
+            <div class="col"></div>
+        </div>
+    </div>
+   
+
+
+
+ 
+<div class="container-fluid main-content" >
+    <div class="row">
+        <div class="col-xl-12">
+            <table>  
+                <thead>
+                    <tr>
+
+                                
+                        
+                        <th class="text-center p-2">Vehicle Number</th>
+                        <th class="text-center p-2">Total rental cost</th>    
+                        <th class="text-center p-2">Total over time cost</th>    
+                        <th class="text-center p-2">Vehicle type</th> 
+                        <th class="text-center p-2">Vehicle status</th> 
+               
+                                
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if rental_and_overtime_costs %}
+
+                    {% for vehicle_info in rental_and_overtime_costs %}
+                    <tr>
+                        <td>{{ vehicle_info.vehicle }}</td>
+                        <td>${{ vehicle_info.rental_cost }}</td>
+                        <td>${{ vehicle_info.overtime_cost }}</td>
+                        <td>{{ vehicle_info.vehicle_rental_type }}</td>
+                        <td>{{ vehicle_info.vehicle_status }}</td>
+                    
+                       
+                        
+
+                    </tr>
+                    {% endfor %}
+                    {% endif %}
+                </tbody>
+                 
+                
+            </table>
+        </div>   
+        
+
+
+
+
+
+
+
+
+    <div class="col" style="height:1200px"></div>
+
+    
+{% endblock %}
+
+
+

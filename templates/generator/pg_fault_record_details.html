@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% load static %}
+{% load duration_filters %}
+
+
+{% block content %}
+
+<title>View PG fault details</title>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+   
+<style>
+
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    
+    }
+    
+    th,td{
+        border: 1px solid black; /* Set border color for individual cells */
+        text-align: left;
+        padding: 0px;
+    }
+    
+    th {
+        background-color: rgb(38, 233, 129);
+        
+    }
+    
+    table thead th {
+    white-space: normal;
+    }
+    
+
+    .main-content {   
+    overflow-y: auto;
+    margin-left:0px;
+    position: absolute;
+    width: 100%;
+    left: 0;
+  
+}
+    
+    
+    </style>
+
+
+
+
+
+    <h4>Please write pg number</h4>
+    
+    <form method="POST" action="">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button class="btn btn-primary" type="submit">Submit</button>
+    </form>      
+     
+
+
+        {% if pg_details %}
+        <h4>PG fault Details</h4>
+        <table>
+            <thead>
+                <tr>
+                    <th class="text-center p-2">Fault Date</th>
+                    <th class="text-center p-2">Repair Date</th>
+                    <th class="text-center p-2">Fault Duration</th>
+                    <th class="text-center p-2">Repair by</th>
+                    <th class="text-center p-2">Repair cost</th>
+                    <th class="text-center p-2">PG supplier</th>
+                    <th class="text-center p-2">PG purchase date</th>
+                    <th class="text-center p-2">PG hire date</th>
+                    <!-- other headers... -->
+                </tr>
+            </thead>
+            <tbody>
+                {% for detail in pg_details %}
+                    <tr>
+                        <td class="text-center p-2">{{ detail.fault_date }}</td>
+                        <td class="text-center p-2">{{ detail.repair_date }}</td>
+                        <td class="text-center p-2">{{ detail.fault_duration }}</td>
+                        <td class="text-center p-2">{{ detail.repair_by }}</td>
+                        <td class="text-center p-2">{{ detail.repair_cost }}</td>
+                        <td class="text-center p-2">{{ detail.pgnumber.PG_supplier}}</td>
+                        <td class="text-center p-2">{{ detail.pgnumber.PG_purchase_date}}</td>
+                        <td class="text-center p-2">{{ detail.pgnumber.PG_hire_date}}</td>
+                        <!-- other fields... -->
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
+
+
+
+<div class="col" style="height:1200px"></div>
+
+
+{% endblock %}

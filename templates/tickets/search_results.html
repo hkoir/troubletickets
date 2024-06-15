@@ -1,0 +1,205 @@
+{% extends "base.html" %}
+{% load static %}
+
+
+{% block content %}
+
+<style>
+    
+  table {
+            border-collapse: collapse;
+            width: 100%;
+            border: 2px solid #0d05ec; /* Set border color for the entire table */
+        }
+
+        th, td {
+            border: 1px solid #031bf1; /* Set border color for individual cells */
+            text-align: left;
+            padding: 0px;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+ #main-content {   
+    overflow-y: auto;
+    margin-left:0px;
+    position: absolute;
+    width: 100%;
+    left: 0;
+  
+}
+
+</style>
+
+<h4 class="text-center">Search Results for "{{ query }}"</h4>
+<div class="container-fluid"id="main-content">
+    <div class="row">
+        <div class="col-xl-12">
+            {% if etickets %}
+                <table>
+                    <thead style="background-color: rgb(194, 240, 94);">
+                        <tr>
+                            <th colspan="10" class="text-center p-2"style="background-color:greenyellow">Parent Ticket</th>
+                        </tr>
+                        <tr>
+                            <th class="text-center p-2">Ticket Created at</th>
+                            <th class="text-center p-2">Ticket Number</th>
+                            <th class="text-center p-2">Region</th>
+                            <th class="text-center p-2">Zone</th>
+                            <th class="text-center p-2">MP</th>
+                            <th class="text-center p-2">Ticket Status</th>
+                            <th class="text-center p-2">Internal GRH</th>
+                            <th class="text-center p-2">Customer GRH</th>
+                            <th class="text-center p-2">Fuel difference</th>
+                            <th class="text-center p-2">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for ticket in etickets %}
+                            <tr>
+                                <td class="text-center p-2" style="white-space: nowrap;">{{ ticket.created_at }}</td>
+                                <td class="text-center p-2">{{ ticket.hepta_ticket_number }}</td>
+                                <td class="text-center p-2">{{ ticket.region }}</td>
+                                <td class="text-center p-2">{{ ticket.zone }}</td>
+                                <td class="text-center p-2">{{ ticket.mp }}</td>
+                                <td class="text-center p-2">{{ ticket.ticket_status }}</td>
+                                <td class="text-center p-2">{{ ticket.hepta_generator_running_hours }}</td>
+                                <td class="text-center p-2">{{ ticket.edotco_generator_running_hours }}</td>
+
+                                {% if ticket.fuel_difference < 0 %}
+                                    <td class="text-center p-2" style="background-color: red;">{{ ticket.fuel_difference }}</td>
+                                {% else %}
+                                    <td class="text-center p-2" style="background-color: greenyellow">{{ ticket.fuel_difference }}</td>
+                                {% endif %}
+                                
+                                <td class="text-center p-2"><a class="btn btn-primary" href="{% url 'tickets:update_ticket_edotco' ticket.id %}">Update</a></td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% endif %}
+        </div>
+  
+        <div class="col-xl-12"style=margin-top:30px>
+            {% if etickets %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th colspan="10" class ='text-center p-2'style="background-color:greenyellow">Child Tickets</th>
+                        </tr>
+                        <tr>
+                            <th class="text-center p-2">Parent Ticket Number</th>
+                            <th class="text-center p-2">Child Ticket Number</th>
+                            <th class="text-center p-2">Internal Generator Start Date</th>
+                            <th class="text-center p-2">Internal Generator Start Time</th>
+                            <th class="text-center p-2">Internal Generator Stop Date</th>
+                            <th class="text-center p-2">Internal Generator Stop Time</th>
+                            <th class="text-center p-2">Internal GRH</th>
+                            <th class="text-center p-2">Internal Calculated Fuel Litre</th>                       
+                            <th class="text-center p-2">Images</th>
+                            <th class="text-center p-2"> update child ticket</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for ticket in etickets %}
+                            {% for child_ticket in ticket.child_tickets.all %}
+                                <tr>
+                                    <td class="text-center p-2">{{ ticket.internal_ticket_number }}</td>
+                                    <td class="text-center p-2">{{ child_ticket.child_ticket_number }}</td>
+                                    <td class="text-center p-2" style="white-space: nowrap;">{{ child_ticket.child_internal_generator_start_date }}</td>
+                                    <td class="text-center p-2">{{ child_ticket.child_internal_generator_start_time }}</td>
+                                    <td class="text-center p-2"style="white-space: nowrap;">{{ child_ticket.child_internal_generator_stop_date }}</td>
+                                    <td class="text-center p-2">{{ child_ticket.child_internal_generator_stop_time }}</td>
+                                    <td class="text-center p-2">{{ child_ticket.child_internal_generator_running_hours }}</td>
+                                    <td class="text-center p-2">{{ child_ticket.child_internal_calculated_fuel_litre }}</td>
+                                    <td class="text-center p-2">
+                                        {% if child_ticket.child_tt_image %}
+                                            <a href="{{ child_ticket.child_tt_image.url }}" target="_blank">
+                                                <img 
+                                                    src="{{ child_ticket.child_tt_image.url }}" 
+                                                    alt="Child Ticket Image" 
+                                                    style="cursor: pointer; width:50px;height:50px"
+                                                >
+                                            </a>
+                                        {% else %}
+                                            No image available
+                                        {% endif %}
+                                    </td>
+                                    <td style="white-space: nowrap;"><a style="text-decoration: none; white-space: nowrap;" href="{% url 'tickets:update_child_ticket' child_ticket.id %}">Update Child</a></td>
+
+                                </tr>
+                            {% endfor %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% endif %}
+        </div>
+
+
+
+
+    <div class="col-xl-12">                
+
+            {% if employees %}
+            <table>
+                <thead>
+                    <tr>
+                        <th class="text-center" colspan="13" style="background-color: rgb(23, 237, 41);">Search Results for "{{ query }}"</th>
+                    </tr>
+                    <tr>
+                        <th class="text-center p-2">Profile</th>
+                        <th class="text-center p-2">Name/Code</th>
+                        <th class="text-center p-2">Email</th>
+                        <th class="text-center p-2">Phone Number</th>
+                        <th class="text-center p-2">Position</th>
+                        <th class="text-center p-2">Department</th>
+                        <th class="text-center p-2">Action</th>
+                        <th class="text-center p-2">Action</th>
+                        <th class="text-center p-2">Action</th>
+                        <th class="text-center p-2">Action</th>
+                        <th class="text-center p-2">Action</th>
+                        <th class="text-center p-2">Action</th> 
+                        <th class="text-center p-2">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for employee in employees %}
+                        <tr>
+                            
+                            <td class="text-center p-2">  <img src="{{ employee.profile_picture.url }}" class="card-img-top" alt="{{ employee.name }}" style="width:60px;height:60px"></td>
+                        
+                            <td class="text-center p-2">{{ employee.employee_code }} - {{ employee.name }}</td>
+                            <td class="text-center p-2">{{ employee.email }}</td>
+                            <td class="text-center p-2">{{ employee.phone_number }}</td>
+                            <td class="text-center p-2">{{ employee.position }}</td>
+                            <td class="text-center p-2">{{ employee.department }}</td>
+                            <td class="text-center p-2"><a class="btn btn-primary" href="{% url 'employee:update_employee' employee.id %}">Update record</a></td>
+                            <td class="text-center p-2"><a class="btn btn-primary" href="{% url 'employee:delete_employee' employee.id %}">Delete record</a></td>
+                            <td class="text-center p-2"> <a class="btn btn-primary" href="{% url 'employee:view_employee_changes_single' employee.id %}"> Check History</a></td>
+                            <td class="text-center p-2" style="white-space:nowarp"><a class="btn btn-primary"style="white-space:nowarp" href="{% url 'employee:view_employee_changes_single' employee.id %}">View history </a></td>
+                            <td class="text-center p-2"><a class="btn btn-primary" href="{% url 'employee:generate_pay_slip' employee.id %}">Pay slip</a></td>
+                            <td class="text-center p-2"> <a class="btn btn-primary" href="{% url 'employee:generate_salary_certificate' employee.id %}">Salary certificate</a></td>
+                            <td class="text-center p-2"> <a class="btn btn-primary" href="{% url 'employee:generate_experience_certificate' employee.id %}"> Experience certificate</a></td>
+                           
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% endif %}
+
+    </div>
+
+
+    </div>
+</div>
+
+
+{% if not tickets and not employees and not etickets %}
+    <p>No results found.</p>
+{% endif %}
+
+<h4 style="height:800px"></h4>
+
+{% endblock %}

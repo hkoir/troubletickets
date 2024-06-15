@@ -1,0 +1,209 @@
+
+{% extends "base.html" %}
+{% load static %}
+
+{% load duration_filters %}
+
+{% block content %}
+
+<style>
+
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    
+    }
+    
+    th,td{
+        border: 1px solid black; /* Set border color for individual cells */
+        text-align: left;
+        padding: 0px;
+    }
+    
+    th {
+        background-color: rgb(38, 233, 129);
+        
+    }
+    
+    table thead th {
+    white-space: normal;
+    }
+    
+    .main-content {   
+    overflow-y: auto;
+    margin-left:0px;
+    position: absolute;
+    width: 100%;
+    left: 0;
+  
+}
+    
+    </style>
+
+
+
+<form method="GET" action="{% url 'vehicle:vehicle_summary_report2' %}">
+
+    <div class="container-fluid ">
+        <div class="row row-cols-1 row-cols-md-4">
+
+         <div class="col" style="padding:5px; margin:5px">  Start Date:  {{ form.start_date }} </div>
+         <div class="col" style="padding:5px; margin:5px">  End Date:  {{ form.end_date }} </div>
+         <div class="col" style="padding:5px; margin:5px"> No of days {{ form.days }} </div>
+         <div class="col" style="padding:5px; margin:5px">  Region:{{ form.region }} </div>  
+         <div class="col" style="padding:5px; margin:5px">  Zone:{{ form.zone }} </div>    
+         <div class="col" style="padding:5px; margin:5px">  mp:{{ form.mp }} </div>    
+
+         <div class="col" style="padding:5px; margin:5px"> <button type="submit" class='btn btn-primary'>Generate Data</button></div>
+           
+        </div>
+    </div>
+      
+    </form>
+
+
+
+
+<div style="left:0px; margin-left:0px">
+    <h4 style="margin-top:40px; margin-left:0px">Data for
+        {% if days %}
+            the last {{ days }} days
+        {% elif start_date and end_date %}
+            from: {{ start_date }} to {{ end_date }}
+        {% endif %}
+    </h4>
+    
+
+
+
+<h2 class="text-center p-2"> Vehicle Summary report2</h2>
+
+<div class="container-fluid main-content">
+
+{% for region, zone_data in grouped_summary_data.items %}
+<div class="col-12">                         
+    <h4>Region: {{ region }}</h4>
+
+    {% for zone, vehicles in zone_data.items %}
+    <h5>Zone: {{ zone }}</h5>
+
+    <table>
+        <thead>
+            <tr>
+                <th class="text-center p-2">Vehicle</th>
+                <th class="text-center p-2">Total Refill Amount</th>
+                <th class="text-center p-2">Total Fuel Consumed</th>
+                <th class="text-center p-2">Total Kilometer Run</th>
+                <th class="text-center p-2">Total TT handle</th>
+                <th class="text-center p-2">Cost/TT</th>
+                <th class="text-center p-2">Net Fuel Balance</th>
+             
+                <!-- Add more columns as needed -->
+            </tr>
+        </thead>
+        <tbody>
+            {% for vehicle in vehicle_running_data %}
+            <tr>
+                <td class="text-center p-2">{{ vehicle.vehicle }}</td>
+                <td class="text-center p-2">{{ vehicle.total_refill_amount }}</td>
+                <td class="text-center p-2">{{ vehicle.total_fuel_consumed }}</td>
+                <td class="text-center p-2">{{ vehicle.total_kilometer_run }}</td>                
+                <td class="text-center p-2">{{ vehicle.vehicle_completed_tickets_count }}</td>
+                <td class="text-center p-2">{{ vehicle.cost_per_tt|floatformat:'2' }}</td>
+                <td class="text-center p-2">{{ vehicle.net_fuel_balance }}</td>
+               
+          
+              
+                <!-- Add more columns as needed -->
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endfor %}
+</div>
+{% endfor %}
+
+
+
+    <!-- Pagination -->
+    <div class="pagination" style="padding: 10px;">
+        <span class="step-links">
+            {% if vehicle_running_data.has_previous %}
+                <a href="?page=1">&laquo; First</a>
+                <a href="?page={{ vehicle_running_data.previous_page_number }}">Previous</a>
+            {% endif %}
+    
+            <span class="current">
+                Page {{ vehicle_running_data.number }} of {{ vehicle_running_data.paginator.num_pages }}.
+            </span>
+    
+            {% if vehicle_running_data.has_next %}
+                <a href="?page={{ vehicle_running_data.next_page_number }}">Next</a>
+                <a href="?page={{ vehicle_running_data.paginator.num_pages }}">Last &raquo;</a>
+            {% endif %}
+        </span>
+    </div>
+
+</div>
+
+<div class="col" style="height:1200px"></div>
+
+
+
+
+
+
+
+
+
+<script>
+
+
+    $(document).ready(function(){      
+      var regionZoneMapping = {
+          'Sylhet': ['','Sylhet', 'Moulovibazar','Mymensingh','Kisorganj','Tangail'], 
+          'Rangpur': ['','Rangpur', 'Dinajpur','Bagura','Rajshahi'] ,                          
+          
+      };
+   
+      $('#id_region').change(function(){
+          var selectedRegion = $(this).val();
+          var zoneChoices = regionZoneMapping[selectedRegion];
+          $('#id_zone').empty();
+          $.each(zoneChoices, function(index, value){
+              $('#id_zone').append($('<option>').text(value).attr('value', value));
+          });
+      });
+            
+      var zoneMpMapping = {              
+          'Sylhet': ['','Sylhet','Taherpur','Sunamganj','Bianibazar','Dorbhost','Dherai','Chatak'], // Add more MPs for Sylhet zone
+          'Moulovibazar': ['','Moulovibazar', 'Saestaganj','Juri','Baniachong'],
+          'Mymensingh': ['','Mymensingh', 'Fulpur','Valuka'] ,
+          'Kisorganj': ['','Kisorganj','Katiadi','Netrokona','Mohonpur','Austogram'],
+          'Tangail': ['','Tangail','Madhupur','Jamalpur','Sherpur','Bakshihanj','Rowmari'],
+         
+          'Rangpur':['','Rangpur','Hatibandha','Gaibandha','Ulipur','Boropar','Polasbari'],
+          'Dinajpur':['','Dinajpur','Panchghor','Jaldhaka','Thakurgaon'],
+          'Rajshahi':['','Rajshahi','Bagura','Nachole','Natore','Chapai'],
+          'Bagura':['','Bagura'],
+          '': ['']
+         
+      };
+  
+  
+      $('#id_zone').change(function(){
+          $('#id_mp').val('');
+          var selectedZone = $(this).val();
+          var mpChoices = zoneMpMapping[selectedZone];
+  
+          $('#id_mp').empty();
+          $.each(mpChoices, function(index, value){
+              $('#id_mp').append($('<option>').text(value).attr('value', value));
+          });
+      });
+      
+  });
+  
+  </script>
+
+{% endblock %}

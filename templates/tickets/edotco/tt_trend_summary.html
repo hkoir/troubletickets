@@ -1,0 +1,218 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<title>Grand Summary TT and Run Hour Trend</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
+
+<style>
+    html, body {
+        background-color: beige;        
+    }
+    #main-content {   
+    overflow-y: auto;
+    margin-left:0px;
+    position: absolute;
+    width: 100%;
+    left: 0;
+  
+}
+
+
+</style>
+
+
+<!-- <p><h1>Grand summary chart</h1>(Select no of days or date range)</p>
+
+<div class="container-fluid" style="margin-top:10px; margin-bottom:30px">
+    <form method="GET" action="{% url 'tickets:zone_wise_tt_run_hour_trend_summary' %}">
+        {{ form.as_p }} 
+        <button type="submit" class='btn btn-primary'>Generate Report</button>
+    </form>
+</div> -->
+
+
+
+
+
+<form method="GET" action="{% url 'tickets:zone_wise_tt_run_hour_trend_summary' %}">
+
+    <div class="container-fluid">      
+        <div class="row row-cols-1 row-cols-md-3">
+            <div class="col">  Start Date:  {{ form.start_date }} </div>
+            <div class="col">  End Date:  {{ form.end_date }} </div>
+            <div class="col">  or Select no of days:  {{ form.days }} </div>
+            <div class="col"> <button type="submit" class='btn btn-primary'>Generate Data</button></div>                                  
+        
+        </div>      
+    </div>
+      
+    </form>
+
+
+
+
+
+<h4 style="margin-top:40px">Report for
+    {% if days %}
+        the last {{ days }} days
+    {% elif start_date and end_date %}
+        from: {{ start_date }} to {{ end_date }}
+    {% endif %}
+</h4>
+
+
+<div class="container-fluid" id =main-content>
+    <div class="row">
+        <div class="col-12 overflow-auto">
+            <h4>Grand Summary TT and Run Hour Trend</h4>
+            <div style="overflow-x: auto;">
+                <canvas class="overflow-auto" id="aggregate_charts" style="border: 1px solid green; height: 400px; width:100%;"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div style="height:800px"></div>
+
+
+
+
+<script type="application/json" id="data-json">
+    {{ json_data|safe }}
+</script>
+
+<script>
+
+const data = JSON.parse(document.getElementById('data-json').textContent);
+const dateMap = {};
+
+data.forEach(item => {
+    const date = item.created_at;
+    const troubleTickets = item.trouble_tickets;
+    const runHours = item.run_hours;
+    const avgRunHour = item.avg_run_hour_per_tt;
+
+    if (!dateMap[date]) {
+        dateMap[date] = {
+            troubleTickets: 0,
+            runHours: 0,          
+            avgRunHour: 0,
+            count: 0  
+        };
+    }
+
+    dateMap[date].troubleTickets += troubleTickets;
+    dateMap[date].runHours += runHours;    
+    dateMap[date].avgRunHour += avgRunHour * troubleTickets;
+
+    dateMap[date].count += troubleTickets;
+});
+
+const dates = Object.keys(dateMap);
+const aggregatedTroubleTickets = dates.map(date => dateMap[date].troubleTickets);
+const aggregatedRunHours = dates.map(date => dateMap[date].runHours);
+
+const aggregatedAvgRunHours = dates.map(date => {
+    const totalRunHours = dateMap[date].avgRunHour;
+    const count = dateMap[date].count;
+    return count > 0 ? totalRunHours / count : 0;
+});
+
+const ctx = document.getElementById('aggregate_charts').getContext('2d');
+const summaryChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: dates,
+
+        datasets: [
+            {
+                label: 'Trouble Tickets',
+                data: aggregatedTroubleTickets,
+                backgroundColor: 'red',               
+              
+            },
+            {
+                label: 'Run Hours',
+                data: aggregatedRunHours,
+                backgroundColor: 'blue'
+            },
+            {
+                label: 'Avg Run Hour per Trouble Ticket',
+                data: aggregatedAvgRunHours,
+                backgroundColor: 'green'
+            }
+        ],
+        
+    },
+    options: {
+        responsive: false,
+        scales: {
+            x: {
+                title: {
+                    display: true,
+                    text: 'Date',
+                    color: '#000578',
+                    font: {
+                        size: 25,
+                        weight: 'bold'
+                    }
+                },
+                ticks: {
+                    color: '#000578',
+                    font: {
+                        size: 16,
+                        weight: 'normal'
+                    }
+                }
+            },
+            y: {
+                beginAtZero: true,
+                title: {
+                    display: true,
+                    text: 'Value',
+                    color: '#000578',
+                    font: {
+                        size: 25,
+                        weight: 'bold'
+                    }
+                },
+                ticks: {
+                    color: '#000578',
+                    font: {
+                        size: 16,
+                        weight: 'normal'
+                    }
+                }
+            }
+        },
+        plugins: {
+            title: {
+                display: true,
+                text: 'Summary Chart',
+                color: '#000578',
+                font: {
+                    size: 25,
+                    weight: 'bold'
+                }
+            },
+            legend: {
+                labels: {
+                    font: {
+                        size: 16, 
+                        weight: 'normal',
+                        family: 'Arial' 
+                    },
+                    color: '#000578' 
+                }
+            }
+        }
+    }
+});
+
+</script>
+
+{% endblock %}

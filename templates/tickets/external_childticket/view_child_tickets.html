@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+{% load static %}
+
+
+
+{% block content %}
+
+<title>View Ticket</title>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <style>
+
+
+table {
+            border-collapse: collapse;
+            width: 100%;
+        
+        }
+        
+        th, td {
+            border: 1px solid black; /* Set border color for individual cells */
+            vertical-align: middle;
+            padding: 0px;
+        }
+        
+        th {
+          background-color: rgb(177, 227, 187);
+           
+        }
+        
+        table thead th {
+        white-space: normal;
+        }
+        
+ #main-content {   
+    overflow-y: auto;
+    margin-left:0px;
+    position: absolute;
+    width: 100%;
+    left: 0;
+  
+}
+
+
+</style>
+
+
+<table>
+    <thead> 
+      <tr>
+        <th  class="text-center p-2">Parent Ticket</th>
+        <th  class="text-center p-2">Child Ticket Number</th>
+        <th  class="text-center p-2">Hepta Generator Start Date</th>
+        <th  class="text-center p-2">Hepta Generator Start Time</th>
+        <th  class="text-center p-2">Hepta Generator Stop Date</th>
+        <th  class="text-center p-2">Hepta Generator Stop Time</th>
+        <th  class="text-center p-2">Hepta Generator Running Hours</th>
+        <th  class="text-center p-2">Hepta Calculated Fuel Litre</th>
+        <th  class="text-center p-2">Image</th>
+        <!-- Add other child ticket fields here -->
+      </tr>
+    </thead>
+    <tbody>
+      {% for parent_ticket in parent_tickets %}
+      {% for child_ticket in child_tickets_external %}
+      <tr>
+          <td class="text-center p-2">{{ parent_ticket.hepta_ticket_number }}</td>
+          <td class="text-center p-2">{{ child_ticket.child_external_ticket_number }}</td>
+          <td class="text-center p-2">{{ child_ticket.child_external_generator_start_date }}</td>
+          <td class="text-center p-2">{{ child_ticket.child_external_generator_start_time }}</td>
+          <td class="text-center p-2">{{ child_ticket.child_external_generator_stop_date }}</td>
+          <td class="text-center p-2">{{ child_ticket.child_external_generator_stop_time }}</td>
+          <td class="text-center p-2">{{ child_ticket.child_external_generator_running_hours }}</td>
+          <td class="text-center p-2">{{ child_ticket.child_external_calculated_fuel_litre }}</td>
+          <td class="text-center p-2">
+              {% if child_ticket.child_external_tt_image %}
+              <a href="{{ child_ticket.child_external_tt_image.url }}" target="_blank">
+                  <img src="{{ child_ticket.child_external_tt_image.url }}" alt="Child Ticket Image"
+                      style="cursor: pointer; width:50px;height:50px">
+              </a>
+              {% else %}
+              No image available
+              {% endif %}
+          </td>
+          <!-- Add other child ticket fields here -->
+      </tr>
+      {% endfor %}
+      
+      {% endfor %}
+    </tbody>
+  </table>
+
+
+    
+    
+
+
+
+    <div class="col" style="height:900px"></div>
+        
+
+
+
+
+
+    
+    <script>
+
+
+        $(document).ready(function(){      
+            var regionZoneMapping = {
+                'Sylhet': ['','Sylhet', 'Moulovibazar','Mymensingh','Kisorganj','Tangail'], 
+                'Rangpur': ['','Rangpur', 'Dinajpur','Bagura','Rajshahi'] ,
+               
+                
+            };
+         
+            $('#id_region').change(function(){
+                var selectedRegion = $(this).val();
+                var zoneChoices = regionZoneMapping[selectedRegion];
+                $('#id_zone').empty();
+                $.each(zoneChoices, function(index, value){
+                    $('#id_zone').append($('<option>').text(value).attr('value', value));
+                });
+            });
+
+                  
+            var zoneMpMapping = {              
+                'Sylhet': ['','Sylhet','Taherpur','Sunamganj','Bianibazar','Dorbhost','Dherai','Chatak'], // Add more MPs for Sylhet zone
+                'Moulovibazar': ['','Moulovibazar', 'Saestaganj','Juri','Baniachong'],
+                'Mymensingh': ['','Mymensingh', 'Fulpur','Valuka'] ,
+                'Kisorganj': ['','Kisorganj','Katiadi','Netrokona','Mohonpur','Austogram'],
+                'Tangail': ['','Tangail','Madhupur','Jamalpur','Sherpur','Bakshihanj','Rowmari'],
+               
+                'Rangpur':['','Rangpur','Hatibandha','Gaibandha','Ulipur','Boropar','Polasbari'],
+                'Dinajpur':['','Dinajpur','Panchghor','Jaldhaka','Thakurgaon'],
+                'Rajshahi':['','Rajshahi','Bagura','Nachole','Natore','Chapai'],
+                'Bagura':['','Bagura']
+               
+            };
+
+
+
+       
+            $('#id_zone').change(function(){
+                var selectedZone = $(this).val();
+                var mpChoices = zoneMpMapping[selectedZone];
+                $('#id_mp').empty();
+                $.each(mpChoices, function(index, value){
+                    $('#id_mp').append($('<option>').text(value).attr('value', value));
+                });
+            });
+        });
+
+
+
+
+
+
+
+
+    
+    function zoomInOut(image) {   
+        var currentScale = parseFloat(image.style.transform.replace('scale(', '').replace(')', '')) || 1;
+           
+        var newScale = currentScale === 1 ? 1.5 : 1;       
+  
+        image.style.transform = 'scale(' + newScale + ')';
+    }
+
+    </script>
+{% endblock %}

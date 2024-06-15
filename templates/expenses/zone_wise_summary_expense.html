@@ -1,0 +1,174 @@
+
+{% extends "base.html" %}
+{% load static %}
+
+
+{% load duration_filters %}
+
+
+{% block content %}
+
+<style>
+    
+   
+    table {
+              border-collapse: collapse;
+              width: 100%;
+              border: 2px solid #e97272; /* Set border color for the entire table */
+          }
+  
+          th, td {
+              border: 1px solid #f15a03; /* Set border color for individual cells */
+              text-align: left;
+              padding: 0px;
+          }
+  
+          th {
+              background-color: #9bdcb3;
+          }
+
+
+#main-content {   
+    overflow-y: auto;
+    margin-left:0px;
+    position: absolute;
+    width: 100%;
+    left: 0;
+  
+}
+.main-content {   
+    overflow-y: auto;
+    margin-left:0px;
+    position: absolute;
+    width: 100%;
+    left: 0;
+  
+}
+  
+  </style>
+
+<h4 class="text-center" style="margin-bottom: 30px;">Zone Summary of Expenses</h4>
+
+
+   
+
+    <div class="container-fluid" id="main-content">
+        <div class="row">
+
+            <div class="col-xl-12"> 
+                <form method="get" action="{% url 'dailyexpense:zone_wise_expenses_view2' %}">
+                <div class="container-fluid">
+                    <div class="row row-cols-1 row-cols-md-4">
+                  
+                        <div class="col" style="padding:5px; right:0">  Start Date:  {{ form.start_date }} </div>
+                        <div class="col" style="padding:5px; right:0">  end Date:  {{ form.end_date }} </div>
+                        <div class="col" style="padding:5px; right:0">  Zone:  {{ form.zone }} </div>
+                        <div class="col" style="padding:5px; right:0">   <button class="btn btn-primary" type="submit">Generate Report</button> </div>
+                    </div>
+                </div>
+               
+          
+
+            <div class="col">
+    
+    {% if zone_data %}
+        <h4>Report for Zone: {{ form.cleaned_data.zone }}</h4>
+        <table>
+            <thead>
+                <tr>
+                    
+                   <th>Action</th>
+                    <th class="text-center p-2">Created at</th>
+                    <th class="text-center p-2">Updated at</th>
+                    <th class="text-center p-2">Zone</th>
+                    <th class="text-center p-2">B/L from Previous month</th>
+                    <th class="text-center p-2">Total Received Amount</th>
+                    <th class="text-center p-2">This month Cash</th>
+    
+                    <th class="text-center p-2">Office Expenses</th>
+                    <th class="text-center p-2">Local Expenses</th>
+                    <th class="text-center p-2">On demand vehicle Expenses</th>
+    
+                    <th class="text-center p-2">Adhoc Man Expenses</th>
+                    <th class="text-center p-2">DGOW Vehicle Cash Expenses</th>
+                    <th class="text-center p-2">DGOW run fuel cash expenses</th>
+    
+                    <th class="text-center p-2">CM vehicle Fuel cash</th>
+                    <th class="text-center p-2">PM vehicle fuel cash</th>
+                    <th class="text-center p-2">PGRUN fuel cash</th>            
+                    <th class="text-center p-2">PGRUN fuel Pump</th>
+    
+                    <th class="text-center p-2">Site PM cost</th>
+                    <th class="text-center p-2">OPTIMA Billable</th>           
+                    <th class="text-center p-2">OPTIMA Non-Billable</th>
+    
+                    <th class="text-center p-2">Office rent</th>
+                    <th class="text-center p-2">Others</th>           
+                    <th class="text-center p-2">Advance due</th>
+    
+                    <th class="text-center p-2">Total zone cost</th>
+                    <th class="text-center p-2">Balance forward</th>           
+    
+                    <th class="text-center p-2">Total TT</th>
+                    <th class="text-center p-2">Total Run hours</th>           
+                </tr>
+            </thead>
+            <tbody>
+                {% for data in zone_data %}
+                    <tr>
+                        <td class="text-center p-2"><a href="{% url 'dailyexpense:update_summary_expenses' data.id %}">Update</a>
+                        </td>
+                        <td class="text-center p-2" style="white-space: nowrap;">{{ data.created_at }}</td>
+                        <td class="text-center p-2" style="white-space: nowrap;">{{ data.updated_at }}</td>
+                        <td class="text-center p-2">{{ data.zone }}</td>
+                        <td class="text-center p-2">{{ data.total_balance_from_previous_month|format_currency}}</td>
+                        <td class="text-center p-2">{{ data.total_amount_received|format_currency}}</td>
+                        <td class="text-center p-2">{{ data.total_this_month_cash|format_currency}}</td>
+                        <td class="text-center p-2">{{ data.total_office_expenses|format_currency}}</td>
+                        <td class="text-center p-2">{{ data.total_local_expenses|format_currency}}</td>
+    
+                        <td class="text-center p-2">{{ data.total_on_demand_vehicle_cost|format_currency}}</td>
+                        <td class="text-center p-2">{{ data.total_on_demand_PGR_cost|format_currency}}</td>
+                        <td class="text-center p-2">{{ data.total_dgow_vehicle_cost|format_currency}}</td>
+                        <td class="text-center p-2">{{ data.total_dgow_run_fuel_cost_cash|format_currency}}</td>
+                        <td class="text-center p-2">{{ data.total_cm_vehicle_fuel_cost|format_currency}}</td>
+                        <td class="text-center p-2">{{ data.total_pm_vehicle_fuel_cost|format_currency}}</td>
+    
+                        <td class="text-center p-2">{{ data.total_pgrun_fuel_cost_cash|format_currency}}</td>
+                        <td class="text-center p-2">{{ data.total_pgrun_fuel_cost_pump|format_currency}}</td>
+                    
+                        <td class="text-center p-2">{{ data.total_site_pm_cost|format_currency}}</td>
+    
+                        <td class="text-center p-2">{{ data.total_optima_billable|format_currency}}</td>
+                        <td class="text-center p-2">{{ data.total_optima_non_billable|format_currency}}</td>
+    
+                        <td class="text-center p-2">{{ data.total_office_rent|format_currency }}</td>
+                        <td class="text-center p-2">{{ data.total_others|format_currency}}</td>
+    
+                        <td class="text-center p-2">{{ data.total_advance_due|format_currency}}</td>
+    
+                        <td class="text-center p-2">{{ data.total_zone_cost|format_currency}}</td>
+    
+                        <td class="text-center p-2">{{ data.total_balance_forward|format_currency}}</td>
+    
+                        <td class="text-center p-2">{{ data.total_tt}}</td>
+                
+                        <!-- <td>{{ data.total_run_hour }}</td> -->
+                        <td class="text-center p-2">{{ data.total_run_hour|total_run_hour_in_hours }}</td>
+                
+                    </tr>        
+                {% endfor %}
+            </tbody>
+        </table>
+
+
+    {% else %}
+        <p class="text-center" style='margin-top:20px'>Please select start and end date and choose your zone and clcik generate report</p>
+    {% endif %}
+
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}

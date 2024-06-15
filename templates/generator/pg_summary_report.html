@@ -1,0 +1,213 @@
+
+{% extends "base.html" %}
+{% load static %}
+
+{% load duration_filters %}
+
+{% block content %}
+
+<style>
+
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    
+    }
+    
+    th,td{
+        border: 1px solid black; /* Set border color for individual cells */
+        text-align: left;
+        padding: 0px;
+    }
+    
+    th {
+        background-color: rgb(38, 233, 129);
+        
+    }
+    
+    table thead th {
+    white-space: normal;
+    }
+    
+    .main-content {   
+    overflow-y: auto;
+    margin-left:0px;
+    position: absolute;
+    width: 100%;
+    left: 0;
+  
+}
+    
+    </style>
+
+
+
+<form method="GET" action="{% url 'generator:pg_summary_report' %}">
+
+    <div class="container-fluid">
+        <div class="row row-cols-1 row-cols-md-4">
+
+         <div class="col" style="padding:5px; margin:5px">  Start Date:  {{ form.start_date }} </div>
+         <div class="col" style="padding:5px; margin:5px">  End Date:  {{ form.end_date }} </div>
+         <div class="col" style="padding:5px; margin:5px"> No of days {{ form.days }} </div>
+         <div class="col" style="padding:5px; margin:5px">  Region:{{ form.region }} </div>  
+         <div class="col" style="padding:5px; margin:5px">  Zone:{{ form.zone }} </div>    
+         <div class="col" style="padding:5px; margin:5px">  mp:{{ form.mp }} </div>    
+
+         <div class="col" style="padding:5px; margin:5px"> <button type="submit" class='btn btn-primary'>Generate Data</button></div>
+           
+        </div>
+    </div>
+      
+    </form>
+
+
+
+
+<div style="left:0px; margin-left:0px">
+    <h4 style="margin-top:40px; margin-left:0px">Data for
+        {% if days %}
+            the last {{ days }} days
+        {% elif start_date and end_date %}
+            from: {{ start_date }} to {{ end_date }}
+        {% endif %}
+    </h4>
+    
+
+
+
+<h2 class="text-center p-2"> PG run Summary report</h2>
+
+<div class="container-fluid main-content">
+    <table>
+        <thead>
+          <tr>
+            <th class="text-center p-2">Region</th>
+            <th class="text-center p-2">Zone</th>
+            <th class="text-center p-2">PG Number</th>
+            <th class="text-center p-2">Total Refill Amount</th>
+            <th class="text-center p-2">Total fuel purchase others</th> 
+            <th class="text-center p-2">total fuel cash advance taken</th> 
+            <th class="text-center p-2">Total fuel cost</th>
+            <th class="text-center p-2"> Total Tickets Handled</th>
+            <th class="text-center p-2">Fuel cost/TT</th>
+            <th class="text-center p-2">Total Run Hours</th>
+            <th class="text-center p-2">fuel consumed/Hour</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for region, zones in pg_summary_reports %}
+          {% for zone, pgnumbers in zones.items %}
+              {% for pgnumber, summary in pgnumbers.items %}
+                  <tr>
+                      <td class="text-center p-2">{{ region }}</td>
+                      <td class="text-center p-2">{{ zone }}</td>
+                      <td class="text-center p-2">{{ pgnumber }}</td>
+                      <td class="text-center p-2">{{ summary.total_refill_amount }}</td>
+                      <td class="text-center p-2">{{ summary.total_fuel_others_purchase}}</td>
+                      <td class="text-center p-2">{{ summary.total_fuel_cash_advance_taken}}</td>
+               
+                      <td class="text-center p-2">{{ summary.total_fuel_cost }}</td> <!-- Check this line -->
+                      <td class="text-center p-2">{{ summary.total_tt_handle }}</td>
+                      <td class="text-center p-2">{{ summary.fuel_consumed_per_tt|floatformat:'2' }}</td>
+                      <td class="text-center p-2">{{ summary.total_run_hour|floatformat:'2' }}</td>
+                      {% if summary.fuel_consumed_per_run_hour > 2.4 %}
+                          <td class="text-center p-2" style="background-color: red; color:white">{{ summary.fuel_consumed_per_run_hour|floatformat:'2' }}</td>
+                      {% else %}
+                          <td class="text-center p-2" style="background-color: green;">{{ summary.fuel_consumed_per_run_hour|floatformat:'2' }}</td>
+                      {% endif %}
+                  </tr>
+              {% endfor %}
+          {% endfor %}
+      {% endfor %}
+      
+        </tbody>
+      </table>
+    
+      <!-- Pagination -->
+      <div class="pagination" style="padding: 10px;">
+        <span class="step-links">
+          {% if pg_summary_reports.has_previous %}
+            <a href="?page=1">&laquo; First</a>
+            <a href="?page={{ pg_summary_reports.previous_page_number }}">Previous</a>
+          {% endif %}
+    
+          <span class="current">
+            Page {{ pg_summary_reports.number }} of {{ pg_summary_reports.paginator.num_pages }}.
+          </span>
+    
+          {% if pg_summary_reports.has_next %}
+            <a href="?page={{ pg_summary_reports.next_page_number }}">Next</a>
+            <a href="?page={{ pg_summary_reports.paginator.num_pages }}">Last &raquo;</a>
+          {% endif %}
+        </span>
+      </div>
+
+
+
+
+
+</div>
+
+<div class="col" style="height:1200px"></div>
+
+
+
+
+
+
+<script>
+
+
+    $(document).ready(function(){      
+      var regionZoneMapping = {
+          'Sylhet': ['','Sylhet', 'Moulovibazar','Mymensingh','Kisorganj','Tangail'], 
+          'Rangpur': ['','Rangpur', 'Dinajpur','Bagura','Rajshahi'] ,                          
+          
+      };
+   
+      $('#id_region').change(function(){
+          var selectedRegion = $(this).val();
+          var zoneChoices = regionZoneMapping[selectedRegion];
+          $('#id_zone').empty();
+          $.each(zoneChoices, function(index, value){
+              $('#id_zone').append($('<option>').text(value).attr('value', value));
+          });
+      });
+            
+      var zoneMpMapping = {              
+          'Sylhet': ['','Sylhet','Taherpur','Sunamganj','Bianibazar','Dorbhost','Dherai','Chatak'], // Add more MPs for Sylhet zone
+          'Moulovibazar': ['','Moulovibazar', 'Saestaganj','Juri','Baniachong'],
+          'Mymensingh': ['','Mymensingh', 'Fulpur','Valuka'] ,
+          'Kisorganj': ['','Kisorganj','Katiadi','Netrokona','Mohonpur','Austogram'],
+          'Tangail': ['','Tangail','Madhupur','Jamalpur','Sherpur','Bakshihanj','Rowmari'],
+         
+          'Rangpur':['','Rangpur','Hatibandha','Gaibandha','Ulipur','Boropar','Polasbari'],
+          'Dinajpur':['','Dinajpur','Panchghor','Jaldhaka','Thakurgaon'],
+          'Rajshahi':['','Rajshahi','Bagura','Nachole','Natore','Chapai'],
+          'Bagura':['','Bagura'],
+          '': ['']
+         
+      };
+  
+  
+      $('#id_zone').change(function(){
+          $('#id_mp').val('');
+          var selectedZone = $(this).val();
+          var mpChoices = zoneMpMapping[selectedZone];
+  
+          $('#id_mp').empty();
+          $.each(mpChoices, function(index, value){
+              $('#id_mp').append($('<option>').text(value).attr('value', value));
+          });
+      });
+      
+  });
+  
+  </script>
+
+
+
+
+
+{% endblock %}

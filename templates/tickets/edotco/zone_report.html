@@ -1,0 +1,214 @@
+
+{% extends "base.html" %}
+{% load static %}
+
+
+
+{% block content %}
+
+
+    <title>Create Ticket</title>
+
+
+    <style>
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        
+        }
+        
+        th, td {
+            border: 1px solid black; /* Set border color for individual cells */
+            text-align: left;
+            padding: 0px;
+        }
+        
+        th {
+            background-color: rgb(19, 112, 25);
+            color:white;
+        }
+        
+        table thead th {
+        white-space: normal;
+        }
+        
+    #main-content {   
+        overflow-y: auto;
+        margin-left:0px;
+        position: absolute;
+        width: 100%;
+        left: 0;
+    
+    }
+
+        
+        </style>
+
+<!-- 
+<p><h1>Zone Report</h1>( Select no of days or date range)</p>
+
+<div class="container-fluid" style="margin-top:10px; margin-bottom:30px">
+    <form method="GET" action="{% url 'tickets:zone_report_view' %}">
+        {{ form.as_p }} 
+        <button type="submit" class='btn btn-primary'>Generate Report</button>
+    </form>
+</div> -->
+
+
+
+
+
+
+<form method="GET" action="{% url 'tickets:zone_report_view' %}">
+
+    <div class="container-fluid">
+        <div class="row row-cols-1 row-cols-md-3">
+            <div class="col">    Start Date:  {{ form.start_date }} </div>
+            <div class="col">    End Date:  {{ form.end_date }} </div>
+            <div class="col">  or Select no of days:  {{ form.days }} </div>
+            <div class="col">    Slect Zone: {{ form.zone }}</div>
+            <div class="col"> <button type="submit" class='btn btn-primary'>Generate Data</button></div>
+                 
+        </div>
+      
+    </div>
+      
+    </form>
+
+
+    <div style="left:0px; margin-left:0px">
+        <h4 style="margin-top:40px; margin-left:0px">Data for
+            {% if days %}
+                the last {{ days }} days
+            {% elif start_date and end_date %}
+                from: {{ start_date }} to {{ end_date }}
+            {% endif %}
+        </h4>        
+        
+    </div>
+
+
+
+
+<div class="container-fluid"id='main-content'>
+    <div class="row">
+        <div class="col-xl-12">      
+                        
+            <table border="1">
+                <thead>
+                    <tr>
+                        <th class="text-center p-2">View details</th> 
+                        <th class="text-center p-2">Date</th>           
+                        <th class="text-center p-2">Region</th>
+                        <th class="text-center p-2">Zone</th>
+                        <th class="text-center p-2">MP</th>
+                        <th class="text-center p-2">TT Number</th>
+                        <th class="text-center p-2">Customer TT Ref</th>
+                        <th class="text-center p-2">Customer Site ID</th>
+
+
+                        <th class="text-center p-2">Internal GRH</th>
+                        <th class="text-center p-2">Customer GRH</th>
+                        <th class="text-center p-2">PGR Type</th>
+                        <th class="text-center p-2">Ticket Status</th>
+                        <th class="text-center p-2">Fuel difference</th>
+                        <th class="text-center p-2">Team Leader</th>
+
+                        <th class="text-center p-2">PGR type</th>
+                        <th class="text-center p-2">Vehicle type</th>
+                        <th class="text-center p-2">PGR Name</th>
+                        <th class="text-center p-2">PG Number</th>
+                        <th class="text-center p-2">Vehicle Number</th>
+                    
+                        <!-- Add other fields as necessary -->
+                    </tr>
+                </thead> 
+                <tbody>
+                    {% if page_obj %}
+                          {% for ticket in page_obj %}
+                        <tr>
+                            <td style="white-space: nowrap; "><a  href="{% url 'tickets:view_child_tickets_external' ticket.id %}" style="text-decoration:none;">view childs</a></td>  
+                            <td class="text-center p-2" style="white-space: nowrap;">{{ ticket.created_at }}</td>               
+                            <td class="text-center p-2">{{ ticket.region }}</td>
+                            <td class="text-center p-2">{{ ticket.zone }}</td>
+                            <td class="text-center p-2">{{ ticket.mp }}</td>
+                            <td class="text-center p-2">{{ ticket.internal_ticket_number }}</td>
+                            <td class="text-center p-2">{{ ticket.customer_ticket_ref }}</td>
+                            <td class="text-center p-2">{{ ticket.site_id }}</td>
+
+                            <td class="text-center p-2">{{ ticket.internal_generator_running_hours }}</td>
+                            <td class="text-center p-2">{{ ticket.customer_generator_running_hours }}</td>
+
+                            <td class="text-center p-2">{{ ticket.assigned_pg_runner_type }}</td>
+                            <td class="text-center p-2">{{ ticket.ticket_status }}</td>
+                            
+            
+                            {% if ticket.fuel_difference > 0 %}
+                            <td class="text-center p-2" style="background-color: red;">{{ ticket.fuel_difference|floatformat:'2' }}</td>
+                            {% else %}
+                            <td class="text-center p-2" style="background-color: greenyellow">{{ ticket.fuel_difference|floatformat:'2' }}</td>
+                            {% endif %}
+
+                            <td class="text-center p-2">{{ ticket.team_leader_name }}</td>
+
+                            {% if ticket.assigned_pg_runner_type == "Adhoc" %}
+                            <td class="text-center p-2" style="background-color: red;">{{ ticket.assigned_pg_runner_type}}</td>
+                            {% else %}
+                            <td class="text-center p-2">{{ ticket.assigned_pg_runner_type}}</td>
+                            {% endif %}
+                           
+                            {% if ticket.assigned_vehicle_type == "Adhoc" %}
+                            <td class="text-center p-2" style="background-color: red;">{{ ticket.assigned_vehicle_type}}</td>
+                            {% else %}
+                            <td class="text-center p-2">{{ ticket.assigned_vehicle_type}}</td>
+                            {% endif %}
+
+                            <td class="text-center p-2">{{ ticket.assigned_to  }}</td>
+                            <td class="text-center p-2">{{ ticket.pgnumber.PGNumber }}</td>
+                            <td class="text-center p-2" style="white-space: nowrap;">{{ ticket.vehicle.vehicle_reg_number }}</td>
+                        
+                            <!-- Add other fields as necessary -->
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="12" class="text-center p-2">
+                                <h4>Currently no data found for this selection.</h4>
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+
+
+        </div>
+    </div>
+
+
+
+    <div class="pagination" style="padding:10px">
+        {% if page_obj.has_previous %}
+            <a style="margin:10px; font-size: 14px;" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+        {% endif %}
+        
+        {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+                <span style="margin:10px; font-size:14px">{{ num }}</span>
+            {% else %}
+                <a style="margin:10px; font-size:14px"href="?page={{ num }}">{{ num }}</a>
+            {% endif %}
+        {% endfor %}
+        
+        {% if page_obj.has_next %}
+            <a style="margin:10px; font-size:14px"href="?page={{ page_obj.next_page_number }}">Next</a>
+        {% endif %}
+    </div>
+
+    
+</div>
+
+
+<div class="col" style="height:500px"></div>
+
+{% endblock %}

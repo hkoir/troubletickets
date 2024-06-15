@@ -1,0 +1,171 @@
+
+ 
+{% extends "base.html" %}
+{% load static %}
+
+
+{% block content %}
+
+
+
+<style>
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+
+}
+
+th, td {
+    border: 1px solid black; /* Set border color for individual cells */
+    text-align: left;
+    padding: 0px;
+}
+
+th {
+    background-color: rgb(13, 151, 72);
+    color:white;
+}
+
+table thead th {
+white-space: normal;
+}
+#main-content {   
+        overflow-y: auto;
+        margin-left:0px;
+        position: absolute;
+        width: 100%;
+        left: 0;
+    
+    }
+
+
+</style>
+
+
+
+<h4>Summary Report hourly</h4>
+
+<!-- 
+<form method="get" action="{% url 'tickets:summary_report_view_hourly' %}">
+    {{ form.as_p }}  
+    <button class="btn btn-primary" type="submit">Generate Report</button>
+</form> -->
+
+
+
+
+<form method="get" action="{% url 'tickets:summary_report_view_hourly' %}">
+
+    <div class="container-fluid" style="margin-bottom:30px">
+        <div class="row row-cols-1 row-cols-md-2">   
+            <div class="col">
+             
+                Select no of hours:  {{ form.hours }} 
+               <button type="submit" class='btn btn-primary'>Generate Data</button>             
+              
+            </div>
+                  
+          </div>
+        </div>       
+      
+    </form>
+
+
+
+
+
+
+
+<div class="container-fluid"id='main-content'>
+    <div class="row row-cols-1">
+        <h4 style="margin-top:40px">Report for
+            {% if hours %}
+                the last {{ hours }} hours            
+            {% endif %}
+        </h4>
+        {% for region, zone_data in grouped_summary_data.items %}
+        <div class="col-xl-12">  
+                    
+            <h4>Region: {{ region }}</h4>
+            <table border="1">
+                <thead>
+                    <tr>
+                        <th class="text-center p-2">Region</th>
+                        <th class="text-center p-2">Zone</th>
+
+                        <th class="text-center p-2">Number of Tickets</th>
+                   
+                        <th class="text-center p-2">Number of Valid Ticket</th>
+                        <th class="text-center p-2">Number of Miss Ticket</th>
+                        <th class="text-center p-2">TT Running</th>
+                        <th class="text-center p-2">TT connected</th>
+                        <th class="text-center p-2">TT OTW</th> 
+                        <th class="text-center p-2">Team assign</th>  
+                        <th class="text-center p-2">TT Open</th>
+                        <th class="text-center p-2">TT invalid</th>  
+                        <th class="text-center p-2">Number of adhoc man</th>
+                        <th class="text-center p-2">Number of adhoc vehicle</th>
+                        
+                   
+
+                        <th class="text-center p-2" >Hepta Running Hours</th>
+                        <th class="text-center p-2" >edotco Running Hours</th>
+                        <th class="text-center p-2">Total Fuel Difference</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in zone_data %}
+                 
+                    <tr>
+                        <td class="text-center p-2">{{ item.region }}</td>
+                        <td class="text-center p-2">{{ item.zone }}</td>
+
+                        <td class="text-center p-2">{{ item.num_tickets }}</td>
+                      
+                        <td class="text-center p-2">{{ item.num_valid_tickets }}</td>
+                        <td class="text-center p-2">{{ item.num_miss_tickets }}</td>
+
+                        <td class="text-center p-2">{{ item.num_running_tickets }}</td>
+                        <td class="text-center p-2">{{ item.num_connected_tickets }}</td>  
+                        <td class="text-center p-2">{{ item.num_otw_tickets }}</td>
+
+                        <td class="text-center p-2">{{ item.num_team_assign_tickets }}</td>
+                        <td class="text-center p-2">{{ item.num_open_tickets }}</td>
+                        <td class="text-center p-2">{{ item.num_invalid_tickets }}</td>
+                        {% if item.num_adhoc_PGR > 0 %}
+                        <td class="text-center p-2" style="background-color: red;">{{ item.num_adhoc_PGR}}</td> 
+                        {% else %}
+                        <td class="text-center p-2">{{ item.num_adhoc_PGR}}</td> 
+                        {% endif %}
+
+                        {% if item.num_adhoc_vehicle > 0 %}
+                        <td class="text-center p-2" style="background-color: red;">{{ item.num_adhoc_vehicle}}</td> 
+                        {% else %}
+                        <td class="text-center p-2">{{ item.num_adhoc_vehicle}}</td> 
+                        {% endif %}
+
+                                             
+                        <td class="text-center p-2">{{ item.total_hepta_running_hours }}</td>
+                        <td class="text-center p-2">{{ item.total_edotco_running_hours }}</td>
+                        {% if item.total_fuel_difference < 0 %}
+                        <td class="text-center p-2" style="background-color: red; color:white"> {{ item.total_fuel_difference|floatformat:2 }}</td>
+                        {% else %}
+                        <td class="text-center p-2" style="background-color: greenyellow; color:black"> {{ item.total_fuel_difference|floatformat:2 }}</td>
+                        {% endif %}
+                    </tr>                   
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+      
+        {% endfor %}
+       
+    </div>
+</div>
+
+
+
+<div class="col" style="height:1200px"></div>
+
+{% endblock %}

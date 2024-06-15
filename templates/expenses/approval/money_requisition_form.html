@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% load static %}
+
+
+{% block content %}
+
+
+    <title>Money Requisition form</title>
+
+    <style>
+
+    html, body { 
+       font-family: Verdana, sans-serif; 
+    
+  }
+
+    </style>
+
+    
+    <h4 class="text-center" style="margin-top:10px">DOPS form</h4>
+
+
+    <div class="container-fluid">
+        <div class="row row-cols-1 row-cols-md-3 p-2">
+
+            <div class="col"></div>
+            <div class="col">
+                <div class="card" style="margin-top:20px;padding:10px;background-color: bisque;">
+                    <div class="card-body">
+                        <h5 class="card-title">Money Requisition Form</h5>
+                        <form method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            {{ form.as_p }}
+                
+                            <div><button type="submit" class="btn btn-primary">Submit</button></div>
+                        </form>
+                    </div>
+                </div>                
+
+            </div>
+            <div class="col"></div>
+        </div>
+    </div>
+
+    <div class="col" style="height:1200px"></div>
+
+
+{% endblock %}
+
+
+

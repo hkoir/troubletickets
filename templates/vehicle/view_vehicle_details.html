@@ -1,0 +1,288 @@
+
+{% extends "base.html" %}
+{% load static %}
+
+
+{% load duration_filters %}
+
+
+{% block content %}
+
+   
+<style>
+
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    
+    }
+    
+    th,td{
+        border: 1px solid black; /* Set border color for individual cells */
+        text-align: left;
+        padding: 0px;
+    }
+    
+    th {
+        background-color: rgb(38, 233, 129);
+        
+    }
+    
+    table thead th {
+    white-space: normal;
+    }
+    
+    .main-content {   
+    overflow-y: auto;
+    margin-left:0px;
+    position: absolute;
+    width: 100%;
+    left: 0;
+  
+}
+    
+    </style>
+
+
+
+<form method="GET" action="{% url 'vehicle:vehicle_detail' vehicle_info.id %}">
+
+    <div class="container-fluid">
+        <div class="row row-cols-1 row-cols-md-4">
+
+         <div class="col" style="padding:5px; margin:5px">  Start Date:  {{ form.start_date }} </div>
+         <div class="col" style="padding:5px; margin:5px">  End Date:  {{ form.end_date }} </div>
+         <div class="col" style="padding:5px; margin:5px"> No of days {{ form.days }} </div>
+         
+         <div class="col" style="padding:5px; margin:5px"> <button type="submit" class='btn btn-primary'>Generate Data</button></div>
+           
+        </div>
+    </div>
+      
+    </form>
+
+
+
+
+<div style="left:0px; margin-left:0px;margin-bottom:30px">
+    <h4 style="margin-top:40px; margin-left:0px">Data for
+        {% if days %}
+            the last {{ days }} days
+        {% elif start_date and end_date %}
+            from: {{ start_date }} to {{ end_date }}
+        {% endif %}
+    </h4>
+    
+    
+</div>
+
+
+
+
+
+<h4 class="text-center" style="left:0; margin-bottom:20px" > Vehicle details for the vehicle:{{ vehicle_info.vehicle_reg_number }} </h4>
+<h4>Basic Vehicle Information </h4>
+
+<div class="container-fluid main-content  ">
+    <div class="row">
+        <div class="col-xl-12">                     
+            <table>
+                <thead>
+                    <tr>
+                        <th class="text-center p-2">Vehicle ID</th>
+                        <th class="text-center p-2">Owner Name</th>
+                        <th class="text-center p-2">Owner Mobile Number</th>
+                        <th class="text-center p-2">Owner Address</th>
+                        <th class="text-center p-2">Owner Company Name</th>
+                        <th class="text-center p-2">Registration Number</th>
+
+                        <th class="text-center p-2"> vehicle kilometer commit per liter</th>
+                        <th class="text-center p-2"> vehicle joining date</th>
+                        <th class="text-center p-2">vehicle supporting documents</th>
+                        <th class="text-center p-2">vehicle fuel type</th>
+
+                        <th class="text-center p-2"> vehicle fuel unit price</th>
+                        <th class="text-center p-2"> vehicle brand name</th>
+                        <th class="text-center p-2">vehicle rental category</th>
+                        <th class="text-center p-2">vehicle rent</th>
+                     
+                        <th class="text-center p-2"> vehicle operational mode</th>
+                        <th class="text-center p-2"> vehicle duty station</th>
+                        <th class="text-center p-2">created_at</th>
+                
+                    
+                        <!-- Add more fields as needed -->
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="text-center p-2" style="white-space: nowrap;">{{ vehicle_info.vehicle_id }}</td>
+                        <td class="text-center p-2"style="white-space: nowrap;">{{ vehicle_info.vehicle_owner_name }}</td>
+                        <td class="text-center p-2"style="white-space: nowrap;">{{ vehicle_info.vehilce_owner_mobile_number }}</td>
+                        <td class="text-center p-2"style="white-space: nowrap;">{{ vehicle_info.vehicle_owner_address }}</td>
+                        <td class="text-center p-2"style="white-space: nowrap;">{{ vehicle_info.vehicle_owner_company_name }}</td>
+                        <td class="text-center p-2"style="white-space: nowrap;">{{ vehicle_info.vehicle_reg_number }}</td>
+
+                        <td class="text-center p-2" style="white-space: nowrap;">{{ vehicle_info.vehicle_kilometer_commit_per_liter }}</td>
+                        <td class="text-center p-2"style="white-space: nowrap;">{{ vehicle_info.vehicle_joining_date }}</td>
+                        
+                        <td class="text-center p-2"style="white-space: nowrap;">
+                            {% if vehicle_info.vehicle_supporting_documents %}
+                            <a href="{{ vehicle_info.vehicle_supporting_documents.url }}" target="_blank">
+                                <img src="{{ vehicle_info.vehicle_supporting_documents.url }}" alt="Supporting Document" style="cursor: pointer; width: 50px; height: 50px;">
+                            </a>
+                            {% else %}
+                            No image available
+                            {% endif %}
+                        </td>  
+                        <td class="text-center p-2"style="white-space: nowrap;">{{ vehicle_info.vehicle_fuel_type }}</td>
+                        <td class="text-center p-2"style="white-space: nowrap;">{{ vehicle_info.vehicle_fuel_unit_price }}</td>
+                        <td class="text-center p-2"style="white-space: nowrap;">{{ vehicle_info.vehicle_brand_name }}</td>
+
+                        <td class="text-center p-2" style="white-space: nowrap;">{{ vehicle_info.vehicle_rental_category }}</td>
+                        <td class="text-center p-2"style="white-space: nowrap;">{{ vehicle_info.vehicle_rent }}</td>
+  
+                        <td class="text-center p-2"style="white-space: nowrap;">{{ vehicle_info.vehicle_operational_mode }}</td>
+                        <td class="text-center p-2"style="white-space: nowrap;">{{ vehicle_info.vehicle_duty_station }}</td>
+                        <td class="text-center p-2"style="white-space: nowrap;">{{ vehicle_info.created_at }}</td>
+
+                        <!-- Add more fields as needed -->
+                    </tr>
+                </tbody>
+            </table>
+
+        </div>
+
+        <div class="col-12">            
+
+            <h3 style="margin-top:20px">Running Data</h3>
+      
+            <table>
+                <thead>
+                    <tr>
+                        <th class="text-center p-2">Travel ID</th>
+                        <th class="text-center p-2">Region</th>
+                        <th class="text-center p-2">Zone</th>
+                        <th class="text-center p-2">MP</th>
+                        <th class="text-center p-2">Expense ID</th>
+                        <th class="text-center p-2">User</th>
+                    
+
+                        <th class="text-center p-2">Start Reading</th>
+                        <th class="text-center p-2">Stop Reading</th>
+                        <th class="text-center p-2">Start Location</th>
+                        <th class="text-center p-2">End Location</th>
+                        <th class="text-center p-2">Travel Purpose</th>
+                        <th class="text-center p-2">Travel Date</th>
+                        <th class="text-center p-2">Total Kilometer Run</th>
+                        <th class="text-center p-2">Total Fuel Consumed</th>
+                        <th class="text-center p-2">Comments</th>
+                        <th class="text-center p-2"> Created At</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for running_data in vehicle_running_data %}
+                        <tr>
+                            <td class="text-center p-2" style="white-space: nowrap;">{{ running_data.vehicle_expense_id }}</td>
+                            <td class="text-center p-2" style="white-space: nowrap;">{{ running_data.region }}</td>
+                            <td class="text-center p-2" style="white-space: nowrap;">{{ running_data.zone }}</td>
+                            <td class="text-center p-2" style="white-space: nowrap;">{{ running_data.mp }}</td>
+                            <td class="text-center p-2" style="white-space: nowrap;">{{ running_data.vehicle_expense_id }}</td>
+                            <td class="text-center p-2" style="white-space: nowrap;">{{ running_data.vehicle_expense_add_requester }}</td>
+
+                            <td class="text-center p-2" style="white-space: nowrap;">{{ running_data.vehicle_start_reading }}</td>
+                            <td class="text-center p-2" style="white-space: nowrap;">{{ running_data.vehicle_stop_reading }}</td>
+                            <td class="text-center p-2" style="white-space: nowrap;">{{ running_data.vehicle_start_location }}</td>
+                            <td class="text-center p-2" style="white-space: nowrap;">{{ running_data.vehicle_end_location }}</td>
+                            <td class="text-center p-2" style="white-space: nowrap;">{{ running_data.travel_purpose }}</td>
+                            <td class="text-center p-2" style="white-space: nowrap;">{{ running_data.travel_date }}</td>
+                            <td class="text-center p-2" style="white-space: nowrap;">{{ running_data.total_kilometer_run }}</td>
+                            <td class="text-center p-2" style="white-space: nowrap;">{{ running_data.total_fuel_consumed }}</td>
+                            <td class="text-center p-2" style="white-space: nowrap;">{{ running_data.comments }}</td>
+                            <td class="text-center p-2" style="white-space: nowrap;">{{ running_data.created_at }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+        </div>
+
+        <div class="col-12">
+            
+
+            <h3 style="margin-top:20px">Fuel Refills</h3>
+      
+            <table>
+                <thead>
+                    <tr>
+                        <th class="text-center p-2">Refill ID</th>
+                        <th class="text-center p-2" >User</th>
+                        <th class="text-center p-2" >Refill Date</th>
+                        <th class="text-center p-2" >Refill Amount</th>
+                        <th class="text-center p-2" > vehicle kilometer reading</th>
+                        <th class="text-center p-2" >vehicle kilometer run</th>
+                        <th class="text-center p-2" >vehicle fuel consumed</th>
+
+                        <th class="text-center p-2" > vehicle fuel balance</th>
+                        <th class="text-center p-2" >vehicle total fuel reserve</th>
+                        <th class="text-center p-2" > refill supporting documents</th>
+                    
+
+
+                        <th class="text-center p-2" >Fuel Pump Supplier name</th>
+                        <th class="text-center p-2" >Supplier Phone</th>
+                        <th class="text-center p-2" >Supplier Address</th>
+                        <th class="text-center p-2" >Rent Paid Amount</th>
+                        <th class="text-center p-2" >Rent Paid Date</th>
+                        <th class="text-center p-2" >Created At</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for refill in fuel_refills %}
+                        <tr>
+                            <td class="text-center p-2" style="white-space: nowrap;">{{ refill.fuel_refill_code }}</td>
+                            <td class="text-center p-2" style="white-space: nowrap;">{{ refill.refill_requester }}</td>
+                            <td class="text-center p-2" style="white-space: nowrap;">{{ refill.refill_date }}</td>
+                            <td class="text-center p-2" style="white-space: nowrap;">{{ refill.refill_amount }}</td>
+                            <td class="text-center p-2" style="white-space: nowrap;">{{ refill.vehicle_kilometer_reading }}</td>
+                            <td class="text-center p-2" style="white-space: nowrap;">{{ refill.vehicle_kilometer_run }}</td>
+                            <td class="text-center p-2" style="white-space: nowrap;">{{ refill.vehicle_fuel_consumed}}</td>
+                            <td class="text-center p-2" style="white-space: nowrap;">{{ refill.vehicle_fuel_balance }}</td>
+                            <td class="text-center p-2" style="white-space: nowrap;">{{ refill.vehicle_total_fuel_reserve }}</td>
+                        
+                            <td class="text-center p-2"style="white-space: nowrap;">
+                                {% if refill.refill_supporting_documents %}
+                                <a href="{{ refill.refill_supporting_documents.url }}" target="_blank">
+                                    <img src="{{ refill.refill_supporting_documents.url }}" alt="Supporting Document" style="cursor: pointer; width: 50px; height: 50px;">
+                                </a>
+                                {% else %}
+                                No image available
+                                {% endif %}
+                            </td>  
+
+
+
+                            <td class="text-center p-2" style="white-space: nowrap;">{{ refill.fuel_pump_supplier_name }}</td>
+                            <td class="text-center p-2" style="white-space: nowrap;">{{ refill.fuel_supplier_phone }}</td>
+                            <td class="text-center p-2" style="white-space: nowrap;">{{ refill.fuel_supplier_address }}</td>
+                            <td class="text-center p-2" style="white-space: nowrap;">{{ refill.vehicle_rent_paid_amount }}</td>
+                            <td class="text-center p-2" style="white-space: nowrap;">{{ refill.vehicle_rent_paid_date }}</td>
+                            <td class="text-center p-2" style="white-space: nowrap;">{{ refill.created_at }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+        </div>
+
+
+
+    </div>
+</div>
+
+
+
+<div class="col" style="height:1200px"></div>
+
+
+{% endblock %}

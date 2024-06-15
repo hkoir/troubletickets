@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% load static %}
+
+
+{% block content %}
+
+    <title>ADD PG fuel</title>
+    
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <style>
+
+    html, body { 
+       font-family: Verdana, sans-serif; 
+    
+  }
+
+    </style>
+
+  
+<div class="container">
+    <div class="row">
+        <div class="col" style="background-color: red;">
+
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+        <li{% if message.tags %} class="{{ message.tags }} text-center"{% endif %} style="color:white">{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+
+        </div>
+    </div>
+</div>
+
+    
+    <h4 class="text-center" style="margin-top:10px">DOPS form</h4>
+    <div class="container-fluid">
+        <div class="row row-cols-1 row-cols-md-3 p-2">
+            <div class="col"></div>
+            <div class="col-md-6"> <!-- Adjust the width for medium screens -->
+                <div class="card" style="background-color: bisque; padding:10px;">
+                    <div class="card-body">
+                        <h4 class="card-title" style="margin-bottom:20px">Add PG fuel</h4>
+                        <form method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            {% for field in form %}
+                            <div class="form-group" style="padding:5px">
+                                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                                {% if field.name == 'fuel_supplier_address' %}
+                                    <textarea class="form-control" id="{{ field.id_for_label }}" name="{{ field.html_name }}" style="height: 100px;"></textarea>                                   
+                                {% else %}
+                                    {{ field }}                                   
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                           
+                            <div><button type="submit" class="btn btn-primary">Submit</button></div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col"></div>
+        </div>
+    </div>
+    
+
+
+
+
+
+
+    <div class="col" style="height:1200px"></div>
+
+
+
+
+
+
+
+    
+<script>
+    $(document).ready(function() {
+       function toggleFields() {
+           var  fuel_pump_supplier_nameValue = $('#id_fuel_pump_supplier_name').val();
+          
+           if ( fuel_pump_supplier_nameValue === 'Others') {
+               $('#id_fuel_supplier_phone, #id_fuel_supplier_address').closest('.form-group').show();
+           } else {
+               $('#id_fuel_supplier_phone, #id_fuel_supplier_address').closest('.form-group').hide();
+           }
+       }
+   
+       toggleFields();
+       $('#id_fuel_pump_supplier_name').change(function() {
+           toggleFields();
+       });
+   });
+   
+   
+   </script>
+
+    
+{% endblock %}
+
+
+

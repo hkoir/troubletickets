@@ -1,0 +1,277 @@
+{% extends "base.html" %}
+{% load static %}
+
+
+
+{% block content %}
+
+<title>View Ticket</title>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <style>
+
+
+table {
+            border-collapse: collapse;
+            width: 100%;
+        
+        }
+        
+        th, td {
+            border: 1px solid black; /* Set border color for individual cells */
+            vertical-align: middle;
+            padding: 0px;
+        }
+        
+        th {
+          background-color: rgb(177, 227, 187);
+           
+        }
+        
+        table thead th {
+        white-space: normal;
+        }
+        
+
+
+        
+.main-content {   
+    overflow-y: auto;
+    margin-left:0px;
+    position: absolute;
+    width: 100%;
+    left: 0;
+  
+}
+
+
+
+</style>
+
+
+
+<form method="GET" action="{% url 'tickets:view_all_parent_tickets_with_children' %}">
+
+  <div class="container-fluid" class="main-content">
+      <div class="row row-cols-1 row-cols-md-4">
+
+       <div class="col" style="padding:5px; margin:5px">  Start Date:  {{ form.start_date }} </div>
+       <div class="col" style="padding:5px; margin:5px">  End Date:  {{ form.end_date }} </div>
+       <div class="col" style="padding:5px; margin:5px"> No of days {{ form.days }} </div>
+       <div class="col" style="padding:5px; margin:5px">  Region:{{ form.region }} </div>  
+       <div class="col" style="padding:5px; margin:5px">  Zone:{{ form.zone }} </div>    
+       <div class="col" style="padding:5px; margin:5px">  mp:{{ form.mp }} </div>    
+
+       <div class="col" style="padding:5px; margin:5px"> <button type="submit" class='btn btn-primary'>Generate Data</button></div>
+         
+      </div>
+  </div>
+    
+  </form>
+
+  <h4 class="text-center">Data for
+    {% if days %}
+        the last {{ days }} days
+    {% elif start_date and end_date %}
+        from: {{ start_date }} to {{ end_date }}
+    {% endif %}
+</h4>
+    
+<div class="container-fluid main-content">
+  <div class="row">
+    <form method="GET" action="{% url 'tickets:view_all_parent_tickets_with_children' %}">        
+      <button type="submit" name="download_csv" class="btn btn-primary">Export CSV</button>
+    </form>
+
+    <div class="col-xl-12"> 
+      <table>
+        <thead> 
+          <tr>
+            <th class="text-center p-2">Region</th> 
+            <th class="text-center p-2">Zone</th>        
+            <th class="text-center p-2">MP</th>
+            <th class="text-center p-2">Parent Ticket date</th> 
+            <th class="text-center p-2"style="white-space:normal">Parent Ticket</th>        
+            <th class="text-center p-2"style="white-space:normal">Customer Ticket Number</th>
+            <th class="text-center p-2">Site ID</th>
+            <th class="text-center p-2">Ticket origin date</th>
+            <th class="text-center p-2">Ticket Status</th>
+            <th class="text-center p-2">Assigned PGR Name</th>
+            <th class="text-center p-2">Assigned PGR type</th>
+            <th class="text-center p-2">Assigned Vehicle Type</th>
+            <th class="text-center p-2">Customer name</th>
+            <th class="text-center p-2">Assigned Vehicle Reg.</th>
+            <th class="text-center p-2">Assigned PG number</th>
+
+          
+
+            <!-- Internal child ticket fields -->
+            <th class="text-center p-2">Child Ticket date</th> 
+            <th class="text-center p-2"style="white-space:normal">Child Ticket Number</th>
+            <th class="text-center p-2" style="white-space:normal">Internal child Generator Start Date</th>
+            <th class="text-center p-2">Internal child Generator Start Time</th>
+            <th class="text-center p-2"style="white-space:normal">Internal child Generator Stop Date</th>
+            <th class="text-center p-2">Internal child Generator Stop Time</th>
+            <th class="text-center p-2">Internal child  Generator Running Hours</th>
+            <th class="text-center p-2">Internal child Calculated Fuel Litre</th>
+            <th class="text-center p-2">Image</th>
+
+            
+          </tr>
+        </thead>
+        <tbody>
+          {% for parent_ticket in page_obj %}
+          
+            {% for child_ticket in parent_ticket.prefetched_child_tickets %}
+              <tr>
+
+                <td class="text-center p-2" style="white-space: nowrap;">{{ parent_ticket.region}}</td> 
+                <td class="text-center p-2" style="white-space: nowrap;">{{ parent_ticket.zone }}</td> 
+                <td class="text-center p-2" style="white-space: nowrap;">{{ parent_ticket.mp }}</td> 
+
+
+
+                <td class="text-center p-2" style="white-space: nowrap;">{{ parent_ticket.created_at }}</td> 
+                <td class="text-center p-2">{{ parent_ticket.internal_ticket_number }}</td>             
+                <td class="text-center p-2" style="font-size: 14px; white-space: nowrap;color:black">{{ parent_ticket.customer_ticket_ref }}</td>
+                <td class="text-center p-2" style="font-size: 14px; white-space: nowrap;color:black">{{ parent_ticket.site_id }}</td>
+                <td class="text-center p-2" style="font-size: 14px; white-space: nowrap;color:black">{{ parent_ticket.ticket_origin_date }}</td>
+                <td class="text-center p-2" style="font-size: 14px; white-space: nowrap;color:black">{{ parent_ticket.ticket_status }}</td>
+                <td class="text-center p-2" style="font-size: 14px; white-space: nowrap;color:black">{{ parent_ticket.assigned_to }}</td>
+                <td class="text-center p-2" style="font-size: 14px; white-space: nowrap;color:black">{{ parent_ticket.assigned_pg_runner_type }}</td> 
+                <td class="text-center p-2" style="font-size: 14px; white-space: nowrap;color:black">{{ parent_ticket.assigned_vehicle_type }}</td>
+                <td class="text-center p-2" style="font-size: 14px; white-space: nowrap;color:black">{{ parent_ticket.customer_name }}</td>
+                <td class="text-center p-2" style="font-size: 14px; white-space: nowrap;color:black">{{ parent_ticket.vehicle.vehicle_reg_number }}</td>
+                <td class="text-center p-2" style="font-size: 14px; white-space: nowrap;color:black">{{ parent_ticket.pgnumber.PGNumber }}</td>
+              
+                               
+                <td class="text-center p-2" style="white-space: nowrap;">{{ child_ticket.created_at }}</td> 
+                <td class="text-center p-2">{{ child_ticket.child_ticket_number }}</td>
+                <td class="text-center p-2" style="white-space: nowrap;">{{ child_ticket.child_internal_generator_start_date }}</td>
+                <td class="text-center p-2">{{ child_ticket.child_internal_generator_start_time }}</td>                  
+                <td class="text-center p-2" style="white-space: nowrap;">{{ child_ticket.child_internal_generator_stop_date }}</td>
+                <td class="text-center p-2">{{ child_ticket.child_internal_generator_stop_time }}</td>
+                <td class="text-center p-2">{{ child_ticket.child_internal_generator_running_hours }}</td>
+                <td class="text-center p-2">{{ child_ticket.child_internal_calculated_fuel_litre }}</td>
+                
+                <td class="text-center p-2" style="white-space: nowrap;">
+                  {% if child_ticket.child_tt_image %}
+                    <a href="{{ child_ticket.child_tt_image.url }}" target="_blank">
+                      <img 
+                        src="{{ child_ticket.child_tt_image.url }}" 
+                        alt="Child Ticket Image" 
+                        style="cursor: pointer; width:50px;height:50px">
+                    </a>
+                  {% else %}
+                    No image available
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+           
+          {% endfor %}
+        </tbody>
+      </table>
+    </div> 
+  </div>
+
+  <div class="pagination" style="padding:10px">
+    {% if page_obj.has_previous %}
+      <a style="margin:10px; font-size: 14px;" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+    {% endif %}
+    
+    {% for num in page_obj.paginator.page_range %}
+      {% if page_obj.number == num %}
+        <span style="margin:10px; font-size:14px">{{ num }}</span>
+      {% else %}
+        <a style="margin:10px; font-size:14px" href="?page={{ num }}">{{ num }}</a>
+      {% endif %}
+    {% endfor %}
+    
+    {% if page_obj.has_next %}
+      <a style="margin:10px; font-size:14px" href="?page={{ page_obj.next_page_number }}">Next</a>
+    {% endif %}
+  </div>
+</div>
+
+  
+    
+    
+
+
+
+    <div class="col" style="height:900px"></div>
+        
+
+
+
+
+
+    
+    <script>
+
+
+        $(document).ready(function(){      
+            var regionZoneMapping = {
+                'Sylhet': ['','Sylhet', 'Moulovibazar','Mymensingh','Kisorganj','Tangail'], 
+                'Rangpur': ['','Rangpur', 'Dinajpur','Bagura','Rajshahi'] ,
+               
+                
+            };
+         
+            $('#id_region').change(function(){
+                var selectedRegion = $(this).val();
+                var zoneChoices = regionZoneMapping[selectedRegion];
+                $('#id_zone').empty();
+                $.each(zoneChoices, function(index, value){
+                    $('#id_zone').append($('<option>').text(value).attr('value', value));
+                });
+            });
+
+                  
+            var zoneMpMapping = {              
+                'Sylhet': ['','Sylhet','Taherpur','Sunamganj','Bianibazar','Dorbhost','Dherai','Chatak'], // Add more MPs for Sylhet zone
+                'Moulovibazar': ['','Moulovibazar', 'Saestaganj','Juri','Baniachong'],
+                'Mymensingh': ['','Mymensingh', 'Fulpur','Valuka'] ,
+                'Kisorganj': ['','Kisorganj','Katiadi','Netrokona','Mohonpur','Austogram'],
+                'Tangail': ['','Tangail','Madhupur','Jamalpur','Sherpur','Bakshihanj','Rowmari'],
+               
+                'Rangpur':['','Rangpur','Hatibandha','Gaibandha','Ulipur','Boropar','Polasbari'],
+                'Dinajpur':['','Dinajpur','Panchghor','Jaldhaka','Thakurgaon'],
+                'Rajshahi':['','Rajshahi','Bagura','Nachole','Natore','Chapai'],
+                'Bagura':['','Bagura']
+               
+            };
+
+
+
+       
+            $('#id_zone').change(function(){
+                var selectedZone = $(this).val();
+                var mpChoices = zoneMpMapping[selectedZone];
+                $('#id_mp').empty();
+                $.each(mpChoices, function(index, value){
+                    $('#id_mp').append($('<option>').text(value).attr('value', value));
+                });
+            });
+        });
+
+
+
+
+
+
+
+
+    
+    function zoomInOut(image) {   
+        var currentScale = parseFloat(image.style.transform.replace('scale(', '').replace(')', '')) || 1;
+           
+        var newScale = currentScale === 1 ? 1.5 : 1;       
+  
+        image.style.transform = 'scale(' + newScale + ')';
+    }
+
+    </script>
+{% endblock %}

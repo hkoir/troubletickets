@@ -1,0 +1,191 @@
+{% extends "base.html" %}
+{% load static %}
+
+
+{% block content %}
+
+
+
+    <style>
+
+    html, body { 
+       font-family: Verdana, sans-serif; 
+    
+  }
+
+
+  
+  table {
+            border-collapse: collapse;
+            width: 100%;
+      
+        }
+
+        th, td {
+            border: 1px solid rgb(227, 87, 7); /* Set border color for individual cells */
+            text-align: left;
+            padding: 0px;
+        }
+        th{
+        background-color: rgb(52, 232, 100);
+      }
+      
+
+    table thead th {
+    white-space: normal;
+        }
+
+        #main-content {   
+    overflow-y: auto;
+    margin-left:0px;
+    position: absolute;
+    width: 100%;
+    left: 0;
+  
+}
+
+    </style>
+
+    
+  
+{% if messages %}
+<div class="messages">
+  {% for message in messages %}
+    <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+      {{ message }}
+    </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+
+
+
+
+
+    <h4 class="text-center" style="margin-top:10px">DOPS form</h4>
+    <div class="container-fluid">
+        <div class="row row-cols-1 row-cols-md-3 p-2">
+            <div class="col"></div>
+            <div class="col-md-6"> <!-- Adjust the width for medium screens -->
+                <div class="card" style="background-color: bisque; padding:10px;">
+                    <div class="card-body">
+                        <h4 class="card-title" style="margin-bottom:20px">Create PG</h4>
+                       
+                        <form method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            {{ form.as_p }}
+                           
+                            <div><button type="submit" class="btn btn-primary">Submit</button></div>
+                        </form>
+                        
+                    </div>
+                </div>
+            </div>
+            <div class="col"></div>
+        </div>
+    </div>
+   
+
+
+
+ 
+
+
+
+
+<div class="container-fluid" id ='main-content'>
+    <div class="row">
+        <div class="col-xl-12">   
+            <h1>PG database</h1>
+            <table>
+                <thead>
+                    <tr>
+                    
+                        <th class="text-center p-2">Region</th>
+                        <th class="text-center p-2">Zone</th>
+                        <th class="text-center p-2">MP</th>            
+
+                        <th class="text-center p-2">PG admin</th>
+                        <th class="text-center p-2">PG code</th>
+                        <th class="text-center p-2">PG Number</th>
+                        <th class="text-center p-2">PG Status</th>
+                        <th class="text-center p-2"> PG_brand</th>
+                        <th class="text-center p-2"> PG_serial_number</th>
+
+                        <th class="text-center p-2">PG_capacity</th>
+                        <th class="text-center p-2"> PG_supplier</th>
+                        <th class="text-center p-2">PG_purchase_date</th>
+
+                        <th class="text-center p-2"> PG_hire_date</th>
+                        <th class="text-center p-2"> PG_supporting_documents</th>                
+                        <th class="text-center p-2">Created at</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for pg in page_obj %}
+
+                    <tr>
+                    
+                        <td class="text-center p-2"style="white-space: nowrap;">{{ pg.region }}</td>
+                        <td class="text-center p-2"style="white-space: nowrap;">{{ pg.zone }}</td>
+                        <td class="text-center p-2"style="white-space: nowrap;">{{ pg.mp }}</td>
+                        <td class="text-center p-2"style="white-space: nowrap;">{{ pg.PG_add_requester }}</td>
+                        <td class="text-center p-2"style="white-space: nowrap;">{{ pg.PG_code }}</td>             
+                        <td class="text-center p-2" style="white-space: nowrap;">{{ pg.PGNumber }}</td>
+                        <td class="text-center p-2" style="white-space: nowrap;">{{ pg.PG_status }}</td>
+                        
+                        <td class="text-center p-2" style="white-space: nowrap;">{{ pg.PG_brand }}</td>
+
+                        <td class="text-center p-2"style="white-space: nowrap;">{{ pg.PG_serial_number }}</td>
+                        <td class="text-center p-2"style="white-space: nowrap;">{{ pg.PG_capacity }}</td>
+                        <td class="text-center p-2"style="white-space: nowrap;">{{ pg.PG_supplier }}</td>
+                        <td class="text-center p-2"style="white-space: nowrap;">{{ pg.PG_purchase_date }}</td>
+                        <td class="text-center p-2"style="white-space: nowrap;">{{ pg.PG_hire_date }}</td>
+                        <td class="text-center p-2"style="white-space: nowrap;">
+                            {% if pg.PG_supporting_documents %}
+                            <a href="{{ pg.PG_supporting_documents.url }}" target="_blank">
+                                <img src="{{ pg.PG_supporting_documents.url }}" alt="Supporting Document" style="cursor: pointer; width: 50px; height: 50px;">
+                            </a>
+                            {% else %}
+                            No image available
+                            {% endif %}
+                        </td>   
+
+                        <td class="text-center p-2"style="white-space: nowrap;">{{ pg.created_at }}</td>
+                    
+                    </tr> 
+                    {% endfor %} 
+                </tbody>
+            </table>
+
+            <div class="pagination" style="padding:10px">
+                {% if page_obj.has_previous %}
+                    <a style="margin:10px; font-size: 14px;" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                {% endif %}
+                
+                {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                        <span style="margin:10px; font-size:14px">{{ num }}</span>
+                    {% else %}
+                        <a style="margin:10px; font-size:14px"href="?page={{ num }}">{{ num }}</a>
+                    {% endif %}
+                {% endfor %}
+                
+                {% if page_obj.has_next %}
+                    <a style="margin:10px; font-size:14px"href="?page={{ page_obj.next_page_number }}">Next</a>
+                {% endif %}
+            </div>
+
+        </div>
+</div>
+
+
+
+<div class="col" style="height:600px"></div>
+
+    
+{% endblock %}
+
+
+

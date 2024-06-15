@@ -1,0 +1,75 @@
+
+{% extends "base.html" %}
+{% load static %}
+
+
+
+{% block content %}
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Ticket</title>
+
+
+    <style>
+
+
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@100;200;300;400;500;600;700;900&display=swap');
+
+html, body { 
+       font-family: Verdana, sans-serif; 
+     
+  }
+
+    </style>
+</head>
+<body>
+    
+    <h1 class ='text-center'>Input attendance</h1>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col"></div>
+            <div class="col">
+                <div class="card" style="margin:20px;padding:20px;background-color: bisque;">
+                    <div class="card-body">
+                        <h5 class="card-title">Employee attendance form</h5>
+                        <form method="post">
+                            {% csrf_token %}
+                            {{ form.as_p }}
+                            <button type="submit">Submit</button>
+                        </form>
+                        <!-- Display form errors if any -->
+                        {% if form.errors %}
+                            <ul>
+                                {% for field in form %}
+                                    {% for error in field.errors %}
+                                        <li>{{ error }}</li>
+                                    {% endfor %}
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </div>
+                </div>
+                
+
+            </div>
+            <div class="col" style="width:200px;height:1000px"></div>
+        </div>
+    </div>
+
+
+    
+</body>
+</html>
+
+
+
+
+
+{% endblock %}

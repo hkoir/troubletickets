@@ -1,0 +1,135 @@
+
+{% extends "base.html" %}
+{% load static %}
+
+
+
+{% block content %}
+
+
+<style>
+    /* Define grid layout */
+    .grid-container {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        grid-gap: 5px;
+        padding: 5px;
+    }
+
+    /* Style cards */
+    .card {
+        background-color: #f0f0f0;
+        padding: 10px;
+        border-radius: 5px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+</style>
+
+<h4 class=" text-center" style="margin-top:10px">DOPS DASHBOARD</h4>
+
+
+
+ <div class="container-fluid">
+    <div class="row row-cols-3 row-cols-md-6 p-2">
+     
+
+    <div class="card" style="background-color: white;">
+        <a class="text-center" style="text-decoration: none;" href="{% url 'tickets:tt_management' %}">
+            <img class="rounded-pill" src="{% static 'images/view.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
+            <br>TT Manage</a>
+    </div>
+
+
+    
+
+        <!-- Vehicle management-->
+
+        <div class="card" style="background-color: white;">
+            <a class="text-center" style="text-decoration: none;" href="{% url 'vehicle:fleet_management' %}">
+                <img class="rounded-pill" src="{% static 'images/pickup.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
+                <br>Fleet Manage</a>
+        </div>
+    
+    
+    
+              <!-- PG management-->
+    
+              <div class="card" style="background-color: white;">
+                <a class="text-center" style="text-decoration: none;" href="{% url 'generator:pg_management' %}">
+                    <img class="rounded-pill" src="{% static 'images/generator.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
+    
+                    <br>PG Manage</a>
+              </div>
+    
+    
+
+
+  
+    <!-- money_requisition -->
+
+    <div class="card" style="background-color: white;">
+        <a class="text-center" style="text-decoration: none;" href="{% url 'dailyexpense:expense_advance_management' %}">
+            <img class="rounded-pill" src="{% static 'images/money.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
+            <br>Expense & Advance</a>
+    </div>
+
+    <div class="card" style="background-color: white;">
+        <a class="text-center" style="text-decoration: none;" href="{% url 'dailyexpense:operational_resource_management' %}">
+            <i class="fas fa-tools"></i>
+            <br>Operational Resource</a>
+    </div>
+    
+
+    <div class="card" style="background-color: white;">
+        <a class="text-center" style="text-decoration: none;" href="{% url 'employee:human_resource_management' %}">
+            <img class="rounded-pill" src="{% static 'images/hr.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
+            <br>HR management</a>
+    </div>
+    
+    
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+
+</div>
+
+
+
+<div class="col" style="height:400px"></div>
+
+
+
+{% for audio in audio_files %}
+    {% if audio.logged_in_success %}
+        <audio id="successAudio" src="{{ audio.logged_in_success.url }}" preload="auto"></audio>
+    {% endif %}
+{% endfor %}
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var successAudio = document.getElementById('successAudio');
+
+        if (successAudio) {
+            var audioPlayed = localStorage.getItem('audioPlayed');
+
+            if (!audioPlayed) {
+                successAudio.play();
+                localStorage.setItem('audioPlayed', 'true');
+            }
+        }
+    });
+</script>
+
+
+
+{% endblock %}
