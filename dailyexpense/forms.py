@@ -1,7 +1,7 @@
 
 from django import forms
 from account.models import Customer
-from tickets.mp_list import REGION_CHOICES,ZONE_CHOICES,MP_CHOICES
+from common.models import Region,Zone,MP
 from .models import MoneyRequisition, SummaryExpenses
 from datetime import timedelta
 from .models import DailyExpenseRequisition,SummaryExpenses,AdhocRequisition
@@ -14,10 +14,7 @@ class MoneyRequisitionForm(forms.ModelForm):
         model = MoneyRequisition
         fields = ['region', 'zone','purpose', 'requisition_amount', 'supporting_documents']
  
-    region = forms.ChoiceField(choices=REGION_CHOICES)
-    zone = forms.ChoiceField(choices=ZONE_CHOICES)
-
- 
+    
 
 class ApprovalForm(forms.ModelForm):
     class Meta:
@@ -123,8 +120,10 @@ class SummaryExpensesForm(forms.ModelForm):
 
 
 
+from .models import Region, Zone, MP
+
 class ZoneWiseExpensesForm(forms.Form):
-    zone = forms.ChoiceField(choices=ZONE_CHOICES, required=True)
+    zone = forms.ModelChoiceField(queryset=Zone.objects.all(), required=False)
     start_date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}), required=True)
     end_date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}), required=True)
 
@@ -135,12 +134,11 @@ class ExpenseRequisitionForm(forms.ModelForm):
         model = DailyExpenseRequisition
         fields = ['region', 'zone','mp','purpose','pgnumber','vehicle', 'requisition_amount','from_address','to_address','mode_travel','supporting_documents','description']
  
-    region = forms.ChoiceField(choices=REGION_CHOICES)
-    zone = forms.ChoiceField(choices=ZONE_CHOICES)
-    mp = forms.ChoiceField(choices=MP_CHOICES)
+ 
    
 
 
+from tickets.mp_list import REGION_CHOICES,ZONE_CHOICES,MP_CHOICES
 class ExpenseRequisitionStatusForm(forms.Form):
     start_date = forms.DateField(
         label='Start Date',
@@ -158,49 +156,28 @@ class ExpenseRequisitionStatusForm(forms.Form):
         required=False
     )
     region = forms.ChoiceField(
-        label ='Select Region',
-        required = False,
-        choices=[('', '------')] + REGION_CHOICES
-
+        label='Select Region',
+        required=False,
+        choices=REGION_CHOICES
     )
-
     zone = forms.ChoiceField(
-        label ='Select zone',
-        required = False,
-        choices=[('', '------')] + ZONE_CHOICES
-
+        label='Select Zone',
+        required=False,
+        choices=ZONE_CHOICES
     )
-
     mp = forms.ChoiceField(
-        label ='Select MP',
-        required = False,
-       choices=[('', '------')] + MP_CHOICES
-
+        label='Select MP',
+        required=False,
+        choices=MP_CHOICES
     )
 
+    # def __init__(self, *args, **kwargs):
+    #     super().__init__(*args, **kwargs)
 
-
-    def clean(self):
-        cleaned_data = super().clean()
-        start_date = cleaned_data.get('start_date')
-        end_date = cleaned_data.get('end_date')
-        days = cleaned_data.get('days')    
-
-        if start_date and end_date and days:
-            raise forms.ValidationError('Please specify either a date range or the number of days, but not both.')
-        
-        if (start_date and not end_date) or (end_date and not start_date):
-            raise forms.ValidationError('Both start and end dates must be specified if you choose date range.')
-        
-        if not (start_date or end_date or days):
-            raise forms.ValidationError('Please specify a date range or number of days for the report.')
-
-        if start_date and end_date and start_date > end_date:
-            raise forms.ValidationError('Start date must be earlier than end date.')
-
-        return cleaned_data
-
-
+    #     # Fetching data from the models to populate choices
+    #     self.fields['region'].choices = [('', '------')] + [(region.id, region.name) for region in Region.objects.all()]
+    #     self.fields['zone'].choices = [('', '------')] + [(zone.id, zone.name) for zone in Zone.objects.all()]
+    #     self.fields['mp'].choices = [('', '------')] + [(mp.id, mp.name) for mp in MP.objects.all()]
 
 
 
@@ -210,8 +187,8 @@ class AdhocRequisitionForm(forms.ModelForm):
         model = AdhocRequisition
         fields = ['region', 'zone','no_of_adhoc_man_day','no_of_adhoc_vehicle_day','purpose', 'requisition_amount', 'supporting_documents']
  
-    region = forms.ChoiceField(choices=REGION_CHOICES)
-    zone = forms.ChoiceField(choices=ZONE_CHOICES)
+
+
 
 
 
@@ -232,49 +209,34 @@ class AdhocRequisitionStatusForm(forms.Form):
         required=False
     )
     region = forms.ChoiceField(
-        label ='Select Region',
-        required = False,
-        choices=[('', '------')] + REGION_CHOICES
-
+        label='Select Region',
+        required=False
     )
-
     zone = forms.ChoiceField(
-        label ='Select zone',
-        required = False,
-        choices=[('', '------')] + ZONE_CHOICES
-
+        label='Select Zone',
+        required=False
     )
-
     mp = forms.ChoiceField(
-        label ='Select MP',
-        required = False,
-       choices=[('', '------')] + MP_CHOICES
-
+        label='Select MP',
+        required=False
     )
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
-
-    def clean(self):
-        cleaned_data = super().clean()
-        start_date = cleaned_data.get('start_date')
-        end_date = cleaned_data.get('end_date')
-        days = cleaned_data.get('days')    
-
-        if start_date and end_date and days:
-            raise forms.ValidationError('Please specify either a date range or the number of days, but not both.')
-        
-        if (start_date and not end_date) or (end_date and not start_date):
-            raise forms.ValidationError('Both start and end dates must be specified if you choose date range.')
-        
-        if not (start_date or end_date or days):
-            raise forms.ValidationError('Please specify a date range or number of days for the report.')
-
-        if start_date and end_date and start_date > end_date:
-            raise forms.ValidationError('Start date must be earlier than end date.')
-
-        return cleaned_data
+        # Fetching data from the models to populate choices
+        self.fields['region'].choices = [('', '------')] + [(region.id, region.name) for region in Region.objects.all()]
+        self.fields['zone'].choices = [('', '------')] + [(zone.id, zone.name) for zone in Zone.objects.all()]
+        self.fields['mp'].choices = [('', '------')] + [(mp.id, mp.name) for mp in MP.objects.all()]
 
 
 
 
 
+class dailyExpenseSummaryForm(forms.Form):
+    start_date = forms.DateField(required=False, widget=forms.TextInput(attrs={'type': 'date'}))
+    end_date = forms.DateField(required=False, widget=forms.TextInput(attrs={'type': 'date'}))
+    days = forms.IntegerField(required=False)
+    region = forms.ModelChoiceField(queryset=Region.objects.all(), required=False)
+    zone = forms.ModelChoiceField(queryset=Zone.objects.all(), required=False)
+    mp = forms.ModelChoiceField(queryset=MP.objects.all(), required=False)

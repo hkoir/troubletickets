@@ -8,6 +8,10 @@
 
     <title>PG fault record</title>
 
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
     <style>
 
 
@@ -46,6 +50,32 @@ html, body {
     
     
 
+    <script>
+        $(document).ready(function() {
+            $('#id_pgnumber').select2({
+                width: '100%', 
+                ajax: {
+                    url: "{% url 'dailyexpense:common_search' %}",
+                    dataType: 'json',
+                    delay: 250,
+                    data: function(params) {
+                        return {
+                            q: params.term
+                        };
+                    },
+                    processResults: function(data) {
+                        return {
+                            results: data.results
+                        };
+                    },
+                    cache: true
+                },
+                minimumInputLength: 1, 
+                placeholder: 'Search',
+                allowClear: true
+            });
+        });
+    </script>
 
 
 {% endblock %}

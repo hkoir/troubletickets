@@ -1,46 +1,45 @@
 
 from django import forms
 from account.models import Customer
-from tickets.mp_list import REGION_CHOICES,ZONE_CHOICES,MP_CHOICES
 from datetime import timedelta
 from .models import AddVehicleInfo,VehicleRuniningData,FuelRefill
 from .models import VehicleRentalCost,Vehiclefault
 
-
-
+from common.models import Region,Zone,MP
+from tickets.mp_list import REGION_CHOICES,ZONE_CHOICES,MP_CHOICES
 
 
 
 class AdVehicleForm(forms.ModelForm):
     vehicle_joining_date = forms.DateField(label='vehicle_joining_date', required=False, widget=forms.DateInput(attrs={'type': 'date'}))
-    vehicle_cancel_date = forms.DateField(label='vehicle_cancel_date', required=False, widget=forms.DateInput(attrs={'type': 'date'}))
+         
     class Meta:
         model = AddVehicleInfo
-        exclude = ['vehicle_id','vehicle_add_requester','created_at'] 
+        exclude = ['vehicle_id','vehicle_add_requester','created_at','vehicle_cancel_date'] 
  
    
-   
-class AddVehicleExpensesForm(forms.ModelForm):      
+class AddVehicleExpensesForm(forms.ModelForm):
     start_time = forms.DateTimeField(label='Start Time', required=False, widget=forms.DateTimeInput(attrs={'type': 'datetime-local'}))
     stop_time = forms.DateTimeField(label='Stop Time', required=False, widget=forms.DateTimeInput(attrs={'type': 'datetime-local'}))
+
     class Meta:
         model = VehicleRuniningData
-        exclude = ['fuel_refill','total_fuel_cost','vehicle_expense_id',
-                   'vehicle_expense_add_requester','total_kilometer_run',
-                   'Vehicle_fuel_balance','total_fuel_consumed',
-                   'created_at',
-                   'travel_date',
-                   'running_hours',
-                   'overtime_hours',
-                   'overtime_cost',
-                   'fuel_balance',
-                   'comments'
-                   ] 
-        
+        exclude = ['fuel_refill', 'total_fuel_cost', 'vehicle_expense_id',
+                   'vehicle_expense_add_requester', 'total_kilometer_run',
+                   'Vehicle_fuel_balance', 'total_fuel_consumed',
+                   'created_at', 'travel_date', 'running_hours',
+                   'overtime_hours', 'overtime_cost', 'fuel_balance', 'comments']
+
         widgets = {
             'vehicle': forms.Select(attrs={'class': 'form-control'}),
         }
-  
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['region'].queryset = Region.objects.all()
+        self.fields['zone'].queryset = Zone.objects.all()
+        self.fields['mp'].queryset = MP.objects.all()
+
 
    
    
@@ -51,8 +50,7 @@ class FuelRefillForm(forms.ModelForm):
         model = FuelRefill
         exclude = ['fuel_refill_code','vehicle_total_fuel_reserve','refill_requester',
                    'vehicle_kilometer_run','vehicle_fuel_consumed',
-                   'vehicle_fuel_balance','created_at','vehicle_rent_paid_amount',
-                   'refill_date'
+                   'vehicle_fuel_balance','created_at','refill_date'
                    ] 
         widgets = {
             'vehicle': forms.Select(attrs={'class': 'form-control'}),
@@ -83,7 +81,6 @@ class UpdateVehicleDatabaeForm(forms.ModelForm):
         #     self.fields['hepta_generator_stop_time'].widget = forms.HiddenInput()
      
 
-
 class vehicleSummaryReportForm(forms.Form):
     start_date = forms.DateField(
         label='Start Date',
@@ -101,25 +98,30 @@ class vehicleSummaryReportForm(forms.Form):
         required=False
     )
     region = forms.ChoiceField(
-        label ='Select Region',
-        required = False,
-        choices=[('', '------')] + REGION_CHOICES
-
+        label='Select Region',
+        required=False
     )
-
     zone = forms.ChoiceField(
-        label ='Select zone',
-        required = False,
-        choices=[('', '------')] + ZONE_CHOICES
-
+        label='Select Zone',
+        required=False
     )
-
     mp = forms.ChoiceField(
-        label ='Select MP',
-        required = False,
-       choices=[('', '------')] + MP_CHOICES
-
+        label='Select MP',
+        required=False
     )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Fetching data from the models to populate choices
+        self.fields['region'].choices = [('', '------')] + [(region.id, region.name) for region in Region.objects.all()]
+        self.fields['zone'].choices = [('', '------')] + [(zone.id, zone.name) for zone in Zone.objects.all()]
+        self.fields['mp'].choices = [('', '------')] + [(mp.id, mp.name) for mp in MP.objects.all()]
+
+        # Debugging: Print choices to verify
+        print("Region choices:", self.fields['region'].choices)
+        print("Zone choices:", self.fields['zone'].choices)
+        print("MP choices:", self.fields['mp'].choices)
 
 
    
@@ -163,34 +165,14 @@ class VehicleDetailsForm(forms.Form):
 
 
 
-class VehicleDatabaseViewForm(forms.Form):   
-    region = forms.ChoiceField(
-        label ='Select Region',
-        required = False,
-        choices=[('', '------')] + REGION_CHOICES
-
-    )
-
-    zone = forms.ChoiceField(
-        label ='Select zone',
-        required = False,
-        choices=[('', '------')] + ZONE_CHOICES
-
-    )
-
-    mp = forms.ChoiceField(
-        label ='Select MP',
-        required = False,
-       choices=[('', '------')] + MP_CHOICES
-
-    )
-
+class VehicleDatabaseViewForm(forms.Form): 
     vehicle_reg_number = forms.CharField(label='Vehicle Registration Number', required=False)  # Add this field
-
+    region = forms.ChoiceField(choices=REGION_CHOICES, required=False)
+    zone = forms.ChoiceField(choices=ZONE_CHOICES, required=False)
+    mp = forms.ChoiceField(choices=MP_CHOICES, required=False)
     class Meta:
         model = AddVehicleInfo
         fields = ['region',' zone','mp','vehicle_reg_number'] 
-
 
 
 class RentalPeriodForm(forms.Form):
@@ -199,26 +181,7 @@ class RentalPeriodForm(forms.Form):
 
 
 
-class VehiclePaymentForm(forms.ModelForm):
-    region = forms.ChoiceField(
-        label='Select Region',
-        required=False,
-        choices=[('', '------')] + REGION_CHOICES
-    )
-
-    zone = forms.ChoiceField(
-        label='Select zone',
-        required=False,
-        choices=[('', '------')] + ZONE_CHOICES
-    )
-
-    mp = forms.ChoiceField(
-        label='Select MP',
-        required=False,
-        choices=[('', '------')] + MP_CHOICES
-    )
-
-   
+class VehiclePaymentForm(forms.ModelForm):   
     class Meta:
         model = VehicleRentalCost
         fields = ['region', 'zone', 'mp', 'vehicle', 'vehicle_rent_paid', 'vehicle_body_overtime_paid', 'vehicle_driver_overtime_paid']
@@ -228,27 +191,51 @@ class VehiclePaymentForm(forms.ModelForm):
 class VehicleFaulttForm(forms.ModelForm):
     fault_start_time = forms.DateTimeField(label='Fault Time', required=False, widget=forms.DateTimeInput(attrs={'type': 'datetime-local'}))
     fault_stop_time = forms.DateTimeField(label='Fault End Time', required=False, widget=forms.DateTimeInput(attrs={'type': 'datetime-local'}))
-    region = forms.ChoiceField(
-        label='Select Region',
-        required=False,
-        choices=[('', '------')] + REGION_CHOICES
-    )
-
-    zone = forms.ChoiceField(
-        label='Select zone',
-        required=False,
-        choices=[('', '------')] + ZONE_CHOICES
-    )
-
-    mp = forms.ChoiceField(
-        label='Select MP',
-        required=False,
-        choices=[('', '------')] + MP_CHOICES
-    )
-
+   
    
     class Meta:
         model = Vehiclefault
         fields = ['region', 'zone', 'mp', 'vehicle', 'fault_start_time','fault_stop_time','fault_type','fault_location']
 
 
+
+
+
+
+
+class vehicleSummaryReportForm(forms.Form):
+    start_date = forms.DateField(
+        label='Start Date',
+        widget=forms.DateInput(attrs={'type': 'date'}),
+        required=False
+    )
+    end_date = forms.DateField(
+        label='End Date',
+        widget=forms.DateInput(attrs={'type': 'date'}),
+        required=False
+    )
+    days = forms.IntegerField(
+        label='Number of Days',
+        min_value=1,
+        required=False
+    )
+    region = forms.ChoiceField(
+        label='Select Region',
+        required=False
+    )
+    zone = forms.ChoiceField(
+        label='Select Zone',
+        required=False
+    )
+    mp = forms.ChoiceField(
+        label='Select MP',
+        required=False
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Fetching data from the models to populate choices
+        self.fields['region'].choices = [('', '------')] + [(region.id, region.name) for region in Region.objects.all()]
+        self.fields['zone'].choices = [('', '------')] + [(zone.id, zone.name) for zone in Zone.objects.all()]
+        self.fields['mp'].choices = [('', '------')] + [(mp.id, mp.name) for mp in MP.objects.all()]

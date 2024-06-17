@@ -92,7 +92,8 @@ white-space: normal;
                         <th class="text-center p-2">TT OTW</th> 
                         <th class="text-center p-2">Team assign</th>   
                         <th class="text-center p-2">TT Open</th>   
-                        <th class="text-center p-2">TT invalid</th>                     
+                        <th class="text-center p-2">TT invalid</th>    
+                        <th class="text-center p-2">No of adhoc used</th>                   
                    
 
                         <th class="text-center p-2" >Internal Running Hours</th>
@@ -103,8 +104,8 @@ white-space: normal;
                 <tbody>
                     {% for item in summary_data %}
                     <tr>
-                        <td class="text-center p-2">{{ item.region }}</td>
-                        <td class="text-center p-2">{{ item.zone }}</td>
+                        <td class="text-center p-2">{{ item.region__name}}</td>
+                        <td class="text-center p-2">{{ item.zone__name }}</td>
 
                         <td class="text-center p-2">{{ item.num_tickets }}</td>
                       
@@ -118,6 +119,7 @@ white-space: normal;
                         <td class="text-center p-2">{{ item.num_team_assign_tickets }}</td>
                         <td class="text-center p-2">{{ item.num_open_tickets }}</td>
                         <td class="text-center p-2">{{ item.num_invalid_tickets }}</td>
+                        <td class="text-center p-2" style="background-color: chocolate;">{{ item.num_adhoc_PGR }}</td>
                       
                         <td class="text-center p-2">{{ item.total_hepta_running_hours }}</td>
                         <td class="text-center p-2">{{ item.total_edotco_running_hours }}</td>

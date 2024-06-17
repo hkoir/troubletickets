@@ -22,9 +22,21 @@ class CreateTicketFormEdotco(forms.ModelForm):
         model =  eTicket
         fields = ['region', 'zone', 'mp', 'site_id','customer_ticket_ref','customer_name']
    
-    # region = forms.ChoiceField(choices=REGION_CHOICES)
-    # zone = forms.ChoiceField(choices=ZONE_CHOICES)
-    # mp = forms.ChoiceField(choices=MP_CHOICES)
+ 
+
+
+class CreateTicketFormEdotco2(forms.ModelForm):
+    class Meta:
+        model = eTicket
+        fields = ['region', 'zone', 'mp', 'site_id', 'customer_ticket_ref', 'customer_name']
+        widgets = {
+            'region': forms.Select(attrs={'class': 'form-control', 'id': 'id_region'}),
+            'zone': forms.Select(attrs={'class': 'form-control', 'id': 'id_zone'}),
+            'mp': forms.Select(attrs={'class': 'form-control', 'id': 'id_mp'}),
+        }
+
+
+
 
 
 class UpdateTicketFormEdotco(forms.ModelForm):
@@ -112,7 +124,7 @@ class DateFormEdotco(forms.ModelForm):
 
 
 
-class SummaryReportForm(forms.Form):
+class SummaryReportForm2(forms.Form):
     report_date = forms.DateField(
         label='Report Date',
         widget=forms.DateInput(attrs={'type': 'date'}),
@@ -123,64 +135,44 @@ class SummaryReportForm(forms.Form):
         min_value=1,
         required=False
     )
+from common.models import Region, Zone, MP
+from.mp_list import REGION_CHOICES,ZONE_CHOICES,MP_CHOICES
+class SummaryReportForm(forms.Form):
+    report_date = forms.DateField(required=False, widget=forms.TextInput(attrs={'type': 'date'}))
+    days = forms.IntegerField(required=False)
+    region = forms.ModelChoiceField(queryset=Region.objects.all(), required=False)
+    zone = forms.ModelChoiceField(queryset=Zone.objects.all(), required=False)
+    mp = forms.ModelChoiceField(queryset=MP.objects.all(), required=False)
+    # region = forms.ChoiceField(choices=REGION_CHOICES, required=False)
+    # zone = forms.ChoiceField(choices=ZONE_CHOICES, required=False)
+    # mp = forms.ChoiceField(choices=MP_CHOICES, required=False)
+
 
 
 
 
 class MPReportForm(forms.Form):
-    mp = forms.ChoiceField(label='Select MP', choices=MP_CHOICES, required=True)
-    days = forms.IntegerField(label='Number of Days', min_value=1, required=False)
-    start_date = forms.DateField(label='Start Date', required=False, widget=forms.DateInput(attrs={'type': 'date'}))
-    end_date = forms.DateField(label='End Date', required=False, widget=forms.DateInput(attrs={'type': 'date'}))
+     start_date = forms.DateField(required=False, widget=forms.TextInput(attrs={'type': 'date'}))
+     end_date = forms.DateField(required=False, widget=forms.TextInput(attrs={'type': 'date'}))
+     days = forms.IntegerField(required=False)     
+     mp = forms.ModelChoiceField(queryset=MP.objects.all(), required=False)
 
-    def clean(self):
-        cleaned_data = super().clean()
-        days = cleaned_data.get('days')
-        start_date = cleaned_data.get('start_date')
-        end_date = cleaned_data.get('end_date')
-   
-        if days and (start_date or end_date):
-            raise forms.ValidationError("You can't specify both a date range and number of days.")
-      
-        if start_date and not end_date:
-            raise forms.ValidationError("Both start and end dates must be provided for a date range.")
-
-        if start_date and end_date and end_date < start_date:
-            raise forms.ValidationError("End date must be later than start date.")
-
-        return cleaned_data
 
 
 
 
 class ZoneReportForm(forms.Form):
-    zone = forms.ChoiceField(label='Select Zone', choices=ZONE_CHOICES, required=True)
-    days = forms.IntegerField(label='Number of Days', min_value=1, required=False)
-    start_date = forms.DateField(label='Start Date', required=False, widget=forms.DateInput(attrs={'type': 'date'}))
-    end_date = forms.DateField(label='End Date', required=False, widget=forms.DateInput(attrs={'type': 'date'}))
-
-    def clean(self):
-        cleaned_data = super().clean()
-        days = cleaned_data.get('days')
-        start_date = cleaned_data.get('start_date')
-        end_date = cleaned_data.get('end_date')   
-   
-        if days and (start_date or end_date):
-            raise forms.ValidationError("You can't specify both a date range and number of days.")
-      
-        if start_date and not end_date:
-            raise forms.ValidationError("Both start and end dates must be provided for a date range.")
-
-        if start_date and end_date and end_date < start_date:
-            raise forms.ValidationError("End date must be later than start date.")
-
-        return cleaned_data
+     start_date = forms.DateField(required=False, widget=forms.TextInput(attrs={'type': 'date'}))
+     end_date = forms.DateField(required=False, widget=forms.TextInput(attrs={'type': 'date'}))
+     days = forms.IntegerField(required=False)     
+     zone = forms.ModelChoiceField(queryset=Zone.objects.all(), required=False)
 
 
 
 
 class SummaryReportFormHourly(forms.Form):
     hours = forms.IntegerField(label='Number of hours', required=True, min_value=1)
+
 
 
 
@@ -202,92 +194,10 @@ class SummaryReportChartForm(forms.Form):
         min_value=1,
         required=False
     )
-    region = forms.ChoiceField(
-        label ='Select Region',
-        required = False,
-        choices=[('', '------')] + REGION_CHOICES
 
-    )
-
-    zone = forms.ChoiceField(
-        label ='Select zone',
-        required = False,
-        choices=[('', '------')] + ZONE_CHOICES
-
-    )
-
-    mp = forms.ChoiceField(
-        label ='Select MP',
-        required = False,
-       choices=[('', '------')] + MP_CHOICES
-
-    )
-
-
-
-
-    def clean(self):
-        cleaned_data = super().clean()
-        start_date = cleaned_data.get('start_date')
-        end_date = cleaned_data.get('end_date')
-        days = cleaned_data.get('days')    
-
-        if start_date and end_date and days:
-            raise forms.ValidationError('Please specify either a date range or the number of days, but not both.')
-        
-        if (start_date and not end_date) or (end_date and not start_date):
-            raise forms.ValidationError('Both start and end dates must be specified if you choose date range.')
-        
-        if not (start_date or end_date or days):
-            raise forms.ValidationError('Please specify a date range or number of days for the report.')
-
-        if start_date and end_date and start_date > end_date:
-            raise forms.ValidationError('Start date must be earlier than end date.')
-
-        return cleaned_data
-
-
-
-
-class PGRForm(forms.ModelForm):
-    TakePicture = forms.ImageField(required=False, widget=forms.ClearableFileInput(attrs={'accept': 'image/*', 'capture': 'camera'})) 
-    UploadPicture = forms.ImageField(required=False,widget=forms.ClearableFileInput(attrs={'accept': 'image/*'}))  
-    joining_date = forms.DateField(label='joining_date', required=False, widget=forms.DateInput(attrs={'type': 'date'}))
-    
-    class Meta:
-        model = PGRdatabase
-        fields = [
-            'region', 'zone', 'mp', 'name','PGR_type', 'PGR_category','phone', 'email',
-            'address','joining_date','reference_person_name','reference_person_phone', 'PGR_birth_certificate'
-        ]
-
-    def clean(self):
-        cleaned_data = super().clean()
-        upload_picture = cleaned_data.get('UploadPicture')
-        take_picture = cleaned_data.get('TakePicture')
-
-        if upload_picture and take_picture:
-            raise forms.ValidationError("Please choose either Upload Picture or Take Picture, not both.")
-
-        return cleaned_data
-
-    def save(self, commit=True):
-        instance = super().save(commit=False)
-        upload_picture = self.cleaned_data.get('UploadPicture')
-        take_picture = self.cleaned_data.get('TakePicture')
-
-        if take_picture:
-            instance.PGR_photo = take_picture
-        elif upload_picture:
-            instance.PGR_photo = upload_picture
-
-        if commit:
-            instance.save()
-
-        return instance
-    
-
-
-
-class ExcelUploadForm(forms.Form):
-    excel_file = forms.FileField()
+    region = forms.ChoiceField(choices=REGION_CHOICES, required=False)
+    zone = forms.ChoiceField(choices=ZONE_CHOICES, required=False)
+    mp = forms.ChoiceField(choices=MP_CHOICES, required=False)
+    # region = forms.ModelChoiceField(queryset=Region.objects.all(), required=False)
+    # zone = forms.ModelChoiceField(queryset=Zone.objects.all(), required=False)
+    # mp = forms.ModelChoiceField(queryset=MP.objects.all(), required=False)

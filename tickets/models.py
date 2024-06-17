@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
 from datetime import timedelta
-from .mp_list import  MP_CHOICES,ZONE_CHOICES,REGION_CHOICES,PGR_CHOICES
+
 from decimal import Decimal, ROUND_DOWN
 
 from django.db.models import Max,Min,Sum
@@ -13,7 +13,7 @@ from vehicle.models import AddVehicleInfo
 from generator.models import AddPGInfo
 from generator.models import PGFuelRefill
 
-from generator.models import Region,Zone,MP
+from common.models import Region,Zone,MP,PGRdatabase
 
 
 
@@ -30,40 +30,6 @@ class ChatMessage(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
 
 
-
-
-class PGRdatabase(models.Model):   
-    region = models.ForeignKey(Region,on_delete=models.CASCADE, related_name='pgr_region')
-    zone = models.ForeignKey(Zone, on_delete=models.CASCADE, related_name='pgr_zone')
-    mp = models.ForeignKey(MP, on_delete=models.CASCADE, related_name='pgr_mp')
-    name = models.CharField(max_length=100)   
-    pgr_id = models.CharField(max_length=150,null=True, blank=True)
-
-    pgr_choices =[
-       ( 'PGR','PGR'),
-       ('PGTL','PGTL')
-    ]
-    PGR_type = models.CharField(max_length=100,choices=pgr_choices,null=True,blank=True)  
-
-    PGR_category_choices=[
-        ('adhoc','adhoc'),
-        ('permanent','permanent')
-    ]
-
-    PGR_category = models.CharField(max_length=100,choices=PGR_category_choices,null=True,blank=True) 
-    phone = models.CharField(max_length=100)
-    email = models.EmailField()
-    address = models.TextField()
-    PGR_photo = models.ImageField(upload_to='PGR_photo', blank=True, null=True) 
-    PGR_birth_certificate = models.FileField(upload_to='PGR_birth_certificate',blank=True, null=True)
-    joining_date=models.DateField(null=True,blank=True)
-    PGR_salary = models.DecimalField(max_digits=15,decimal_places=2,null=True,blank=True)
-    reference_person_name = models.CharField(max_length=100,null=True,blank=True)
-    reference_person_phone = models.CharField(max_length=100,null=True,blank=True)
-    created_at = models.DateField(default=timezone.now)
-
-    def __str__(self):
-        return self.name
 
 
 

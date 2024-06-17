@@ -33,13 +33,13 @@ html, body {
     <div class="row">
         <div class="col" style="background-color: red;">
 
-{% if messages %}
-<ul class="messages">
-    {% for message in messages %}
-        <li{% if message.tags %} class="{{ message.tags }} text-center"{% endif %} style="color:white">{{ message }}</li>
-    {% endfor %}
-</ul>
-{% endif %}
+            {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                    <li{% if message.tags %} class="{{ message.tags }} text-center"{% endif %} style="color:white">{{ message }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
 
         </div>
     </div>
@@ -75,30 +75,36 @@ html, body {
 <div class="col" style="height:1200px"></div>
 
 <script>
-    $(document).ready(function() {
-        $('#id_pgnumber, #id_vehicle,#id_assigned_to ,#id_team_leader_name').select2({
-            width: '100%', 
-            ajax: {
-                url: "{% url 'dailyexpense:common_search' %}",
-                dataType: 'json',
-                delay: 250,
-                data: function(params) {
-                    return {
-                        q: params.term
-                    };
-                },
-                processResults: function(data) {
-                    return {
-                        results: data.results
-                    };
-                },
-                cache: true
+   $(document).ready(function() {
+    $('#id_pgnumber, #id_vehicle, #id_assigned_to, #id_team_leader_name').select2({
+        width: '100%',
+        ajax: {
+            url: "{% url 'dailyexpense:common_search' %}",
+            dataType: 'json',
+            delay: 250,
+            data: function(params) {
+                return {
+                    q: params.term
+                };
             },
-            minimumInputLength: 1, 
-            placeholder: 'Search ',
-            allowClear: true
-        });
+            processResults: function(data) {
+                return {
+                    results: $.map(data.results, function(item) {
+                        return {
+                            id: item.id,
+                            text: item.text
+                        };
+                    })
+                };
+            },
+            cache: true
+        },
+        minimumInputLength: 1,
+        placeholder: 'Search',
+        allowClear: true
     });
+});
+
 </script>
 
 {% endblock %}

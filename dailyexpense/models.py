@@ -4,7 +4,6 @@ from django.contrib.auth.models import User
 from datetime import datetime
 from django.utils import timezone
 from datetime import timedelta
-from tickets.mp_list import  MP_CHOICES,ZONE_CHOICES,REGION_CHOICES
 from decimal import Decimal
 from django.db import models
 from account.models import Customer
@@ -18,7 +17,7 @@ from django.db.models import Sum, Avg,Count,Q,Case, When, IntegerField,F,Max,Dur
 
 from vehicle.models import AddVehicleInfo
 from generator.models import AddPGInfo
-from tickets.models import Region,Zone,MP
+from common.models import Region,Zone,MP
 
 
 class MoneyRequisition(models.Model):
@@ -30,7 +29,7 @@ class MoneyRequisition(models.Model):
    
     region = models.ForeignKey(Region,related_name='requisition_region',on_delete=models.CASCADE)
     zone = models.ForeignKey(Zone,related_name='requisition_zone',on_delete=models.CASCADE)
-    mp = models.ForeignKey(MP,related_name='requisition_mp',on_delete=models.CASCADE)
+
     purpose_choices=[
         ('CM_work','CM_work'),
         ('PM_work','PM_work'),

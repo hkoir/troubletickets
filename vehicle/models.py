@@ -2,13 +2,14 @@
 from django.db import models
 from django.utils import timezone
 from django.core.validators import FileExtensionValidator
-from tickets.mp_list import REGION_CHOICES,ZONE_CHOICES,MP_CHOICES
+
 from account.models import Customer
 from decimal import Decimal
 from django.db import IntegrityError
 from django.apps import apps
 
-from generator.models import Region,Zone,MP,FuelPumpDatabase
+from common.models import Region,Zone,MP,FuelPumpDatabase
+
 
 
 class AddVehicleInfo(models.Model):
@@ -72,14 +73,13 @@ class AddVehicleInfo(models.Model):
         ]
     vehicle_operational_mode = models.CharField(max_length=50,choices=vehicle_operational_mode_choices, default='None')
    
-    vehicle_duty_station = models.CharField(max_length=50, choices=MP_CHOICES, default='None')
     
     vehicle_status_choice =[
        ('active','active'),
        ('cancel','cancel')
     ]
     vehicle_status = models.CharField(max_length=50, choices=vehicle_status_choice,default='None')
-   
+    
    
     created_at = models.DateField(default=timezone.now)
 
@@ -93,6 +93,14 @@ class FuelRefill(models.Model):
     zone = models.ForeignKey(Zone,related_name='vehicle_refill_zone',on_delete=models.CASCADE)
     mp = models.ForeignKey(MP,related_name='vehicle_refill_mp',on_delete=models.CASCADE) 
     vehicle = models.ForeignKey(AddVehicleInfo, related_name='refills_info', on_delete=models.CASCADE)
+
+    REFILL_CHOICES = [
+        ('pump', 'pump'),
+        ('local_purchase', 'Local Purchase')
+    ]
+    
+    refill_type = models.CharField(max_length=20, choices=REFILL_CHOICES, default='pump')
+   
     pump = models.ForeignKey(FuelPumpDatabase,related_name='vehicle_fuel_pump',on_delete=models.CASCADE,default=None,null=True,blank=True)
     refill_requester = models.ForeignKey(Customer, related_name='refill_requester_name', on_delete=models.CASCADE, null=True, blank=True)
     fuel_refill_code = models.CharField(max_length=50, default='None')
@@ -112,7 +120,8 @@ class FuelRefill(models.Model):
     vehicle_fuel_balance = models.DecimalField(max_digits=30, decimal_places=2, default=0.0)
     vehicle_total_fuel_reserve = models.DecimalField(max_digits=30, decimal_places=2, default=0.0)
     refill_supporting_documents = models.FileField(upload_to='refill_supporting_documents/', null=True, blank=True)
-                  
+    
+    fuel_supplier_name = models.CharField(max_length=150,null=True,blank=True)                  
     fuel_supplier_phone = models.CharField(max_length=50, default='None')   
     fuel_supplier_address = models.TextField(default='None',null=True, blank=True)      
    

@@ -7,7 +7,10 @@
 
 <title>View Ticket</title>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+
+
 
 <style>
 
@@ -64,57 +67,43 @@
         display: inline; 
         margin-right: 10px; 
     }
+  
+    .form-select {
+        width: 100%; /* Ensure the select element takes up the full width of its container */
+    }
+
 
 </style>
 
 
-<div class="container">
-    <div class="row">
-        <div class="col" style="background-color: red;">
-    
-{% if messages %}
-<ul class="messages">
-    {% for message in messages %}
-        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-    {% endfor %}
-</ul>
-{% endif %}
-
-</div>
-</div>
-</div>
-
-
 
 <div class="container-fluid" id="main-content">
-        <div class="row">
-
-            <div class="col-xl-12">                
-                <form method="GET" action="{% url 'tickets:view_tt_edotco' %}">
-                    <div class="container-fluid main-content2">
-                        <div class="row row-cols-1 row-cols-md-4">
-                
+    <div class="row">
+        <div class="col-xl-12">                
+            <form method="GET" action="{% url 'tickets:view_tt_edotco' %}">
+                <div class="container-fluid main-content2">
+                    <div class="row row-cols-1 row-cols-md-4">
                         <div class="col" style="padding:5px; margin:5px">  Start Date:  {{ form.start_date }} </div>
                         <div class="col" style="padding:5px; margin:5px">  End Date:  {{ form.end_date }} </div>
                         <div class="col" style="padding:5px; margin:5px"> No of days {{ form.days }} </div>
                         <div class="col" style="padding:5px; margin:5px">  Region:{{ form.region }} </div>  
                         <div class="col" style="padding:5px; margin:5px">  Zone:{{ form.zone }} </div>    
-                        <div class="col" style="padding:5px; margin:5px">  mp:{{ form.mp }} </div>  
-                        <div class="col" style="padding:5px; margin:5px"> <button type="submit" class='btn btn-primary'>Generate Data</button></div>
-                        
+                        <div class="col" style="padding:5px; margin:5px">  MP:{{ form.mp }} </div>  
+                        <div class="col" style="padding:5px; margin:5px"> 
+                            <button type="submit" class='btn btn-primary'>Generate Data</button>
                         </div>
-                    </div>                    
-                </form>          
-    
-                    <h4 class="text-center">Data for
-                        {% if days %}
-                            the last {{ days }} days
-                        {% elif start_date and end_date %}
-                            from: {{ start_date }} to {{ end_date }}
-                        {% endif %}
-                    </h4>          
-         </div>
-
+                    </div>
+                </div>                    
+            </form>
+            <h4 class="text-center">Data for
+                {% if days %}
+                    the last {{ days }} days
+                {% elif start_date and end_date %}
+                    from: {{ start_date }} to {{ end_date }}
+                {% endif %}
+            </h4>          
+        </div>
+  
 
 
 
@@ -190,6 +179,7 @@
                             <th class="text-center p-2">Team Leader</th>                     
                             <th class="text-center p-2">Assigned PGR Name</th>
                             <th class="text-center p-2">Assigned PGR type</th>
+                            <th class="text-center p-2">Assigned PGR category</th>
 
                             <th class="text-center p-2">Assigned Vehicle Type</th>
                             <th class="text-center p-2">Customer name</th>
@@ -248,9 +238,10 @@
                            
                             <td class="text-center" style="font-size: 14px; white-space: nowrap;color:black">{{ ticket.ticket_status }}</td>
                             <td class="text-center" style="font-size: 14px; white-space: nowrap;color:black">{{ ticket.team_leader_name }}</td>
-
+                                                                                                      
                             <td class="text-center" style="font-size: 14px; white-space: nowrap;color:black">{{ ticket.assigned_to }}</td>
-                            <td class="text-center" style="font-size: 14px; white-space: nowrap;color:black">{{ ticket.assigned_pg_runner_type }}</td> 
+                            <td class="text-center" style="font-size: 14px; white-space: nowrap;color:black">{{ ticket.assigned_to.PGR_type }}</td> 
+                            <td class="text-center" style="font-size: 14px; white-space: nowrap;color:black">{{ ticket.assigned_to.PGR_category }}</td> 
                             <td class="text-center" style="font-size: 14px; white-space: nowrap;color:black">{{ ticket.assigned_vehicle_type  }}</td>
 
                             <td class="text-center" style="font-size: 14px; white-space: nowrap;color:black">{{ ticket.customer_name }}</td>
@@ -303,62 +294,44 @@
         
 
 
-
-
-
-
-
-    
     <script>
-        $(document).ready(function(){      
+        $(document).ready(function() {
             var regionZoneMapping = {
-                'Sylhet': ['','Sylhet', 'Moulovibazar','Mymensingh','Kisorganj','Tangail'], 
-                'Rangpur': ['','Rangpur', 'Dinajpur','Bagura','Rajshahi'] ,                          
-                
+                'Sylhet': ['', 'Sylhet', 'Moulovibazar', 'Mymensingh', 'Kisorganj', 'Tangail'],
+                'Rangpur': ['', 'Rangpur', 'Dinajpur', 'Bagura', 'Rajshahi']
             };
-         
-            $('#id_region').change(function(){
-                var selectedRegion = $(this).val();
-                var zoneChoices = regionZoneMapping[selectedRegion];
-                $('#id_zone').empty();
-                $.each(zoneChoices, function(index, value){
-                    $('#id_zone').append($('<option>').text(value).attr('value', value));
-                });
-            });
-                  
-            var zoneMpMapping = {              
-                'Sylhet': ['','Sylhet','Taherpur','Sunamganj','Bianibazar','Dorbhost','Dherai','Chatak'], // Add more MPs for Sylhet zone
-                'Moulovibazar': ['','Moulovibazar', 'Saestaganj','Juri','Baniachong'],
-                'Mymensingh': ['','Mymensingh', 'Fulpur','Valuka'] ,
-                'Kisorganj': ['','Kisorganj','Katiadi','Netrokona','Mohonpur','Austogram'],
-                'Tangail': ['','Tangail','Madhupur','Jamalpur','Sherpur','Bakshihanj','Rowmari'],
-               
-                'Rangpur':['','Rangpur','Hatibandha','Gaibandha','Ulipur','Boropar','Polasbari'],
-                'Dinajpur':['','Dinajpur','Panchghor','Jaldhaka','Thakurgaon'],
-                'Rajshahi':['','Rajshahi','Bagura','Nachole','Natore','Chapai'],
-                'Bagura':['','Bagura'],
+    
+            var zoneMpMapping = {
+                'Sylhet': ['', 'Sylhet', 'Taherpur', 'Sunamganj', 'Bianibazar', 'Dorbhost', 'Dherai', 'Chatak'],
+                'Moulovibazar': ['', 'Moulovibazar', 'Saestaganj', 'Juri', 'Baniachong'],
+                'Mymensingh': ['', 'Mymensingh', 'Fulpur', 'Valuka'],
+                'Kisorganj': ['', 'Kisorganj', 'Katiadi', 'Netrokona', 'Mohonpur', 'Austogram'],
+                'Tangail': ['', 'Tangail', 'Madhupur', 'Jamalpur', 'Sherpur', 'Bakshihanj', 'Rowmari'],
+                'Rangpur': ['', 'Rangpur', 'Hatibandha', 'Gaibandha', 'Ulipur', 'Boropar', 'Polasbari'],
+                'Dinajpur': ['', 'Dinajpur', 'Panchghor', 'Jaldhaka', 'Thakurgaon'],
+                'Rajshahi': ['', 'Rajshahi', 'Bagura', 'Nachole', 'Natore', 'Chapai'],
+                'Bagura': ['', 'Bagura'],
                 '': ['']
-               
             };
-
-       
-            $('#id_zone').change(function(){
-                $('#id_mp').val('');
-                var selectedZone = $(this).val();
-                var mpChoices = zoneMpMapping[selectedZone];
-
-                $('#id_mp').empty();
-                $.each(mpChoices, function(index, value){
-                    $('#id_mp').append($('<option>').text(value).attr('value', value));
-                });
+    
+            $('#id_region').change(function() {
+                var selectedRegion = $(this).val();
+                var zoneChoices = regionZoneMapping[selectedRegion] || [];
+                $('#id_zone').empty().append($.map(zoneChoices, function(value) {
+                    return $('<option>').text(value).attr('value', value);
+                })).trigger('change');
             });
-
-
-
-});          
-
-</script>
-
+    
+            $('#id_zone').change(function() {
+                var selectedZone = $(this).val();
+                var mpChoices = zoneMpMapping[selectedZone] || [];
+                $('#id_mp').empty().append($.map(mpChoices, function(value) {
+                    return $('<option>').text(value).attr('value', value);
+                }));
+            });
+        });
+    </script>
+    
 
 
 {% endblock %}

@@ -5,15 +5,28 @@ from datetime import timedelta
 from decimal import Decimal
 from account.models import Customer
 from decimal import Decimal, ROUND_DOWN
-from tickets.mp_list import MP_CHOICES,ZONE_CHOICES,REGION_CHOICES
 
-from generator.models import MP,Region,Zone
+from tickets.models import PGRdatabase
+
+from vehicle.models import AddVehicleInfo
+from generator.models import AddPGInfo
+from common.models import Region,Zone,MP
+
+
 
 class EmployeeModel(models.Model): 
     employee_code = models.CharField(max_length=100, unique=True, null=True, blank=True, default='None')
     name = models.CharField(max_length=100, null=True, blank=True,default="Nome")
     first_name = models.CharField(max_length=100, null=True, blank=True,default="Nome")
     last_name = models.CharField(max_length=100,null=True, blank=True,default="Nome")
+    posting_area_choices=[
+        ('Dhaka','Dhaka'),
+        ('Rangpur','Rangpur'),
+        ('Sylhet','Sylhet'),
+        ('Rajshahi','Rajshahi'),
+        ('Chittagong','Chittagong')
+    ]
+    posting_area = models.CharField(max_length=100,choices=posting_area_choices,null=True,blank=True)
 
     gender_choices =[
         ('Male','Male'),
@@ -161,17 +174,12 @@ class MonthlySalaryReport(models.Model):
     year = models.IntegerField()
     total_working_hours = models.DecimalField(max_digits=5, decimal_places=2 , null=True, blank=True )
     total_salary = models.DecimalField(max_digits=10, decimal_places=2 , null=True, blank=True)
-# employee/models.py
-from django.db import models
-from django.utils import timezone
-from tickets.models import PGRdatabase
-from vehicle.models import AddVehicleInfo
-from generator.models import AddPGInfo
+
 
 class Resource(models.Model):
-    region = models.CharField(max_length=20, choices=REGION_CHOICES, default='None')
-    zone = models.CharField(max_length=20, choices=ZONE_CHOICES, default='None')
-    mp = models.CharField(max_length=20, choices=MP_CHOICES, default='None')
+    region = models.ForeignKey(Region,on_delete=models.CASCADE)
+    zone = models.ForeignKey(Zone,on_delete=models.CASCADE)
+    mp = models.ForeignKey(MP,on_delete=models.CASCADE)
     total_site = models.IntegerField(null=True, blank=True)
     no_of_KPI_site = models.IntegerField(null=True, blank=True)
     num_of_PGTL = models.IntegerField(null=True, blank=True)

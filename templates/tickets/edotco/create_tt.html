@@ -9,13 +9,6 @@
 
     <title>Create Ticket</title>
    
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-
-<script src="{% static 'js/mapping_data.js' %}"></script>
-<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
-<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
-
 
     <style>
 
@@ -81,63 +74,4 @@ html, body {
 
     <div class="col" style="height:1200px"></div>
  
-
-
-<!-- 
-
-<script>
-    $(document).ready(function() {
-        $('#id_region, #id_zone, #id_mp').select2({
-            width: '100%', 
-            ajax: {
-                url: "{% url 'dailyexpense:common_search' %}",
-                dataType: 'json',
-                delay: 250,
-                data: function(params) {
-                    return {
-                        q: params.term
-                    };
-                },
-                processResults: function(data) {
-                    return {
-                        results: data.results
-                    };
-                },
-                cache: true
-            },
-            minimumInputLength: 1, 
-            placeholder: 'Search ',
-            allowClear: true
-        });
-    });
-</script> -->
-
-
-<script>
-    $(document).ready(function() {
-        $('#id_region, #id_zone,#id_mp').select2({
-            width: '100%', 
-            ajax: {
-                url: "{% url 'dailyexpense:common_search' %}",
-                dataType: 'json',
-                delay: 250,
-                data: function(params) {
-                    return {
-                        q: params.term
-                    };
-                },
-                processResults: function(data) {
-                    return {
-                        results: data.results
-                    };
-                },
-                cache: true
-            },
-            minimumInputLength: 1, 
-            placeholder: 'Search ',
-            allowClear: true
-        });
-    });
-</script>
-
 {% endblock %}

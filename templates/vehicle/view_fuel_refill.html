@@ -84,7 +84,8 @@
                 <th class="text-center p-2"> Fuel supplier address</th>
             
                
-                <th class="text-center p-2">Vehicle owner Name</th>           
+                <th class="text-center p-2">Vehicle owner Name</th>     
+                <th class="text-center p-2">Vehicle owner phone</th>        
                 <th class="text-center p-2">vehicle joining date</th>       
                                 
                
@@ -122,12 +123,19 @@
                     No image available
                     {% endif %}
                 </td>  
-                <td class="text-center p-2" style="white-space: nowrap;">{{ fuel.fuel_pump_supplier_name  }}</td> 
+                {% if fuel.pump %}
+                <td class="text-center p-2" style="white-space: nowrap;">{{ fuel.pump.fuel_pump_name  }}</td> 
+                <td class="text-center p-2"style="white-space: nowrap;">{{ fuel.pump.fuel_pump_phone }}</td>
+                <td class="text-center p-2"style="white-space: nowrap;">{{ fuel.pump.fuel_pump_address }}</td>
+                {% else %}
+                <td class="text-center p-2" style="white-space: nowrap;">{{ fuel.fuel_supplier_name  }}</td> 
                 <td class="text-center p-2"style="white-space: nowrap;">{{ fuel.fuel_supplier_phone }}</td>
                 <td class="text-center p-2"style="white-space: nowrap;">{{ fuel.fuel_supplier_address }}</td>
+                {% endif %}
 
               
                 <td class="text-center p-2"style="white-space: nowrap;">{{ fuel.vehicle.vehicle_owner_name }}</td>
+                <td class="text-center p-2"style="white-space: nowrap;">{{ fuel.vehicle.vehilce_owner_mobile_number }}</td>
                 <td class="text-center p-2"style="white-space: nowrap;">{{ fuel.vehicle.vehicle_joining_date }}</td>
                    
               

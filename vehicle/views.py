@@ -29,7 +29,8 @@ from tickets .views import generate_unique_finance_requisition_number
 
 import calendar
 
-
+from dailyexpense.models import DailyExpenseRequisition
+from.forms import vehicleSummaryReportForm
 
 import csv
 
@@ -74,11 +75,11 @@ def view_vehicle_info(request):
         vehicle_reg_number = form.cleaned_data.get('vehicle_reg_number')
 
         if region:
-             vehicle_info =  vehicle_info.filter(region=region)
+             vehicle_info =  vehicle_info.filter(region__name=region)
         if zone:
-             vehicle_info =  vehicle_info.filter(zone=zone)
+             vehicle_info =  vehicle_info.filter(zone__name=zone)
         if mp:
-            vehicle_info =  vehicle_info.filter(mp=mp)
+            vehicle_info =  vehicle_info.filter(mp__name=mp)
 
         if vehicle_reg_number:
               vehicle_info =  vehicle_info.filter(vehicle_reg_number=vehicle_reg_number)
@@ -116,7 +117,7 @@ def update_vehicle_database(request, vehicle_id):
          return redirect('account:login')
 
     if request.method == 'POST': 
-        form = UpdateVehicleDatabaeForm(request.POST, instance=vehicle_info,user_role=user_role)
+        form = UpdateVehicleDatabaeForm(request.POST,request.FILES, instance=vehicle_info,user_role=user_role)
         if form.is_valid():
             form.save()
             return redirect('vehicle:view_vehicle_info') 
@@ -125,7 +126,7 @@ def update_vehicle_database(request, vehicle_id):
         form = UpdateVehicleDatabaeForm(instance=vehicle_info, initial=initial_data, user_role=user_role)
         print("Vehicle Owner Address:", vehicle_info.vehicle_owner_address)
 
-    return render(request, 'vehicle/create_vehicle.html', {'form': form,'vehicle_info':vehicle_info,'vehicle_owner_address': vehicle_info.vehicle_owner_address})
+    return render(request, 'vehicle/update_vehicle.html', {'form': form,'vehicle_info':vehicle_info,'vehicle_owner_address': vehicle_info.vehicle_owner_address})
 
 
 
@@ -145,18 +146,23 @@ def delete_vehicle_database(request, vehicle_id):
 
 
 
-
 @login_required
 def create_vehicle_expenses(request):
-    if request.method == 'POST':   
+    if request.method == 'POST':
         form = AddVehicleExpensesForm(request.POST, request.FILES)
-        if form.is_valid():        
+        if form.is_valid():
             form.instance.vehicle_expense_add_requester = request.user
             form.instance.vehicle_expense_id = generate_unique_finance_requisition_number()
             form.save()
             return redirect('vehicle:view_vehicle_travel_data')
-    else:     
+        else:
+            print("Form is invalid:", form.errors)
+            print("Submitted data:", request.POST)
+            for field in form:
+                print(f"Field: {field.name}, Errors: {field.errors}, Value: {field.value()}")
+    else:
         form = AddVehicleExpensesForm()
+
     return render(request, 'vehicle/create_vehicle_expenses.html', {'form': form})
 
 
@@ -275,7 +281,7 @@ def vehicle_summary_report(request):
     vehicle_running_data = VehicleRuniningData.objects.all().order_by('-created_at')
     total_refill_amount_qs = FuelRefill.objects.all()  # Renamed to avoid conflict
     vehicle_completed_tickets_count_qs = eTicket.objects.all()  # Renamed to avoid conflict
-   
+    vehicle_completed_pg_runhour_count_qs = eTicket.objects.all()
 
     vehicle_summary_reports = {}
     processed_vehicles = {}
@@ -284,6 +290,7 @@ def vehicle_summary_report(request):
     end_date = None
     vehicle = []
     total_fuel_cost = 0
+   
 
     if form.is_valid():
         start_date = form.cleaned_data.get('start_date')
@@ -403,7 +410,7 @@ def vehicle_summary_report(request):
 
 
 
-from dailyexpense.models import DailyExpenseRequisition
+
 
 
 @login_required
@@ -630,7 +637,6 @@ def vehicle_overtime_calc(request):
     return render(request, 'vehicle/vehicle_overtime_calc.html', context)
 
 
-
 ## vehicle cost performance #######################
 @login_required
 def vehicle_grand_summary(request):
@@ -644,7 +650,7 @@ def vehicle_grand_summary(request):
     vehicle_reg_number = None  
     aggregated_data = {}
 
-    form = SummaryReportChartForm(request.GET or {'days': 20})
+    form = vehicleSummaryReportForm(request.GET or {'days': 20})
     vehicle_running_data = VehicleRuniningData.objects.all()
     vehicle_fault_data = Vehiclefault.objects.all()
     vehicle_payment_data = VehicleRentalCost.objects.all()
@@ -693,123 +699,124 @@ def vehicle_grand_summary(request):
             vehicle_ticket_data = vehicle_ticket_data.filter(mp=mp)
             vehicle_refill_data = vehicle_refill_data.filter(mp=mp)
 
-     
-        
         for running_data in vehicle_running_data:
-            vehicle_reg_number = running_data.vehicle.vehicle_reg_number
-            driver_overtime_rate = running_data.vehicle.vehicle_driver_overtime_rate
-            vehicle_body_overtime_rate = running_data.vehicle.vehicle_body_overtime_rate      
-        
-            total_fuel_consumed = running_data.total_fuel_consumed or 0
-            total_kilometer_run = running_data.total_kilometer_run or 0
+            if running_data.vehicle:
+                vehicle_reg_number = running_data.vehicle.vehicle_reg_number
+                driver_overtime_rate = running_data.vehicle.vehicle_driver_overtime_rate
+                vehicle_body_overtime_rate = running_data.vehicle.vehicle_body_overtime_rate      
 
-            vehicle_zone = running_data.vehicle.zone
+                total_fuel_consumed = running_data.total_fuel_consumed or 0
+                total_kilometer_run = running_data.total_kilometer_run or 0
 
-            if running_data.vehicle.vehicle_rental_category == 'monthly':
-                vehicle_rent = running_data.vehicle.vehicle_rent / 30
-                vehicle_rental_type = 'Monthly'
-            elif running_data.vehicle.vehicle_rental_category == 'daily':
-                vehicle_rent = running_data.vehicle.vehicle_rent
-                vehicle_rental_type = 'Daily'
-            else:
-                vehicle_rent = 0
+                vehicle_zone = running_data.vehicle.zone
 
-            friday_saturday = running_data.start_time.weekday() in [4, 5]
-            running_hours = running_data.running_hours or 0
-            overtime_run_hours = running_hours if friday_saturday else max(0, running_hours - 8)
-            overtime_cost = float(overtime_run_hours) * float(driver_overtime_rate)
-            vehicle_body_overtime_cost = float(overtime_run_hours) * float(vehicle_body_overtime_rate)
+                if running_data.vehicle.vehicle_rental_category == 'monthly':
+                    vehicle_rent = running_data.vehicle.vehicle_rent / 30
+                    vehicle_rental_type = 'Monthly'
+                elif running_data.vehicle.vehicle_rental_category == 'daily':
+                    vehicle_rent = running_data.vehicle.vehicle_rent
+                    vehicle_rental_type = 'Daily'
+                else:
+                    vehicle_rent = 0
 
-            total_vehicle_bill_amount = float(vehicle_rent) + float(overtime_cost) + float(vehicle_body_overtime_cost)
+                friday_saturday = running_data.start_time.weekday() in [4, 5]
+                running_hours = running_data.running_hours or 0
+                overtime_run_hours = running_hours if friday_saturday else max(0, running_hours - 8)
+                overtime_cost = float(overtime_run_hours) * float(driver_overtime_rate)
+                vehicle_body_overtime_cost = float(overtime_run_hours) * float(vehicle_body_overtime_rate)
 
-            if vehicle_reg_number not in aggregated_data:
-                aggregated_data[vehicle_reg_number] = {
-                    'vehicle_id': running_data.vehicle.id, 
-                    'total_running_hours': 0,
-                    'total_overtime_run_hours': 0,
-                    'total_overtime_cost': 0,
-                    'total_vehicle_rent_due': 0,
-                    'total_vehicle_bill_amount':0,
-                    'driver_overtime_rate': [],
-                    'vehicle_body_overtime_rate':[],
-                    'vehicle_rent': [],
-                    'vehicle_rental_type': set(),
-                    'travel_dates': set(),
-                    'num_travel_dates': 0,
-                    'total_tickets_handle': 0,
-                    'total_pg_runhour_handle': 0,
-                    'total_fault_hours': 0,
+                total_vehicle_bill_amount = float(vehicle_rent) + float(overtime_cost) + float(vehicle_body_overtime_cost)
 
-                    'vehicle_rent_paid': 0,
-                    'vehicle_body_overtime_paid': 0,
-                    'vehicle_driver_overtime_paid': 0,
-                    'total_bill_paid':0,
-                
-                    'total_fuel_balance':0,
-                    'total_fuel_consumed':0,
-                    'total_kilometer_run':0,
-                    'total_kilometer_run_from_refill':0,
-                    'vehicle_body_overtime_cost':0,
+                if vehicle_reg_number not in aggregated_data:
+                    aggregated_data[vehicle_reg_number] = {
+                        'vehicle_id': running_data.vehicle.id,
+                        'total_running_hours': 0,
+                        'total_overtime_run_hours': 0,
+                        'total_overtime_cost': 0,
+                        'total_vehicle_rent_due': 0,
+                        'total_vehicle_bill_amount':0,
+                        'driver_overtime_rate': [],
+                        'vehicle_body_overtime_rate':[],
+                        'vehicle_rent': [],
+                        'vehicle_rental_type': set(),
+                        'travel_dates': set(),
+                        'num_travel_dates': 0,
+                        'total_tickets_handle': 0,
+                        'total_pg_runhour_handle': 0,
+                        'total_fault_hours': 0,
 
-                    'total_fuel_refil':0,
-                    'total_fuel_consumed_from_refil':0,
-                    'total_fuel_balance_from_refil':0,
-                    'total_fuel_reserve_from_refil':0,
-                    'zone': vehicle_zone 
-                }
-                
-            aggregated_data[vehicle_reg_number]['total_running_hours'] += running_hours
-            aggregated_data[vehicle_reg_number]['total_kilometer_run'] += total_kilometer_run 
-            aggregated_data[vehicle_reg_number]['total_fuel_consumed'] += total_fuel_consumed       
-            aggregated_data[vehicle_reg_number]['total_overtime_run_hours'] += overtime_run_hours
-            aggregated_data[vehicle_reg_number]['total_overtime_cost'] += overtime_cost
-            aggregated_data[vehicle_reg_number]['vehicle_body_overtime_cost'] += vehicle_body_overtime_cost
-            aggregated_data[vehicle_reg_number]['total_vehicle_rent_due'] += vehicle_rent
-            aggregated_data[vehicle_reg_number]['total_vehicle_bill_amount'] += float(total_vehicle_bill_amount)
-        
-            aggregated_data[vehicle_reg_number]['driver_overtime_rate'].append(driver_overtime_rate)
-            aggregated_data[vehicle_reg_number]['vehicle_body_overtime_rate'].append(vehicle_body_overtime_rate)
-            aggregated_data[vehicle_reg_number]['vehicle_rent'].append(vehicle_rent)
-            aggregated_data[vehicle_reg_number]['vehicle_rental_type'].add(vehicle_rental_type)
-            aggregated_data[vehicle_reg_number]['travel_dates'].add(running_data.start_time)
-            aggregated_data[vehicle_reg_number]['num_travel_dates'] += 1
+                        'vehicle_rent_paid': 0,
+                        'vehicle_body_overtime_paid': 0,
+                        'vehicle_driver_overtime_paid': 0,
+                        'total_bill_paid':0,
+                    
+                        'total_fuel_balance':0,
+                        'total_fuel_consumed':0,
+                        'total_kilometer_run':0,
+                        'total_kilometer_run_from_refill':0,
+                        'vehicle_body_overtime_cost':0,
+
+                        'total_fuel_refil':0,
+                        'total_fuel_consumed_from_refil':0,
+                        'total_fuel_balance_from_refil':0,
+                        'total_fuel_reserve_from_refil':0,
+                        'zone': vehicle_zone 
+                    }
+
+                aggregated_data[vehicle_reg_number]['total_running_hours'] += running_hours
+                aggregated_data[vehicle_reg_number]['total_kilometer_run'] += total_kilometer_run 
+                aggregated_data[vehicle_reg_number]['total_fuel_consumed'] += total_fuel_consumed       
+                aggregated_data[vehicle_reg_number]['total_overtime_run_hours'] += overtime_run_hours
+                aggregated_data[vehicle_reg_number]['total_overtime_cost'] += overtime_cost
+                aggregated_data[vehicle_reg_number]['vehicle_body_overtime_cost'] += vehicle_body_overtime_cost
+                aggregated_data[vehicle_reg_number]['total_vehicle_rent_due'] += vehicle_rent
+                aggregated_data[vehicle_reg_number]['total_vehicle_bill_amount'] += float(total_vehicle_bill_amount)
+
+                aggregated_data[vehicle_reg_number]['driver_overtime_rate'].append(driver_overtime_rate)
+                aggregated_data[vehicle_reg_number]['vehicle_body_overtime_rate'].append(vehicle_body_overtime_rate)
+                aggregated_data[vehicle_reg_number]['vehicle_rent'].append(vehicle_rent)
+                aggregated_data[vehicle_reg_number]['vehicle_rental_type'].add(vehicle_rental_type)
+                aggregated_data[vehicle_reg_number]['travel_dates'].add(running_data.start_time)
+                aggregated_data[vehicle_reg_number]['num_travel_dates'] += 1
 
         for fault_data in vehicle_fault_data:
-            vehicle_reg_number = fault_data.vehicle.vehicle_reg_number  # Ensure we get the correct vehicle registration number     
-            if vehicle_reg_number in aggregated_data:  # Check if vehicle_reg_number is in aggregated_data
-                aggregated_data[vehicle_reg_number]['total_fault_hours'] += fault_data.fault_duration_hours
+            if fault_data.vehicle:
+                vehicle_reg_number = fault_data.vehicle.vehicle_reg_number  # Ensure we get the correct vehicle registration number     
+                if vehicle_reg_number in aggregated_data:  # Check if vehicle_reg_number is in aggregated_data
+                    aggregated_data[vehicle_reg_number]['total_fault_hours'] += fault_data.fault_duration_hours
 
         for payment_data in vehicle_payment_data:
-            vehicle_reg_number = payment_data.vehicle.vehicle_reg_number  # Ensure we get the correct vehicle registration number   
-            if vehicle_reg_number in aggregated_data:  # Check if vehicle_reg_number is in aggregated_data
-                total_bill_paid = float(payment_data.vehicle_rent_paid) + float(payment_data.vehicle_body_overtime_paid) + float(payment_data.vehicle_driver_overtime_paid)
-                aggregated_data[vehicle_reg_number]['vehicle_rent_paid'] += float(payment_data.vehicle_rent_paid)
-                aggregated_data[vehicle_reg_number]['vehicle_body_overtime_paid'] += float(payment_data.vehicle_body_overtime_paid)
-                aggregated_data[vehicle_reg_number]['vehicle_driver_overtime_paid'] += float(payment_data.vehicle_driver_overtime_paid)
-                aggregated_data[vehicle_reg_number]['total_bill_paid'] += float(total_bill_paid)
+            if payment_data.vehicle:
+                vehicle_reg_number = payment_data.vehicle.vehicle_reg_number  # Ensure we get the correct vehicle registration number   
+                if vehicle_reg_number in aggregated_data:  # Check if vehicle_reg_number is in aggregated_data
+                    total_bill_paid = float(payment_data.vehicle_rent_paid) + float(payment_data.vehicle_body_overtime_paid) + float(payment_data.vehicle_driver_overtime_paid)
+                    aggregated_data[vehicle_reg_number]['vehicle_rent_paid'] += float(payment_data.vehicle_rent_paid)
+                    aggregated_data[vehicle_reg_number]['vehicle_body_overtime_paid'] += float(payment_data.vehicle_body_overtime_paid)
+                    aggregated_data[vehicle_reg_number]['vehicle_driver_overtime_paid'] += float(payment_data.vehicle_driver_overtime_paid)
+                    aggregated_data[vehicle_reg_number]['total_bill_paid'] += float(total_bill_paid)
 
         for ticket_data in vehicle_ticket_data:
-            vehicle_reg_number = ticket_data.vehicle.vehicle_reg_number  # Ensure we get the correct vehicle registration number
-            if vehicle_reg_number in aggregated_data:  # Check if vehicle_reg_number is in aggregated_data
-                total_pg_runhour_handle = ticket_data.internal_generator_running_hours.total_seconds() / 3600 if isinstance(ticket_data.internal_generator_running_hours, timedelta) else ticket_data.internal_generator_running_hours
-                aggregated_data[vehicle_reg_number]['total_tickets_handle'] += 1
-                aggregated_data[vehicle_reg_number]['total_pg_runhour_handle'] += total_pg_runhour_handle
+            if ticket_data.vehicle:
+                vehicle_reg_number = ticket_data.vehicle.vehicle_reg_number  # Ensure we get the correct vehicle registration number
+                if vehicle_reg_number in aggregated_data:  # Check if vehicle_reg_number is in aggregated_data
+                    total_pg_runhour_handle = ticket_data.internal_generator_running_hours.total_seconds() / 3600 if isinstance(ticket_data.internal_generator_running_hours, timedelta) else ticket_data.internal_generator_running_hours
+                    aggregated_data[vehicle_reg_number]['total_tickets_handle'] += 1
+                    aggregated_data[vehicle_reg_number]['total_pg_runhour_handle'] += total_pg_runhour_handle
 
         for fuel_refill in vehicle_refill_data:
-            vehicle_reg_number = fuel_refill.vehicle.vehicle_reg_number  # Ensure we get the correct vehicle registration number
-            if vehicle_reg_number in aggregated_data:  # Check if vehicle_reg_number is in aggregated_data
-                total_fuel_consumed_from_refil = fuel_refill.vehicle_fuel_consumed
-                           
-                total_fuel_refil = fuel_refill.refill_amount
-                total_kilometer_run_from_refill = fuel_refill.vehicle_kilometer_run or 0
-                total_fuel_balance_from_refil = total_fuel_refil - total_fuel_consumed_from_refil    
-                
-                
-                aggregated_data[vehicle_reg_number]['total_fuel_refil'] += total_fuel_refil
-                aggregated_data[vehicle_reg_number]['total_kilometer_run_from_refill'] += total_kilometer_run_from_refill
-                aggregated_data[vehicle_reg_number]['total_fuel_consumed_from_refil'] += total_fuel_consumed_from_refil
-                aggregated_data[vehicle_reg_number]['total_fuel_balance_from_refil'] += total_fuel_balance_from_refil
-                
+            if fuel_refill.vehicle:
+                vehicle_reg_number = fuel_refill.vehicle.vehicle_reg_number  # Ensure we get the correct vehicle registration number
+                if vehicle_reg_number in aggregated_data:  # Check if vehicle_reg_number is in aggregated_data
+                    total_fuel_consumed_from_refil = fuel_refill.vehicle_fuel_consumed
+
+                    total_fuel_refil = fuel_refill.refill_amount
+                    total_kilometer_run_from_refill = fuel_refill.vehicle_kilometer_run or 0
+                    total_fuel_balance_from_refil = total_fuel_refil - total_fuel_consumed_from_refil    
+
+                    aggregated_data[vehicle_reg_number]['total_fuel_refil'] += total_fuel_refil
+                    aggregated_data[vehicle_reg_number]['total_kilometer_run_from_refill'] += total_kilometer_run_from_refill
+                    aggregated_data[vehicle_reg_number]['total_fuel_consumed_from_refil'] += total_fuel_consumed_from_refil
+                    aggregated_data[vehicle_reg_number]['total_fuel_balance_from_refil'] += total_fuel_balance_from_refil
 
         for vehicle_reg_number, data in aggregated_data.items():
             data['total_fuel_balance'] = data['total_fuel_refil'] - data['total_fuel_consumed']
@@ -829,7 +836,7 @@ def vehicle_grand_summary(request):
     except EmptyPage:
         aggregated_data_page = paginator.page(paginator.num_pages)
 
-    form = SummaryReportChartForm()
+    form = vehicleSummaryReportForm()
     context = {
         'aggregated_data_page': aggregated_data_page,
         'form': form,
@@ -841,6 +848,7 @@ def vehicle_grand_summary(request):
     }
 
     return render(request, 'vehicle/vehicle_payment_grand_sum.html', context)
+
 
 
 

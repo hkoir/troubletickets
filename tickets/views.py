@@ -24,7 +24,7 @@ from django.views import View
 from .models import eTicket,ChatMessage,ChildTicket,ChildTicketExternal,PGRdatabase
 from employee.models import EmployeeModel
 from generator.models import AddPGInfo
-from .forms import CreateTicketFormEdotco,UpdateTicketFormEdotco,ChatForm,SummaryReportForm,MPReportForm,ZoneReportForm,UpdateTicketFormEdotco,PGRForm,ExcelUploadForm
+from .forms import CreateTicketFormEdotco,UpdateTicketFormEdotco,ChatForm,SummaryReportForm,MPReportForm,ZoneReportForm,UpdateTicketFormEdotco
 from .forms import SummaryReportFormHourly,SummaryReportChartForm,CreateChildTicketForm,TicketStatusUpdateForm
 
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -32,7 +32,7 @@ from account.models import AudioModel
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction, IntegrityError
 from django.contrib.auth.decorators import login_required
-
+from django.db.models import Sum, ExpressionWrapper, DecimalField
 
 
 @login_required
@@ -40,32 +40,40 @@ def dash_board(request):
     audio_files = AudioModel.objects.all()
     return render(request, 'tickets/edotco/dash_board.html',{'audio_files':audio_files})
 
+
 @login_required
 def search_all(request):
-    query = request.GET.get('q')   
+    query = request.GET.get('q')
 
-    etickets = eTicket.objects.filter(Q(internal_ticket_number__icontains=query) | 
-                                    Q(region__icontains=query) | 
-                                    Q(zone__icontains=query) | 
-                                    Q(mp__icontains=query) | 
-                                    Q(site_id__icontains=query) | 
-                                    Q(ticket_status__icontains=query))
+    etickets = eTicket.objects.filter(
+        Q(internal_ticket_number__icontains=query) | 
+        Q(region__name__icontains=query) |  # Assuming region has a 'name' field
+        Q(zone__name__icontains=query) |    # Assuming zone has a 'name' field
+        Q(mp__name__icontains=query) |      # Assuming mp has a 'name' field
+        Q(site_id__icontains=query) | 
+        Q(ticket_status__icontains=query)
+    )
     
     child_tickets = ChildTicket.objects.none()  # Initialize with an empty queryset
 
     if etickets.exists():  # Check if any parent tickets were found
         child_tickets = ChildTicket.objects.filter(parent_ticket__in=etickets)
    
+    employees = EmployeeModel.objects.filter(
+        Q(name__icontains=query) | 
+        Q(employee_code__icontains=query) | 
+        Q(email__icontains=query) | 
+        Q(phone_number__icontains=query) | 
+        Q(position__icontains=query) | 
+        Q(department__icontains=query)
+    )
 
-    employees = EmployeeModel.objects.filter(Q(name__icontains=query) | 
-                                             Q(employee_code__icontains=query) | 
-                                             Q(email__icontains=query) | 
-                                             Q(phone_number__icontains=query) | 
-                                             Q(position__icontains=query) | 
-                                             Q(department__icontains=query))
-
-    return render(request, 'tickets/search_results.html', {'employees': employees, 'etickets': etickets, 'query': query,'child_tickets': child_tickets})
-
+    return render(request, 'tickets/search_results.html', {
+        'employees': employees, 
+        'etickets': etickets, 
+        'query': query,
+        'child_tickets': child_tickets
+    })
 
 
 
@@ -96,7 +104,7 @@ def generate_unique_finance_requisition_number():
 
 
 @login_required
-def create_ticket_edotco(request):
+def create_ticket_edotco2(request):
     if request.method == 'POST':
         form = CreateTicketFormEdotco(request.POST)
         if form.is_valid():           
@@ -104,11 +112,28 @@ def create_ticket_edotco(request):
             ticket.internal_ticket_number = generate_unique_ticket_number() 
             ticket.save()  
             return redirect('tickets:view_tt_edotco') 
+        else:
+             messages.error(request, " Something went wrong. Please try again carefully")
     else:
         form = CreateTicketFormEdotco()
     return render(request, 'tickets/edotco/create_tt.html', {'form': form})
 
+@login_required
+def create_ticket_edotco(request):
+    if request.method == 'POST':
+        form = CreateTicketFormEdotco(request.POST)
+        if form.is_valid():
+            ticket = form.save(commit=False)
+            ticket.internal_ticket_number = generate_unique_ticket_number()
+            ticket.save()
+            messages.success(request, "Ticket created successfully!")
+            return redirect('tickets:view_tt_edotco')
+        else:
+            messages.error(request, "Something went wrong. Please check the form and try again.")
+    else:
+        form = CreateTicketFormEdotco()
 
+    return render(request, 'tickets/edotco/create_tt.html', {'form': form})
 
 @login_required
 def update_ticket_edotco(request, ticket_id):
@@ -142,10 +167,11 @@ def update_ticket_edotco(request, ticket_id):
                         updated_ticket.pgnumber = None
 
                     updated_ticket.save()
-                    return redirect('tickets:view_tt_edotco')
-                
+                    return redirect('tickets:view_tt_edotco')      
             except IntegrityError:
                 form.add_error(None, 'There was an error saving the ticket due to a foreign key constraint failure.')
+        else:
+             messages.error(request, " Something went wrong. Please try again carefully")
     else:
         form = UpdateTicketFormEdotco(instance=ticket, user_role=user_role)
     
@@ -333,11 +359,11 @@ def view_all_parent_tickets_with_children(request):
             parent_tickets = parent_tickets.filter(created_at__range=(start_date, end_date))
 
         if region:
-            parent_tickets = parent_tickets.filter(region=region)
+            parent_tickets = parent_tickets.filter(region__name=region)
         if zone:
-            parent_tickets = parent_tickets.filter(zone=zone)
+            parent_tickets = parent_tickets.filter(zone__name=zone)
         if mp:
-            parent_tickets = parent_tickets.filter(mp=mp)
+            parent_tickets = parent_tickets.filter(mp__name=mp)
 
     ticket_data = []
     tickets_per_page = 5
@@ -509,11 +535,11 @@ def view_tt_edotco(request):
             tickets = tickets.filter(created_at__range=(start_date, end_date))
           
         if region:
-            tickets = tickets.filter(region=region)
+            tickets = tickets.filter(region__name=region)
         if zone:
-            tickets = tickets.filter(zone=zone)
+            tickets = tickets.filter(zone__name=zone)
         if mp:
-            tickets = tickets.filter(mp=mp)
+            tickets = tickets.filter(mp__name=mp)
     
     # Pagination logic
     ticket_data = []
@@ -600,7 +626,9 @@ def view_tt_edotco(request):
         'total_assigned_ticket': total_assigned_ticket
     })
 
-from django.db.models import Sum, ExpressionWrapper, DecimalField
+
+
+
 @login_required
 def summary_report_view(request):
     form = SummaryReportForm(request.GET or {'days': 20})
@@ -612,75 +640,62 @@ def summary_report_view(request):
         report_date = form.cleaned_data.get('report_date')
         days = form.cleaned_data.get('days')
 
-        if report_date:      
+        if report_date:
             summary = eTicket.objects.filter(created_at__date=report_date) \
-                .values('region', 'zone') \
+                .select_related('region', 'zone') \
+                .values('region__name', 'zone__name') \
                 .annotate(
                     num_tickets=Count('id'),
-
                     num_closed_tickets=Count('id', filter=Q(ticket_status='closed')),
                     num_valid_tickets=Count('id', filter=Q(ticket_status='TT_Valid')),
                     num_invalid_tickets=Count('id', filter=Q(ticket_status='TT_invalid')),
                     num_miss_tickets=Count('id', filter=Q(ticket_status='TT_Miss')),
-
                     num_running_tickets=Count('id', filter=Q(ticket_status='running')),
-                    num_connected_tickets=Count('id', filter=Q(ticket_status='TT_connected')),                    
-                    num_otw_tickets=Count('id', filter=Q(ticket_status='onTheWay')),   
-                    num_open_tickets=Count('id', filter=Q(ticket_status='open')), 
-                    num_team_assign_tickets=Count('id', filter=Q(ticket_status='team_assign')),                  
-                                              
-                    num_adhoc_PGR=Count('id', filter=Q(assigned_pg_runner_type='Adhoc')),
+                    num_connected_tickets=Count('id', filter=Q(ticket_status='TT_connected')),
+                    num_otw_tickets=Count('id', filter=Q(ticket_status='onTheWay')),
+                    num_open_tickets=Count('id', filter=Q(ticket_status='open')),
+                    num_team_assign_tickets=Count('id', filter=Q(ticket_status='team_assign')),
+                    num_adhoc_PGR=Count('id', filter=Q(assigned_to__PGR_type='Adhoc')),
                     total_hepta_running_hours=Sum('internal_generator_running_hours', output_field=DurationField()),
                     total_edotco_running_hours=Sum('customer_generator_running_hours', output_field=DurationField()),
-
                     total_hepta_calculated_fuel=Sum('internal_calculated_fuel_litre', output_field=DurationField()),
                     total_edotco_calculated_fuel=Sum('customer_calculated_fuel_litre', output_field=DurationField()),
-
-                     total_fuel_difference=ExpressionWrapper(
+                    total_fuel_difference=ExpressionWrapper(
                         F('total_hepta_calculated_fuel') - F('total_edotco_calculated_fuel'),
                         output_field=DecimalField(max_digits=10, decimal_places=2)
                     )
                 ) \
                 .order_by('region', 'zone')
             summary_data = list(summary)
-            form = SummaryReportForm()         
 
-        elif days:         
+        elif days:
             start_date = datetime.now() - timedelta(days=days)
             summary = eTicket.objects.filter(created_at__gte=start_date) \
-                .values('region', 'zone') \
+                .select_related('region', 'zone') \
+                .values('region__name', 'zone__name') \
                 .annotate(
                     num_tickets=Count('id'),
-
                     num_closed_tickets=Count('id', filter=Q(ticket_status='closed')),
                     num_valid_tickets=Count('id', filter=Q(ticket_status='TT_Valid')),
                     num_invalid_tickets=Count('id', filter=Q(ticket_status='TT_invalid')),
                     num_miss_tickets=Count('id', filter=Q(ticket_status='TT_Miss')),
-
                     num_running_tickets=Count('id', filter=Q(ticket_status='running')),
-                    num_connected_tickets=Count('id', filter=Q(ticket_status='TT_connected')),                    
-                    num_otw_tickets=Count('id', filter=Q(ticket_status='onTheWay')),   
-                    num_open_tickets=Count('id', filter=Q(ticket_status='open')), 
-                    num_team_assign_tickets=Count('id', filter=Q(ticket_status='team_assign')),                  
-                           
-                    num_adhoc_pgr_used=Count('id', filter=Q(assigned_pg_runner_type='Adhoc')),
+                    num_connected_tickets=Count('id', filter=Q(ticket_status='TT_connected')),
+                    num_otw_tickets=Count('id', filter=Q(ticket_status='onTheWay')),
+                    num_open_tickets=Count('id', filter=Q(ticket_status='open')),
+                    num_team_assign_tickets=Count('id', filter=Q(ticket_status='team_assign')),
+                    num_adhoc_PGR=Count('id', filter=Q(assigned_to__PGR_type='Adhoc')),
                     total_hepta_running_hours=Sum('internal_generator_running_hours', output_field=DurationField()),
                     total_edotco_running_hours=Sum('customer_generator_running_hours', output_field=DurationField()),
-                   
                     total_hepta_calculated_fuel=Sum('internal_calculated_fuel_litre', output_field=DurationField()),
                     total_edotco_calculated_fuel=Sum('customer_calculated_fuel_litre', output_field=DurationField()),
-
-                     total_fuel_difference=ExpressionWrapper(
+                    total_fuel_difference=ExpressionWrapper(
                         F('total_hepta_calculated_fuel') - F('total_edotco_calculated_fuel'),
                         output_field=DecimalField(max_digits=10, decimal_places=2)
                     )
                 ) \
                 .order_by('region', 'zone')
             summary_data = list(summary)
-            form = SummaryReportForm()
-
-        else:           
-            pass
 
     return render(request, 'tickets/edotco/summary_report.html', {
         'summary_data': summary_data,
@@ -688,7 +703,6 @@ def summary_report_view(request):
         'days': days,
         'report_date': report_date,
     })
-
 
 
 @login_required
@@ -704,7 +718,8 @@ def summary_report_view_region(request):
 
         if report_date:          
             summary = eTicket.objects.filter(created_at__date=report_date) \
-                .values('region', 'zone') \
+                .select_related('region', 'zone') \
+                .values('region__name', 'zone__name') \
                 .annotate(
                     num_tickets=Count('id'),
                     num_closed_tickets=Count('id', filter=Q(ticket_status='closed')),
@@ -735,7 +750,8 @@ def summary_report_view_region(request):
         elif days:
             start_date = datetime.now() - timedelta(days=days)
             summary = eTicket.objects.filter(created_at__gte=start_date) \
-                .values('region', 'zone') \
+                .select_related('region', 'zone') \
+                .values('region__name', 'zone__name') \
                 .annotate(
                     num_tickets=Count('id'),                   
                     num_valid_tickets=Count('id', filter=Q(ticket_status='TT_Valid')),
@@ -748,8 +764,8 @@ def summary_report_view_region(request):
                     num_open_tickets=Count('id', filter=Q(ticket_status='open')), 
                     num_team_assign_tickets=Count('id', filter=Q(ticket_status='team_assign')),                  
               
-                  
-                    num_adhoc_pgr_used=Count('id', filter=Q(assigned_pg_runner_type='Adhoc')),                 
+               
+                    num_adhoc_pgr_used=Count('id', filter=Q(assigned_to__PGR_type='Adhoc')),                 
                     num_adhoc_vehicle=Count('id', filter=Q( assigned_vehicle_type='Adhoc')),
 
                     total_hepta_running_hours=Sum('internal_generator_running_hours', output_field=DurationField()),
@@ -758,7 +774,7 @@ def summary_report_view_region(request):
                 ) \
                 .order_by('region', 'zone')
             for data in summary:
-                region = data['region']
+                region = data['region__name']
                 if region not in grouped_summary_data:
                     grouped_summary_data[region] = []
                 grouped_summary_data[region].append(data)
@@ -787,7 +803,8 @@ def summary_report_view_hourly(request):
             start_time = datetime.now() - timedelta(hours=hours)            
       
             summary = eTicket.objects.filter(created_at__gte=start_time) \
-                .values('region', 'zone') \
+                .select_related('region', 'zone') \
+                .values('region__name', 'zone__name') \
                 .annotate(
                     num_tickets=Count('id'),
                     num_closed_tickets=Count('id', filter=Q(ticket_status='closed')),
@@ -799,9 +816,8 @@ def summary_report_view_hourly(request):
                     num_connected_tickets=Count('id', filter=Q(ticket_status='TT_connected')),                    
                     num_otw_tickets=Count('id', filter=Q(ticket_status='onTheWay')),   
                     num_open_tickets=Count('id', filter=Q(ticket_status='open')), 
-                    num_team_assign_tickets=Count('id', filter=Q(ticket_status='team_assign')),                  
-              
-                    num_adhoc_PGR=Count('id', filter=Q(assigned_pg_runner_type='Adhoc')),
+                    num_team_assign_tickets=Count('id', filter=Q(ticket_status='team_assign')),                 
+                    num_adhoc_PGR=Count('id', filter=Q(assigned_to__PGR_type='Adhoc')), 
                     num_adhoc_vehicle=Count('id', filter=Q( assigned_vehicle_type='Adhoc')),
                     total_hepta_running_hours=Sum('internal_generator_running_hours', output_field=DurationField()),
                     total_edotco_running_hours=Sum('customer_generator_running_hours', output_field=DurationField()),
@@ -810,7 +826,7 @@ def summary_report_view_hourly(request):
                 .order_by('region', 'zone')
                  
             for data in summary:
-                region = data['region']
+                region = data['region__name']
                 if region not in grouped_summary_data:
                     grouped_summary_data[region] = []
                 grouped_summary_data[region].append(data)
@@ -944,7 +960,9 @@ def mp_report_view(request):
 def aggregated_tt_run_hour_trend_summary(request):
     form = SummaryReportChartForm(request.GET or {'days': 7})  
 
-    query = eTicket.objects.values('zone', 'created_at').annotate(
+    query = eTicket.objects \
+    .select_related('zone') \
+    .values('zone__name', 'created_at').annotate(
         trouble_tickets=Count('internal_ticket_number'),
         run_hours=Sum('internal_generator_running_hours')
     ).order_by('zone', 'created_at')    
@@ -1013,7 +1031,9 @@ def aggregated_tt_run_hour_trend_summary(request):
 def aggregated_tt_run_hour_trend(request):
     form = SummaryReportChartForm(request.GET or {'days': 20})
 
-    query = eTicket.objects.values('zone', 'created_at').annotate(
+    query = eTicket.objects \
+    .select_related('zone') \
+    .values('zone__name', 'created_at').annotate(
         trouble_tickets=Count('internal_ticket_number'),
         run_hours=Sum('internal_generator_running_hours')
     ).order_by('zone', 'created_at')
@@ -1080,7 +1100,9 @@ def aggregated_tt_run_hour_trend(request):
 def individual_tt_run_hour_trend(request):
     form = SummaryReportChartForm(request.GET or {'days': 20})
 
-    query = eTicket.objects.values('zone', 'created_at').annotate(
+    query = eTicket.objects \
+    .select_related('zone') \
+    .values('zone__name', 'created_at').annotate(
         trouble_tickets=Count('internal_ticket_number'),
         run_hours=Sum('internal_generator_running_hours')
     ).order_by('zone', 'created_at')
@@ -1152,7 +1174,9 @@ def individual_tt_run_hour_trend(request):
 
 @login_required
 def datewise_summary_edotco(request):
-    ticket_data = eTicket.objects.values('region', 'zone', 'ticket_origin_date').annotate(
+    ticket_data = eTicket.objects \
+    .select_related('region','zone') \
+    .values('region_name', 'zone_name', 'ticket_origin_date').annotate(
         total_tickets=Count('id'),
         total_running_hours=Sum('customer_generator_running_hours')
     ).order_by('region', 'zone', 'ticket_origin_date')
@@ -1279,104 +1303,6 @@ def create_child_ticket_api(request, parent_ticket_id):
 
 
 ## PGR database ###############################################
-
-def create_pgr(request):
-    if request.method == 'POST':
-        form = PGRForm(request.POST,request.FILES)
-        if form.is_valid():
-            pgr_record = form.save(commit=False) 
-            pgr_record.pgr_id = generate_unique_ticket_number() 
-            pgr_record.save()  
-            form.save()
-            messages.success(request, "Entries created successfully")
-            return redirect('tickets:view_pgr_database')  # Replace 'success_page' with the name of your success page
-    else:
-        form = PGRForm()
-    return render(request, 'tickets/edotco/create_pgr.html', {'form': form})
-
-
-
-def view_pgr_database(request):
-    pgr_list = PGRdatabase.objects.all().order_by('-created_at')
-
-    return render(request,'tickets/edotco/view_pgr_database.html',{'pgr_list':pgr_list})
-
-def update_pgr_database(request, pgr_id):
-    pgr_instance = get_object_or_404(PGRdatabase, id=pgr_id)
-    if request.method == 'POST':
-        form = PGRForm(request.POST, request.FILES, instance=pgr_instance)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "Entries updated successfully")
-            return redirect('tickets:view_pgr_database')  # Replace 'success_page' with the name of your success page
-    else:
-        form = PGRForm(instance=pgr_instance)
-    return render(request, 'tickets/edotco/update_pgr_database.html', {'form': form, 'pgr_instance': pgr_instance})
-
-from django.shortcuts import render
-from django.db.models import Count
-from .models import PGRdatabase
-
-def pgr_summary_view(request):   
-    summary_data = PGRdatabase.objects.values('region__name', 'zone__name', 'mp__name').annotate(
-        total_pgr=Count('id', filter=Q(PGR_type='PGR')),
-        total_pgtl=Count('id', filter=Q(PGR_type='PGTL'))
-    ).order_by('region__name', 'zone__name', 'mp__name')
-
-    overall_summary = PGRdatabase.objects.aggregate(
-        total_pgr=Count('id', filter=Q(PGR_type='PGR')),
-        total_pgtl=Count('id', filter=Q(PGR_type='PGTL'))
-    )
-
-
-    return render(request, 'tickets/edotco/summary_pgr.html', 
-            {
-            'summary_data': summary_data,
-            'overall_summary':overall_summary
-            })
-
-
-
-
-def upload_pgr_excel(request):
-    if request.method == 'POST':
-        form = ExcelUploadForm(request.POST, request.FILES)
-        if form.is_valid():
-            excel_file = request.FILES['excel_file']
-            try:
-                df = pd.read_excel(excel_file)
-
-                for _, row in df.iterrows():
-
-                    PGRdatabase.objects.create(
-                        region=row['region'],
-                        zone=row['zone'],
-                        mp=row['mp'],
-                        name=row['name'],
-                        pgr_id=row.get('pgr_id', None),
-                        PGR_type=row['PGR_type'],
-                        phone=row['phone'],
-                        email=row['email'],
-                        address=row['address'],
-                        joining_date=row.get('joining_date', None),
-                        reference_person_name=row.get('reference_person_name', None),
-                        reference_person_phone=row.get('reference_person_phone', None),
-                        # Assuming PGR_photo and PGR_birth_certificate are URLs or paths in your Excel file
-                        PGR_photo=row.get('PGR_photo', None),
-                        PGR_birth_certificate=row.get('PGR_birth_certificate', None)
-                    )
-
-                messages.success(request, "Data uploaded successfully")
-                return redirect('tickets:view_pgr_database')
-            except Exception as e:
-                messages.error(request, f"Error processing file: {e}")
-
-    else:
-        form = ExcelUploadForm()
-
-    return render(request, 'tickets/edotco/upload_pgr_excel.html', {'form': form})
-
-
 
 
 @login_required

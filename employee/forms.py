@@ -9,14 +9,14 @@ class AddEmployeeForm(forms.ModelForm):
     joining_date = forms.DateField(label='joining_date', required=False, widget=forms.DateInput(attrs={'type': 'date'}))
     class Meta:
         model = EmployeeModel
-        exclude = ['bonus','gross_monthly_salary','house_allowance','medical_allowance','transportation_allowance','updated_at'] 
+        exclude = ['resignation_date','employee_code','bonus','gross_monthly_salary','house_allowance','medical_allowance','transportation_allowance','updated_at'] 
  
 
 
 class AttendanceForm(forms.ModelForm):
     class Meta:
         model = AttendanceModel
-        fields = '__all__'
+        exclude=['total_hours']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)      

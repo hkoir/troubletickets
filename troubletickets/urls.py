@@ -15,6 +15,7 @@ urlpatterns = [
      path("dailyexpense/", include("dailyexpense.urls", namespace="dailyexpense")),
     path("vehicle/", include("vehicle.urls", namespace="vehicle")),
      path("generator/", include("generator.urls", namespace="generator")),
+    path("common/", include("common.urls", namespace="common")),
 ]
 
 

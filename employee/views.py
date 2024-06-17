@@ -37,7 +37,7 @@ def human_resource_management(request):
 
 
 @login_required
-def add_employee(request):
+def add_employee2(request):
     if request.method == 'POST':
         form = AddEmployeeForm(request.POST, request.FILES)
         if form.is_valid():
@@ -47,6 +47,21 @@ def add_employee(request):
             print(form.errors)  
     else:
         form = AddEmployeeForm()    
+    return render(request, 'employee/add_employee_form.html', {'form': form})
+
+
+from tickets.views import generate_unique_finance_requisition_number
+
+def add_employee(request):
+    if request.method == 'POST':   
+        form = AddEmployeeForm(request.POST, request.FILES)
+        if form.is_valid():        
+       
+            form.instance.employee_code = generate_unique_finance_requisition_number()
+            form.save()
+            return redirect('employee:view_employee')
+    else:     
+        form = AddEmployeeForm()
     return render(request, 'employee/add_employee_form.html', {'form': form})
 
 

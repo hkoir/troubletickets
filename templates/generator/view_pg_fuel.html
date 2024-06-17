@@ -97,10 +97,21 @@
                 <td class="text-center p-2" style="white-space: nowrap;">{{ fuel.fuel_rate}}</td>
                 <td class="text-center p-2" style="white-space: nowrap;">{{ fuel.fuel_cost}}</td>
 
-                <td class="text-center p-2" style="white-space: nowrap;">{{ fuel.fuel_pump_supplier_name }}</td>
+                {% if fuel.fuel_pump %}
+                <td class="text-center p-2" style="white-space: nowrap;">{{ fuel.fuel_pump.fuel_pump_name  }}</td> 
+                <td class="text-center p-2"style="white-space: nowrap;">{{ fuel.fuel_pump.fuel_pump_phone }}</td>
+                <td class="text-center p-2"style="white-space: nowrap;">{{ fuel.fuel_pump.fuel_pump_address }}</td>
+                {% else %}
+                <td class="text-center p-2" style="white-space: nowrap;">{{ fuel.fuel_supplier_name  }}</td> 
                 <td class="text-center p-2"style="white-space: nowrap;">{{ fuel.fuel_supplier_phone }}</td>
                 <td class="text-center p-2"style="white-space: nowrap;">{{ fuel.fuel_supplier_address }}</td>
-   
+                {% endif %}
+
+
+
+
+
+              
                 <td class="text-center p-2"style="white-space: nowrap;">
                     {% if fuel.refill_supporting_documents %}
                     <a href="{{ fuel.refill_supporting_documents.url }}" target="_blank">
@@ -146,5 +157,55 @@
 
 <div class="col" style="height:1200px"></div>
 
+<script>
+
+    $(document).Ready(function(){
+
+        var regionZoneMapping = {
+            'Sylhet': ['','Sylhet', 'Moulovibazar','Mymensingh','Kisorganj','Tangail'], 
+            'Rangpur': ['','Rangpur', 'Dinajpur','Bagura','Rajshahi'] ,                          
+            
+        };
+     
+        $('#id_region').change(function(){
+            var selectedRegion = $(this).val();
+            var zoneChoices = regionZoneMapping[selectedRegion];
+            $('#id_zone').empty();
+            $.each(zoneChoices, function(index, value){
+                $('#id_zone').append($('<option>').text(value).attr('value', value));
+            });
+        });
+              
+        var zoneMpMapping = {              
+            'Sylhet': ['','Sylhet','Taherpur','Sunamganj','Bianibazar','Dorbhost','Dherai','Chatak'], // Add more MPs for Sylhet zone
+            'Moulovibazar': ['','Moulovibazar', 'Saestaganj','Juri','Baniachong'],
+            'Mymensingh': ['','Mymensingh', 'Fulpur','Valuka'] ,
+            'Kisorganj': ['','Kisorganj','Katiadi','Netrokona','Mohonpur','Austogram'],
+            'Tangail': ['','Tangail','Madhupur','Jamalpur','Sherpur','Bakshihanj','Rowmari'],
+           
+            'Rangpur':['','Rangpur','Hatibandha','Gaibandha','Ulipur','Boropar','Polasbari'],
+            'Dinajpur':['','Dinajpur','Panchghor','Jaldhaka','Thakurgaon'],
+            'Rajshahi':['','Rajshahi','Bagura','Nachole','Natore','Chapai'],
+            'Bagura':['','Bagura'],
+            '': ['']
+           
+        };
+
+   
+        $('#id_zone').change(function(){
+            $('#id_mp').val('');
+            var selectedZone = $(this).val();
+            var mpChoices = zoneMpMapping[selectedZone];
+
+            $('#id_mp').empty();
+            $.each(mpChoices, function(index, value){
+                $('#id_mp').append($('<option>').text(value).attr('value', value));
+            });
+        });
+
+
+
+    });
+</script>
 
 {% endblock %}

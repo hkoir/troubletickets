@@ -83,7 +83,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const zoneDateMap = {};
 
     data.forEach(item => {
-        const zone = item.zone;
+        const zone = item.zone__name;
         const date = item.created_at;
         const troubleTickets = item.trouble_tickets;
         const runHours = item.run_hours;

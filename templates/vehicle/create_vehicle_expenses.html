@@ -18,38 +18,59 @@
   
     
     <h4 class="text-center" style="margin-top:10px">DOPS form</h4>
-    <div class="container-fluid">
-        <div class="row row-cols-1 row-cols-md-3 p-2">
-            <div class="col"></div>
-            <div class="col-md-6"> <!-- Adjust the width for medium screens -->
-                <div class="card" style="background-color: bisque; padding:10px;">
-                    <div class="card-body">
-                        <h4 class="card-title" style="margin-bottom:20px">Add kilometer reading</h4>
-                        <form method="post" enctype="multipart/form-data">
-                            {% csrf_token %}
-                            {% for field in form %}
-                                <div class="form-group" style="padding:5px">
-                                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-                                    {% if field.name == 'travel_purpose' %}
-                                        <textarea class="form-control" id="{{ field.id_for_label }}" name="{{ field.html_name }}" style="height: 100px;"></textarea>
-                                        {% elif field.name == 'comments' %}
-                                        <textarea class="form-control" id="{{ field.id_for_label }}" name="{{ field.html_name }}" style="height: 100px;"></textarea>
-                                    {% else %}
-                                        {{ field }}
-                                    {% endif %}
-                                </div>
-                            {% endfor %}
-                            <div><button type="submit" class="btn btn-primary">Submit</button></div>
-                        </form>
-                    </div>
+    <h4 class="text-center" style="margin-top:10px">Create Vehicle Expenses</h4>
+<div class="container-fluid">
+    <div class="row row-cols-1 row-cols-md-3 p-2">
+        <div class="col"></div>
+        <div class="col-md-6">
+            <div class="card" style="background-color: bisque; padding:10px;">
+                <div class="card-body">
+                    <h4 class="card-title" style="margin-bottom:20px">Add Vehicle Expense</h4>
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {{ form.as_p }}
+                        <div><button type="submit" class="btn btn-primary">Submit</button></div>
+                    </form>
                 </div>
             </div>
-            <div class="col"></div>
         </div>
+        <div class="col"></div>
     </div>
+</div>
+
     
 
 
+    <script>
+        $(document).ready(function() {
+            $('#id_vehicle').select2({
+                width: '100%', 
+                ajax: {
+                    url: "{% url 'dailyexpense:common_search' %}",
+                    dataType: 'json',
+                    delay: 250,
+                    data: function(params) {
+                        return {
+                            q: params.term
+                        };
+                    },
+                    processResults: function(data) {
+                        return {
+                            results: data.results
+                        };
+                    },
+                    cache: true
+                },
+                minimumInputLength: 1, 
+                placeholder: 'Search ',
+                allowClear: true
+            });
+
+
+
+
+        });
+    </script>
 
 
 

@@ -1,0 +1,135 @@
+
+{% extends "base.html" %}
+{% load static %}
+
+
+
+{% block content %}
+
+
+    <title>Create Ticket</title>
+   
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <style>
+
+
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@100;200;300;400;500;600;700;900&display=swap');
+
+html, body { 
+       font-family: Verdana, sans-serif; 
+     
+  }
+
+  
+table {
+            border-collapse: collapse;
+            width: 100%;
+        
+        }
+        
+        th, td {
+            border: 1px solid black; /* Set border color for individual cells */
+            vertical-align: middle;
+            padding: 0px;
+        }
+        
+        th {
+          background-color: rgb(177, 227, 187);
+           
+        }
+        
+        table thead th {
+        white-space: normal;
+        }
+        
+
+
+        
+.main-content {   
+    overflow-y: auto;
+    margin-left:0px;
+    position: absolute;
+    width: 100%;
+    left: 0;
+  
+}
+
+    </style>
+
+<body>
+
+<div>
+
+    {% if messages %}
+    <div class="alert alert-success" role="alert">
+        {% for message in messages %}
+            <li>{{ message }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+</div>
+
+
+<h1 class ='text-center'>view region zone mp</h1>
+
+<div class="container-fluid main-content">
+    <div class="row">
+      <div class="col-xl-12">
+        <table>
+          <thead>        
+            <tr>
+              <th class="text-center p-2">Region</th>
+              <th class="text-center p-2">Zone</th>
+              <th class="text-center p-2">MP</th>              
+  
+            </tr>
+          </thead>
+          <tbody>
+            {% for data in data %}
+              <tr>
+  
+               
+  
+                <td class="text-center p-2" style="white-space: nowrap;">{{ data.zone.region.name}}</td>
+                <td class="text-center p-2" style="white-space: nowrap;">{{ data.zone.name }}</td>
+                <td class="text-center p-2" style="white-space: nowrap;">{{ data.name }}</td>
+                
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+<div class="col" style="height:1200px"></div>
+ 
+
+
+    <script>
+        $(document).ready(function() {
+            $('#id_region_id').change(function() {
+                var selectedRegion = $('#id_region_id option:selected').text();
+                if (selectedRegion) {
+                    $('#id_region_name').val(selectedRegion);
+                }
+            });
+
+            $('#id_region_name').focus(function() {
+                $('#id_region_id').val('');
+            });
+
+            $('#id_zone_id').change(function() {
+                var selectedZone = $('#id_zone_id option:selected').text();
+                if (selectedZone) {
+                    $('#id_zone_name').val(selectedZone);
+                }
+            });
+
+            $('#id_zone_name').focus(function() {
+                $('#id_zone_id').val('');
+            });
+        });
+    </script>
+
+{% endblock %}

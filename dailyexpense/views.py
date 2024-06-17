@@ -37,9 +37,7 @@ from .forms import ZoneWiseExpensesForm,AdhocRequisitionStatusForm,AdhocRequisit
 def expense_advance_management(request):
     return render(request,'expenses/expense_advance_management.html')# for expense and advance management dashboard shortcut
 
-def operational_resource_management(request):
-    return render(request,'expenses/operational_resource_management.html') # for operational resource dashboard shortcut
-
+from common.models import FuelPumpDatabase
 
 
 def common_search(request):
@@ -61,6 +59,11 @@ def common_search(request):
         Q(vehicle_brand_name__icontains=query)
     ).values('id', 'vehicle_reg_number', 'vehicle_brand_name')
 
+    addpumpInfo_results = FuelPumpDatabase.objects.filter(
+        Q(fuel_pump_name__icontains=query) |
+        Q(fuel_pump_company_name__icontains=query)
+    ).values('id', 'fuel_pump_name', 'fuel_pump_company_name')
+
     region_results = Region.objects.filter(
         Q(name__icontains=query)
     ).values('id', 'name')
@@ -77,7 +80,6 @@ def common_search(request):
 
     pgr_results = PGRdatabase.objects.filter(
         Q(name__icontains=query)
-  
     ).values('id', 'name')
 
     results = []
@@ -102,20 +104,26 @@ def common_search(request):
         elif query in vh['vehicle_brand_name'].lower():
             results.append({'id': vh['id'], 'text': vh['vehicle_brand_name'], 'model': 'AddVehicleInfo'})
 
+    for pump in addpumpInfo_results:
+        if query in pump['fuel_pump_name'].lower():
+            results.append({'id': pump['id'], 'text': pump['fuel_pump_name'], 'model': 'FuelPumpDatabase'})
+        elif query in pump['fuel_pump_company_name'].lower():
+            results.append({'id': pump['id'], 'text': pump['fuel_pump_company_name'], 'model': 'FuelPumpDatabase'})
+
     for region in region_results:
         results.append({'id': region['id'], 'text': region['name'], 'model': 'Region'})
 
     for zone in zone_results:
-        results.append({'id': zone['id'], 'text': zone['name'], 'region': zone['region__name'], 'model': 'Zone'})
+        results.append({'id': zone['id'], 'text': f"{zone['name']} ({zone['region__name']})", 'model': 'Zone'})
 
     for mp in mp_results:
-        results.append({'id': mp['id'], 'text': mp['name'], 'zone': mp['zone__name'], 'model': 'MP'})
-   
+        results.append({'id': mp['id'], 'text': f"{mp['name']} ({mp['zone__name']})", 'model': 'MP'})
+
     for pgr in pgr_results:
         results.append({'id': pgr['id'], 'text': pgr['name'], 'model': 'PGRdatabase'})
 
-    
     return JsonResponse({'results': results})
+
 
 
 
@@ -146,7 +154,7 @@ def money_requisition(request):
             return redirect('dailyexpense:all_approval_status')
     else:     
         form = MoneyRequisitionForm()
-    return render(request, 'expenses/approval/money_requisition_form.html', {'form': form})
+    return render(request, 'expenses/money_requisition/money_requisition_form.html', {'form': form})
 
 
 
@@ -180,11 +188,11 @@ def all_approval_status(request):
             money_requisitions = money_requisitions.filter(created_at__range=(start_date, end_date))
 
         if region:
-            money_requisitions = money_requisitions.filter(region=region)
+            money_requisitions = money_requisitions.filter(region__name=region)
         if zone:
-            money_requisitions = money_requisitions.filter(zone=zone)
+            money_requisitions = money_requisitions.filter(zone__name=zone)
         if mp:
-            money_requisitions = money_requisitions.filter(mp=mp)
+            money_requisitions = money_requisitions.filter(mp__name=mp)
 
         # Calculate region-wise and zone-wise summaries
         region_approvals = money_requisitions.values('region').annotate(
@@ -214,7 +222,7 @@ def all_approval_status(request):
 
     
     form = ExpenseRequisitionStatusForm()
-    return render(request, 'expenses/approval/approval_history.html', {
+    return render(request, 'expenses/money_requisition/approval_history.html', {
         'money_requisitions':money_requisitions,
         'page_obj': page_obj,
         'region_approvals': region_approvals,
@@ -274,7 +282,7 @@ def requisition_approval(request, requisition_id):
 
             return redirect('dailyexpense:all_approval_status')
         else:
-            return render(request, 'expenses/approval/money_approval_form.html', {'requisition': requisition})
+            return render(request, 'expenses/money_requisition/money_approval_form.html', {'requisition': requisition})
     else:        
         messages.error(request, "You can not get access at this moment. May be due to previous level approval is pending or you are not authorized from your management")
         return redirect('dailyexpense:all_approval_status')
@@ -320,19 +328,19 @@ def download_money_requisition_data(request):
         worksheet.write(row, 0, str(update_at_str))
         worksheet.write(row, 1, str(requisition.requisition_number))      
         worksheet.write(row, 2, str(requisition.requester))
-        worksheet.write(row, 3, requisition.region)
-        worksheet.write(row, 4, requisition.zone)
-        worksheet.write(row, 5, requisition.mp)
-        worksheet.write(row, 6, requisition.purpose)
-        worksheet.write(row, 7, float(requisition.requisition_amount))
-        worksheet.write(row, 8, float(requisition.approved_amount))
-        worksheet.write(row, 9, requisition.level1_approver)
-        worksheet.write(row, 10, str(requisition.level1_approval_date))
-        worksheet.write(row, 11, requisition.level2_approver)
-        worksheet.write(row, 12, str(requisition.level2_approval_date))
-        worksheet.write(row, 13, requisition.level3_approver)
-        worksheet.write(row, 14, str(requisition.level3_approval_date))
-        worksheet.write(row, 15, requisition.receiving_status)
+        worksheet.write(row, 3, str(requisition.region.name))
+        worksheet.write(row, 4, str(requisition.zone.name))
+   
+        worksheet.write(row, 5, requisition.purpose)
+        worksheet.write(row, 6, float(requisition.requisition_amount))
+        worksheet.write(row, 7, float(requisition.approved_amount))
+        worksheet.write(row, 8, requisition.level1_approver)
+        worksheet.write(row, 9, str(requisition.level1_approval_date))
+        worksheet.write(row, 10, requisition.level2_approver)
+        worksheet.write(row, 11, str(requisition.level2_approval_date))
+        worksheet.write(row, 12, requisition.level3_approver)
+        worksheet.write(row, 13, str(requisition.level3_approval_date))
+        worksheet.write(row, 14, requisition.receiving_status)
 
     workbook.close()
     return response
@@ -362,7 +370,7 @@ def update_money_requisition(request,requisition_id):
 
     else:     
         form = MoneySendingForm()
-    return render(request, 'expenses/approval/money_requisition_form.html', {'form': form})
+    return render(request, 'expenses/money_requisition/money_requisition_form.html', {'form': form})
 
 
 
@@ -401,7 +409,7 @@ def create_expense_requisition(request):
             return redirect('dailyexpense:expense_approval_status')
     else:     
         form = ExpenseRequisitionForm()
-    return render(request, 'expenses/approval/create_expense_requisition.html', {'form': form})
+    return render(request, 'expenses/daily_expenses/create_expense_requisition.html', {'form': form})
 
 
 
@@ -470,7 +478,7 @@ def expense_approval_status(request):
         page_obj = paginator.page(paginator.num_pages)
 
     form = ExpenseRequisitionStatusForm()
-    return render(request, 'expenses/approval/expense_approval_status.html', {
+    return render(request, 'expenses/daily_expenses/expense_approval_status.html', {
         'expense_requisitions':expense_requisitions,
         'page_obj': page_obj,
         'region_approvals': region_approvals,
@@ -532,7 +540,7 @@ def expense_requisition_approval(request, expense_requisition_id):
 
             return redirect('dailyexpense:expense_approval_status')
         else:
-            return render(request, 'expenses/approval/expense_approval.html', {'expense_requisitions': expense_requisitions})
+            return render(request, 'expenses/daily_expenses/expense_approval.html', {'expense_requisitions': expense_requisitions})
     else:        
         messages.error(request, "You can not get access at this moment. May be due to previous level approval is pending or you are not authorized from your management")
         return redirect('dailyexpense:expense_approval_status')
@@ -569,7 +577,7 @@ def download_expense_requisition_data(request):
     workbook = xlsxwriter.Workbook(response)
     worksheet = workbook.add_worksheet()
     
-    headers = ['Date','Requisition Number','Reqquester', 'Region', 'Zone','MP','Purpose', 'Requisition Amount','Approved Amount', 'Level 1 Approval', 
+    headers = ['Date','Requisition Number','Requester', 'Region', 'Zone','MP','Purpose', 'Requisition Amount','Approved Amount', 'Level 1 Approval', 
                'Level 1 Approval Date', 'Level 2 Approval', 'Level 2 Approval Date', 'Level 3 Approval', 
                'Level 3 Approval Date', 'Receiving Status']
     
@@ -578,16 +586,15 @@ def download_expense_requisition_data(request):
   
     requisitions = DailyExpenseRequisition.objects.all()
     for row, requisition in enumerate(requisitions, start=1):
-        update_at_str = timezone.localtime(requisition.update_at).strftime('%Y-%m-%d %H:%M:%S')
+        created_at_str = timezone.localtime(requisition.created_at).strftime('%Y-%m-%d %H:%M:%S')
       
-
-        worksheet.write(row, 0, str(update_at_str))
+        worksheet.write(row, 0, str(created_at_str))
         worksheet.write(row, 1, str(requisition.expense_requisition_number))      
         worksheet.write(row, 2, str(requisition.expense_requester))
-        worksheet.write(row, 3, requisition.region)
-        worksheet.write(row, 4, requisition.zone)
-        worksheet.write(row, 5, requisition.mp)
-        worksheet.write(row, 6, requisition.purpose)
+        worksheet.write(row, 3, str(requisition.region.name))  # Assuming 'name' is the attribute of Region you want to display
+        worksheet.write(row, 4, str(requisition.zone.name))    # Assuming 'name' is the attribute of Zone you want to display
+        worksheet.write(row, 5, str(requisition.mp.name))      # Assuming 'name' is the attribute of MP you want to display
+        worksheet.write(row, 6, str(requisition.purpose))
         worksheet.write(row, 7, float(requisition.requisition_amount))
 
         if requisition.approved_amount is not None:
@@ -595,21 +602,193 @@ def download_expense_requisition_data(request):
         else:
             worksheet.write(row, 8, "Not Approved yet")
      
-
-        worksheet.write(row, 9, requisition.level1_approver)
+        worksheet.write(row, 9, str(requisition.level1_approver))
         worksheet.write(row, 10, str(requisition.level1_approval_date))
-        worksheet.write(row, 11, requisition.level2_approver)
+        worksheet.write(row, 11, str(requisition.level2_approver))
         worksheet.write(row, 12, str(requisition.level2_approval_date))
-        worksheet.write(row, 13, requisition.level3_approver)
+        worksheet.write(row, 13, str(requisition.level3_approver))
         worksheet.write(row, 14, str(requisition.level3_approval_date))
-        worksheet.write(row, 15, requisition.receiving_status)
+        worksheet.write(row, 15, str(requisition.receiving_status))
 
     workbook.close()
     return response
 
 
 
+
+
+from .forms import dailyExpenseSummaryForm
+
+
 def daily_expense_summary(request):
+    form = dailyExpenseSummaryForm(request.GET or {'days': 7})
+    grouped_summary_data = []
+    report_date = None
+    days = None
+    grouped_data=[]
+
+    total_requisition_amount_count =None
+    total_approved_amount_count =None
+    local_conveyance_amount=None
+    pg_carrying_cost_amount =None
+    toll_amount=None
+    night_bill_amount=None
+    food_amount=None
+  
+
+    if form.is_valid():
+        start_date = form.cleaned_data.get('start_date')
+        end_date = form.cleaned_data.get('end_date')
+        days = form.cleaned_data.get('days')
+        region = form.cleaned_data.get('region')
+        zone = form.cleaned_data.get('zone')
+        mp = form.cleaned_data.get('mp')
+        data = None 
+
+        if start_date and end_date:
+            data = DailyExpenseRequisition.objects.filter(created_at__range=(start_date, end_date))
+        elif days:
+            end_date = datetime.today()
+            start_date = end_date - timedelta(days=days)
+            data = DailyExpenseRequisition.objects.filter(created_at__range=(start_date, end_date))
+
+        # Filter data based on region, zone, and mp if specified
+        if data is not None:
+            if region:
+                data = data.filter(region=region)
+            if zone:
+                data = data.filter(zone=zone)
+            if mp:
+                data = data.filter(mp=mp)
+
+
+            data_grand = data.aggregate(
+            total_requisition_amount=Sum('requisition_amount'),
+            total_approved_amount=Sum('approved_amount'),           
+            local_conveyance_amount=Sum(
+                Case(
+                    When(purpose='local_conveyance', then=F('requisition_amount')),
+                    default=0,
+                    output_field=FloatField()
+                        )
+                    ),
+            pg_carrying_cost_amount=Sum(
+                Case(
+                    When(purpose='pg_carrying_cost', then=F('requisition_amount')),
+                    default=0,
+                    output_field=FloatField()
+                        )
+                    ),
+            toll_amount=Sum(
+                Case(
+                    When(purpose='toll', then=F('requisition_amount')),
+                    default=0,
+                    output_field=FloatField()
+                        )
+                    ),
+            food_amount=Sum(
+                Case(
+                    When(purpose='food', then=F('requisition_amount')),
+                    default=0,
+                    output_field=FloatField()
+                        )
+                    ),
+
+            night_bill_amount=Sum(
+                Case(
+                    When(purpose='night_bill', then=F('requisition_amount')),
+                    default=0,
+                    output_field=FloatField()
+                        )
+                    ),
+
+
+                  )
+
+            total_requisition_amount_count = data_grand.get('total_requisition_amount', 0)
+            total_approved_amount_count = data_grand.get('total_approved_amount', 0)
+            local_conveyance_amount = data_grand.get('local_conveyance_amount', 0)
+            pg_carrying_cost_amount = data_grand.get('pg_carrying_cost_amount', 0)
+            toll_amount = data_grand.get('toll_amount', 0)
+            night_bill_amount = data_grand.get('night_bill_amount', 0)
+            food_amount = data_grand.get('food_amount', 0)
+
+            
+            grouped_data = data.values('region__name', 'zone__name', 'mp__name').annotate(
+                total_requisition_amount=Sum('requisition_amount'),
+                total_approved_amount=Sum('approved_amount'),
+                local_conveyance_amount=Sum(
+                    Case(
+                        When(purpose='local_conveyance', then=F('requisition_amount')),
+                        default=0,
+                        output_field=FloatField()
+                    )
+                ),
+                pg_carrying_cost_amount=Sum(
+                    Case(
+                        When(purpose='pg_carrying_cost', then=F('requisition_amount')),
+                        default=0,
+                        output_field=FloatField()
+                    )
+                ),
+                toll_amount=Sum(
+                    Case(
+                        When(purpose='toll', then=F('requisition_amount')),
+                        default=0,
+                        output_field=FloatField()
+                    )
+                ),
+                food_amount=Sum(
+                    Case(
+                        When(purpose='food', then=F('requisition_amount')),
+                        default=0,
+                        output_field=FloatField()
+                    )
+                ),
+                night_bill_amount=Sum(
+                    Case(
+                        When(purpose='night_bill', then=F('requisition_amount')),
+                        default=0,
+                        output_field=FloatField()
+                    )
+                )
+            )
+
+        # Append the results to grouped_summary_data
+        for entry in grouped_data:
+            grouped_summary_data.append({
+                'region': entry['region__name'],
+                'zone': entry['zone__name'],
+                'mp': entry['mp__name'],
+                'total_requisition_amount': entry.get('total_requisition_amount', 0),
+                'total_approved_amount': entry.get('total_approved_amount', 0),
+                'local_conveyance_amount': entry.get('local_conveyance_amount', 0),
+                'pg_carrying_cost_amount': entry.get('pg_carrying_cost_amount', 0),
+                'toll_amount': entry.get('toll_amount', 0),
+                'food_amount': entry.get('food_amount', 0),
+                'night_bill_amount': entry.get('night_bill_amount', 0)
+            })
+
+    form = dailyExpenseSummaryForm()
+    return render(request, 'expenses/daily_expenses/daily_expense_summary.html', {
+        'form': form,
+        'days': days,
+        'start_date':start_date,
+        'end_date':end_date,
+        'report_date': report_date,
+        'grouped_summary_data': grouped_summary_data,
+         'total_requisition_amount_count': total_requisition_amount_count,
+        'total_approved_amount_count': total_approved_amount_count,
+        'local_conveyance_amount': local_conveyance_amount,
+        'pg_carrying_cost_amount': pg_carrying_cost_amount,
+         'toll_amount':toll_amount,
+         'night_bill_amount':night_bill_amount,
+         'food_amount':food_amount,
+    })
+
+
+
+def daily_expense_summary2(request):
     form = SummaryReportChartForm(request.GET or {'days': 7})
     grouped_summary_data = {}
     report_date = None
@@ -830,8 +1009,6 @@ def daily_expense_summary(request):
 
 
 
-
-
 ########### adhoc-man and adhoc vehicle requisition management#######################
 
 
@@ -843,10 +1020,10 @@ def create_adhoc_requisition(request):
             form.instance.adhoc_requester = request.user
             form.instance.adhoc_requisition_number = generate_unique_finance_requisition_number()
             form.save()
-            return redirect('dailyexpense:create_adhoc_requisition')
+            return redirect('dailyexpense:adhoc_approval_status')
     else:     
         form = AdhocRequisitionForm()
-    return render(request, 'expenses/approval/create_adhoc_requisition .html', {'form': form})
+    return render(request, 'expenses/adhoc_expenses/create_adhoc_requisition .html', {'form': form})
 
 
 
@@ -914,7 +1091,7 @@ def adhoc_approval_status(request):
         page_obj = paginator.page(paginator.num_pages)
 
     form = ExpenseRequisitionStatusForm()
-    return render(request, 'expenses/approval/adhoc_approval_status .html', {
+    return render(request, 'expenses/adhoc_expenses/adhoc_approval_status .html', {
         'expense_requisitions':expense_requisitions,
         'page_obj': page_obj,
         'region_approvals': region_approvals,
@@ -978,7 +1155,7 @@ def adhoc_requisition_approval(request, adhoc_requisition_id):
 
             return redirect('dailyexpense:adhoc_approval_status')
         else:
-            return render(request, 'expenses/approval/adhoc_approval.html', {'adhoc_requisitions': adhoc_requisitions})
+            return render(request, 'expenses/adhoc_expenses/adhoc_approval.html', {'adhoc_requisitions': adhoc_requisitions})
     else:        
         messages.error(request, "You can not get access at this moment. May be due to previous level approval is pending or you are not authorized from your management")
         return redirect('dailyexpense:expense_approval_status')
@@ -1073,12 +1250,14 @@ def summary_expenses_form_view(request):
     else:
         form = SummaryExpensesForm()
     
-    return render(request, 'expenses/summary_expenses_form.html', {'form': form})
+    return render(request, 'expenses/grand_summary_expenses/summary_expenses_form.html', {'form': form})
 
 
 @login_required
 def zone_wise_expenses_view(request):
-    region_zone_data = SummaryExpenses.objects.values('id','region', 'zone','created_at','updated_at').annotate(
+    region_zone_data = SummaryExpenses.objects \
+    .select_related('id','region','zone','created_at','updated_at') \
+    .values('id','region__name', 'zone__name','created_at','updated_at').annotate(
         total_balance_from_previous_month=Sum('balance_from_previous_month'),
         total_amount_received=Sum('total_amount_received'),
         total_this_month_cash=Sum('this_month_cash'),
@@ -1108,7 +1287,7 @@ def zone_wise_expenses_view(request):
 
     region_data = {}
     for data in region_zone_data:
-        region = data['region']
+        region = data['region__name']
         if region not in region_data:
             region_data[region] = []
         region_data[region].append(data)
@@ -1117,24 +1296,24 @@ def zone_wise_expenses_view(request):
         'region_data': region_data,
     }
 
-    return render(request, 'expenses/view_summary_expenses.html', context)
+    return render(request, 'expenses/grand_summary_expenses/view_summary_expenses.html', context)
 
 
 
 
 @login_required
 def zone_wise_expenses_view2(request):
-    form = ZoneWiseExpensesForm(request.GET or None)
-  
-    zone_data = []
-    
+    form = ZoneWiseExpensesForm(request.GET or None)  
+    zone_data = []    
     if form.is_valid():
         zone = form.cleaned_data['zone']
         start_date = form.cleaned_data['start_date']
         end_date = form.cleaned_data['end_date']
         
-        zone_data = SummaryExpenses.objects.filter(zone=zone, created_at__range=(start_date, end_date)).values(
-            'id','region', 'zone', 'created_at','updated_at'
+        zone_data = SummaryExpenses.objects.filter(zone=zone, created_at__range=(start_date, end_date)) \
+       .select_related('region','zone') \
+        .values( 'id','region__name', 'zone__name', 'created_at','updated_at'
+           
         ).annotate(
             total_balance_from_previous_month=Sum('balance_from_previous_month'),
             total_amount_received=Sum('total_amount_received'),
@@ -1166,7 +1345,7 @@ def zone_wise_expenses_view2(request):
         'zone_data': zone_data,
     }
 
-    return render(request, 'expenses/zone_wise_summary_expense.html', context)
+    return render(request, 'expenses/grand_summary_expenses/zone_wise_summary_expense.html', context)
 
 
 
@@ -1187,5 +1366,5 @@ def update_summary_expenses(request, summary_expenses_id):
                 return redirect('dailyexpense:zone_wise_expenses_view')
     else:
         form = SummaryExpensesForm(instance=summary_expenses)
-    return render(request, 'expenses/update_summary_report.html', {'form': form})
+    return render(request, 'expenses/grand_summary_expenses/update_summary_report.html', {'form': form})
 

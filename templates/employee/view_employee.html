@@ -57,7 +57,7 @@ white-space: normal;
                         <p class="card-title">{{ employee.name }}<br>
                        {{ employee.position }}<br>
                        {{ employee.joining_date }}<br>
-                        <strong>Dept.</strong> {{ employee.department }}<br>    
+                       {{ employee.department }}<br>    
                         
                         {% if request.user.manager_level == 'third_level' %}
                         <a href="{% url 'employee:update_employee' employee.id %}">Update Record</a>

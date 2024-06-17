@@ -65,33 +65,56 @@
 
 
 
+<script>
+    $(document).ready(function() {
+        $('#id_vehicle,#id_pump').select2({
+            width: '100%', 
+            ajax: {
+                url: "{% url 'dailyexpense:common_search' %}",
+                dataType: 'json',
+                delay: 250,
+                data: function(params) {
+                    return {
+                        q: params.term
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.results
+                    };
+                },
+                cache: true
+            },
+            minimumInputLength: 1, 
+            placeholder: 'Search ',
+            allowClear: true
+        });
+
+
+
+    });
+</script>
+
 
 <script>
     $(document).ready(function() {
-       function toggleFields() {
-           var  fuel_pump_supplier_nameValue = $('#id_fuel_pump_supplier_name').val();
-          
-           if ( fuel_pump_supplier_nameValue === 'Others') {
-               $('#id_fuel_supplier_phone, #id_fuel_supplier_address').closest('.form-group').show();
-           } else {
-               $('#id_fuel_supplier_phone, #id_fuel_supplier_address').closest('.form-group').hide();
-           }
-       }
-   
-       toggleFields();
-       $('#id_fuel_pump_supplier_name').change(function() {
-           toggleFields();
-       });
-   });
-   
-   
-   </script>
-
-
-
-
-
-
+        function toggleFields() {
+            var refillType = $('#id_refill_type').val();
+            if (refillType === 'pump') {
+                $('#id_pump').closest('.form-group').show();
+                $('#id_fuel_supplier_phone,#id_fuel_supplier_address').closest('.form-group').hide();
+            } else if (refillType === 'local_purchase') {
+                $('#id_pump').closest('.form-group').hide();
+                $('#id_fuel_supplier_phone,#id_fuel_supplier_address').closest('.form-group').show();
+            }
+        }
+        
+        toggleFields();
+        $('#id_refill_type').change(function() {
+            toggleFields();
+        });
+    });
+</script>
 
 
 

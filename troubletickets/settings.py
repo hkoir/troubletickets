@@ -26,6 +26,7 @@ INSTALLED_APPS = [
     'vehicle',
     'generator',
     'rest_framework',
+    'common'
 ]
 
 

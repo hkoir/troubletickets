@@ -47,10 +47,5 @@ urlpatterns = [
     path('eTicket_update_api/<int:id>/', views.eTicket_update_api, name='eTicket_update_api'),  
     path('create_child_ticket_api/<int:parent_ticket_id>/', views.create_child_ticket_api, name='create_child_ticket_api'),  
   
-     ## PGR database #######################################################################
-     path('create_pgr/', views.create_pgr, name='create_pgr'), 
-     path('view_pgr_database/', views.view_pgr_database, name='view_pgr_database'), 
-     path('update_pgr_database/<int:pgr_id>/', views.update_pgr_database, name='update_pgr_database'), 
-     path('pgr_summary/', views.pgr_summary_view, name='pgr_summary'), 
-     path('upload-pgr-excel/', views.upload_pgr_excel, name='upload_pgr_excel'),
+    
 ]

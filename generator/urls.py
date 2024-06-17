@@ -24,8 +24,6 @@ urlpatterns = [
     path('view_pg_fault/', views.view_pg_fault, name='view_pg_fault'),
     path('view_pg_details_fault/', views.view_pg_details_fault, name='view_pg_details_fault'),
 
-    path('create_region_zone_database/', views.create_region_zone_database, name='create_region_zone_database'), 
-
-      
+            
 ]
 

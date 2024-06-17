@@ -29,26 +29,10 @@ from .models import AddPGInfo,PGFuelRefill,PGFaultRecord
 
 
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from tickets.models import  Region, Zone, MP
+from common.models import  Region, Zone, MP
 from tickets.forms import SummaryReportChartForm
 from dailyexpense.models import DailyExpenseRequisition
 
-from.forms import CombinedForm
-
-
-
-@login_required
-def create_region_zone_database(request):
-    if request.method == 'POST':
-        form = CombinedForm(request.POST)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "Entries created successfully")
-            return redirect('generator:create_region_zone_database')  # Change to your view name
-    else:
-        form = CombinedForm()
-
-    return render(request, 'tickets/edotco/create_region_zone.html', {'form': form})
 
 
 
@@ -137,11 +121,11 @@ def view_pg_info(request):
         PGNumber = form.cleaned_data.get('PGNumber')
 
         if region:
-             pg_info = pg_info.filter(region=region)
+             pg_info = pg_info.filter(region__name=region)
         if zone:
-             pg_info = pg_info.filter(zone=zone)
+             pg_info = pg_info.filter(zone__name=zone)
         if mp:
-             pg_info = pg_info.filter(mp=mp)
+             pg_info = pg_info.filter(mp__name=mp)
 
         if PGNumber:
                pg_info = pg_info.filter(PGNumber= PGNumber)
@@ -171,6 +155,9 @@ def view_pg_info(request):
     })
 
 
+
+
+
 @login_required
 def add_pg_fuel2(request):
     if request.method == 'POST':   
@@ -183,6 +170,9 @@ def add_pg_fuel2(request):
     else:     
         form = PGFuelRefillForm()
     return render(request, 'generator/add_pg_fuel.html', {'form': form})
+
+
+
 
 @login_required
 def add_pg_fuel(request):
@@ -332,7 +322,7 @@ def pg_summary_report(request):
 
             total_refill_amount = related_refills.aggregate(total_refill_amount=Sum('refill_amount'))['total_refill_amount'] or 0
 
-            others_refills = related_refills.filter(fuel_pump_supplier_name='Others')
+            others_refills = related_refills.filter(fuel_supplier_name='Others')
             total_fuel_others_purchase = others_refills.aggregate(total_refill_amount=Sum('refill_amount'))['total_refill_amount'] or 0
 
             total_fuel_cost = related_refills.aggregate(total_fuel_cost=Sum('fuel_cost'))['total_fuel_cost'] or 0
@@ -521,11 +511,11 @@ def view_pg_fault(request):
             pg_fault_data =  pg_fault_data.filter(created_at__range=(start_date, end_date))
           
         if region:
-             pg_fault_data =  pg_fault_data.filter(region=region)
+             pg_fault_data =  pg_fault_data.filter(region__name=region)
         if zone:
-            pg_fault_data = pg_fault_data.filter(zone=zone)
+            pg_fault_data = pg_fault_data.filter(zone__name=zone)
         if mp:
-           pg_fault_data = pg_fault_data.filter(mp=mp)
+           pg_fault_data = pg_fault_data.filter(mp__name=mp)
     form = SummaryReportChartForm()
     return render(request,'generator/pg_fault_record_view .html', 
                   {'pg_fault_data':pg_fault_data,
