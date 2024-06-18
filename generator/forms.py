@@ -1,6 +1,11 @@
 from django import forms
 from.models import AddPGInfo,PGFaultRecord,PGFuelRefill
-from common.models import Region,Zone,MP
+
+
+from tickets.mp_list import REGION_CHOICES,ZONE_CHOICES,MP_CHOICES
+
+
+
 
 
 class AddPgForm(forms.ModelForm):
@@ -27,7 +32,6 @@ class UpdatePgStatusForm(forms.ModelForm):
  
 
 
-from tickets.mp_list import REGION_CHOICES,ZONE_CHOICES,MP_CHOICES
 
 class PGDatabaseViewForm(forms.Form):   
     region = forms.ChoiceField(choices=REGION_CHOICES, required=False)

@@ -27,9 +27,7 @@ from .forms import AddPgForm,PGDatabaseViewForm,PGFuelRefillForm,UpdatePgStatusF
 from.forms import PGFaultRecordForm,UpdatePGFaultRecordForm,PGNumberForm
 from .models import AddPGInfo,PGFuelRefill,PGFaultRecord
 
-
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from common.models import  Region, Zone, MP
 from tickets.forms import SummaryReportChartForm
 from dailyexpense.models import DailyExpenseRequisition
 
@@ -121,11 +119,11 @@ def view_pg_info(request):
         PGNumber = form.cleaned_data.get('PGNumber')
 
         if region:
-             pg_info = pg_info.filter(region__name=region)
+             pg_info = pg_info.filter(region=region)
         if zone:
-             pg_info = pg_info.filter(zone__name=zone)
+             pg_info = pg_info.filter(zone=zone)
         if mp:
-             pg_info = pg_info.filter(mp__name=mp)
+             pg_info = pg_info.filter(mp=mp)
 
         if PGNumber:
                pg_info = pg_info.filter(PGNumber= PGNumber)
@@ -511,11 +509,11 @@ def view_pg_fault(request):
             pg_fault_data =  pg_fault_data.filter(created_at__range=(start_date, end_date))
           
         if region:
-             pg_fault_data =  pg_fault_data.filter(region__name=region)
+             pg_fault_data =  pg_fault_data.filter(region=region)
         if zone:
-            pg_fault_data = pg_fault_data.filter(zone__name=zone)
+            pg_fault_data = pg_fault_data.filter(zone=zone)
         if mp:
-           pg_fault_data = pg_fault_data.filter(mp__name=mp)
+           pg_fault_data = pg_fault_data.filter(mp=mp)
     form = SummaryReportChartForm()
     return render(request,'generator/pg_fault_record_view .html', 
                   {'pg_fault_data':pg_fault_data,

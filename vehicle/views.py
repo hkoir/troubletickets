@@ -75,11 +75,11 @@ def view_vehicle_info(request):
         vehicle_reg_number = form.cleaned_data.get('vehicle_reg_number')
 
         if region:
-             vehicle_info =  vehicle_info.filter(region__name=region)
+             vehicle_info =  vehicle_info.filter(region=region)
         if zone:
-             vehicle_info =  vehicle_info.filter(zone__name=zone)
+             vehicle_info =  vehicle_info.filter(zone=zone)
         if mp:
-            vehicle_info =  vehicle_info.filter(mp__name=mp)
+            vehicle_info =  vehicle_info.filter(mp=mp)
 
         if vehicle_reg_number:
               vehicle_info =  vehicle_info.filter(vehicle_reg_number=vehicle_reg_number)

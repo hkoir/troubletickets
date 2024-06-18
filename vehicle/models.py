@@ -8,14 +8,15 @@ from decimal import Decimal
 from django.db import IntegrityError
 from django.apps import apps
 
-from common.models import Region,Zone,MP,FuelPumpDatabase
+from common.models import FuelPumpDatabase
+from tickets.mp_list import REGION_CHOICES,ZONE_CHOICES,MP_CHOICES
 
 
 
 class AddVehicleInfo(models.Model):
-    region = models.ForeignKey(Region,related_name='vehicle_region',on_delete=models.CASCADE)
-    zone = models.ForeignKey(Zone,related_name='vehicle_zone',on_delete=models.CASCADE)
-    mp = models.ForeignKey(MP,related_name='vehicle_mp',on_delete=models.CASCADE)
+    region = models.CharField(max_length=100,choices=REGION_CHOICES,null=True,blank=True)
+    zone = models.CharField(max_length=100,choices=ZONE_CHOICES,null=True,blank=True)
+    mp = models.CharField(max_length=100,choices=MP_CHOICES,null=True,blank=True)
     vehicle_id = models.CharField(max_length=50, default='None')
     vehicle_add_requester = models.ForeignKey(Customer, related_name='vehicle_add_user', on_delete=models.CASCADE)
 
@@ -89,9 +90,9 @@ class AddVehicleInfo(models.Model):
 
 
 class FuelRefill(models.Model):
-    region = models.ForeignKey(Region,related_name='vehicle_refill_region',on_delete=models.CASCADE)
-    zone = models.ForeignKey(Zone,related_name='vehicle_refill_zone',on_delete=models.CASCADE)
-    mp = models.ForeignKey(MP,related_name='vehicle_refill_mp',on_delete=models.CASCADE) 
+    region = models.CharField(max_length=100,choices=REGION_CHOICES,null=True,blank=True)
+    zone = models.CharField(max_length=100,choices=ZONE_CHOICES,null=True,blank=True)
+    mp = models.CharField(max_length=100,choices=MP_CHOICES,null=True,blank=True)
     vehicle = models.ForeignKey(AddVehicleInfo, related_name='refills_info', on_delete=models.CASCADE)
 
     REFILL_CHOICES = [
@@ -159,9 +160,9 @@ class FuelRefill(models.Model):
 
 
 class VehicleRuniningData(models.Model):
-    region = models.ForeignKey(Region,related_name='vehicle_run_region',on_delete=models.CASCADE)
-    zone = models.ForeignKey(Zone,related_name='vehicle_run_zone',on_delete=models.CASCADE)
-    mp = models.ForeignKey(MP,related_name='vehicle_run_mp',on_delete=models.CASCADE)
+    region = models.CharField(max_length=100,choices=REGION_CHOICES,null=True,blank=True)
+    zone = models.CharField(max_length=100,choices=ZONE_CHOICES,null=True,blank=True)
+    mp = models.CharField(max_length=100,choices=MP_CHOICES,null=True,blank=True)
     vehicle_expense_id = models.CharField(max_length=50, default='None')     
     vehicle = models.ForeignKey(AddVehicleInfo, related_name='vehicle_expense', on_delete=models.CASCADE) 
     fuel_refill = models.ForeignKey(FuelRefill, related_name='fuelexpenses', on_delete=models.CASCADE, null=True, blank=True)
@@ -215,9 +216,9 @@ class VehicleRuniningData(models.Model):
 
 
 class Vehiclefault(models.Model):
-    region = models.ForeignKey(Region,related_name='vehicle_fault_region',on_delete=models.CASCADE)
-    zone = models.ForeignKey(Zone,related_name='vehicle_fault_zone',on_delete=models.CASCADE)
-    mp = models.ForeignKey(MP,related_name='vehicle_fault_mp',on_delete=models.CASCADE)
+    region = models.CharField(max_length=100,choices=REGION_CHOICES,null=True,blank=True)
+    zone = models.CharField(max_length=100,choices=ZONE_CHOICES,null=True,blank=True)
+    mp = models.CharField(max_length=100,choices=MP_CHOICES,null=True,blank=True)
     vehicle_fault_id = models.CharField(max_length=50, default='None')    
     vehicle = models.ForeignKey(AddVehicleInfo, related_name='vehiclefault_info', on_delete=models.CASCADE,null=True, blank=True)
     vehicle_runnin_data = models.ForeignKey(VehicleRuniningData, related_name='VehicleRuniningDataInfo', on_delete=models.CASCADE ,null=True, blank=True) 
@@ -249,9 +250,9 @@ class Vehiclefault(models.Model):
 
 
 class VehicleRentalCost(models.Model):
-    region = models.ForeignKey(Region,related_name='vehicle_pay_region',on_delete=models.CASCADE)
-    zone = models.ForeignKey(Zone,related_name='vehicle_pay_zone',on_delete=models.CASCADE)
-    mp = models.ForeignKey(MP,related_name='vehicle_pay_mp',on_delete=models.CASCADE)
+    region = models.CharField(max_length=100,choices=REGION_CHOICES,null=True,blank=True)
+    zone = models.CharField(max_length=100,choices=ZONE_CHOICES,null=True,blank=True)
+    mp = models.CharField(max_length=100,choices=MP_CHOICES,null=True,blank=True)
     vehicle_rent_paid_id = models.CharField(max_length=50, default='None')     
 
     vehicle_rent_paid = models.CharField(max_length=50, default='None') 

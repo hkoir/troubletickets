@@ -111,13 +111,18 @@
                         <th class="text-center p-2">Internal GRH</th>
                         <th class="text-center p-2">Customer GRH</th>
                         <th class="text-center p-2">PGR Type</th>
+                        <th class="text-center p-2">PGR Category</th>
+                        <th class="text-center p-2">PGR Name</th>
+                        <th class="text-center p-2">Team leader Name</th>     
+                        <th class="text-center p-2">PGR Phone</th> 
+                        <th class="text-center p-2">Team Leader Phone</th>          
                         <th class="text-center p-2">Ticket Status</th>
                         <th class="text-center p-2">Fuel difference</th>
-                        <th class="text-center p-2">Team Leader</th>
+                     
 
-                        <th class="text-center p-2">PGR type</th>
+                       
                         <th class="text-center p-2">Vehicle type</th>
-                        <th class="text-center p-2">PGR Name</th>
+                      
                         <th class="text-center p-2">PG Number</th>
                         <th class="text-center p-2">Vehicle Number</th>
                     
@@ -140,7 +145,17 @@
                             <td class="text-center p-2">{{ ticket.internal_generator_running_hours }}</td>
                             <td class="text-center p-2">{{ ticket.customer_generator_running_hours }}</td>
 
-                            <td class="text-center p-2">{{ ticket.assigned_pg_runner_type }}</td>
+                            <td class="text-center p-2">{{ ticket.assigned_to.PGR_type }}</td>
+                            {% if ticket.assigned_to.PGR_category == "adhoc" %}
+                            <td class="text-center p-2" style="background-color: red;">{{ ticket.assigned_to.PGR_category }}</td>
+                            {% else %}
+                            <td class="text-center p-2">{{ ticket.assigned_to.PGR_category }}</td>
+                            {% endif %} 
+                            <td class="text-center p-2">{{ ticket.assigned_to.name }}</td>
+                            <td class="text-center p-2">{{ ticket.team_leader_name.name }}</td>
+                            <td class="text-center p-2">{{ ticket.assigned_to.phone }}</td>
+                            <td class="text-center p-2">{{ ticket.team_leader_name.phone }}</td>
+                           
                             <td class="text-center p-2">{{ ticket.ticket_status }}</td>
                             
             
@@ -149,22 +164,15 @@
                             {% else %}
                             <td class="text-center p-2" style="background-color: greenyellow">{{ ticket.fuel_difference|floatformat:'2' }}</td>
                             {% endif %}
+                            
 
-                            <td class="text-center p-2">{{ ticket.team_leader_name }}</td>
-
-                            {% if ticket.assigned_pg_runner_type == "Adhoc" %}
-                            <td class="text-center p-2" style="background-color: red;">{{ ticket.assigned_pg_runner_type}}</td>
-                            {% else %}
-                            <td class="text-center p-2">{{ ticket.assigned_pg_runner_type}}</td>
-                            {% endif %}
                            
                             {% if ticket.assigned_vehicle_type == "Adhoc" %}
                             <td class="text-center p-2" style="background-color: red;">{{ ticket.assigned_vehicle_type}}</td>
                             {% else %}
                             <td class="text-center p-2">{{ ticket.assigned_vehicle_type}}</td>
                             {% endif %}
-
-                            <td class="text-center p-2">{{ ticket.assigned_to  }}</td>
+                          
                             <td class="text-center p-2">{{ ticket.pgnumber.PGNumber }}</td>
                             <td class="text-center p-2" style="white-space: nowrap;">{{ ticket.vehicle.vehicle_reg_number }}</td>
                         
@@ -210,5 +218,65 @@
 
 
 <div class="col" style="height:500px"></div>
+
+
+
+
+
+
+
+
+
+<script>
+    $(document).ready(function(){      
+        var regionZoneMapping = {
+            'Sylhet': ['','Sylhet', 'Moulovibazar','Mymensingh','Kisorganj','Tangail'], 
+            'Rangpur': ['','Rangpur', 'Dinajpur','Bagura','Rajshahi'] ,                          
+            
+        };
+     
+        $('#id_region').change(function(){
+            var selectedRegion = $(this).val();
+            var zoneChoices = regionZoneMapping[selectedRegion];
+            $('#id_zone').empty();
+            $.each(zoneChoices, function(index, value){
+                $('#id_zone').append($('<option>').text(value).attr('value', value));
+            });
+        });
+              
+        var zoneMpMapping = {              
+            'Sylhet': ['','Sylhet','Taherpur','Sunamganj','Bianibazar','Dorbhost','Dherai','Chatak'], // Add more MPs for Sylhet zone
+            'Moulovibazar': ['','Moulovibazar', 'Saestaganj','Juri','Baniachong'],
+            'Mymensingh': ['','Mymensingh', 'Fulpur','Valuka'] ,
+            'Kisorganj': ['','Kisorganj','Katiadi','Netrokona','Mohonpur','Austogram'],
+            'Tangail': ['','Tangail','Madhupur','Jamalpur','Sherpur','Bakshihanj','Rowmari'],
+           
+            'Rangpur':['','Rangpur','Hatibandha','Gaibandha','Ulipur','Boropar','Polasbari'],
+            'Dinajpur':['','Dinajpur','Panchghor','Jaldhaka','Thakurgaon'],
+            'Rajshahi':['','Rajshahi','Bagura','Nachole','Natore','Chapai'],
+            'Bagura':['','Bagura'],
+            '': ['']
+           
+        };
+
+   
+        $('#id_zone').change(function(){
+            $('#id_mp').val('');
+            var selectedZone = $(this).val();
+            var mpChoices = zoneMpMapping[selectedZone];
+
+            $('#id_mp').empty();
+            $.each(mpChoices, function(index, value){
+                $('#id_mp').append($('<option>').text(value).attr('value', value));
+            });
+        });
+
+
+
+});          
+
+</script> 
+
+
 
 {% endblock %}

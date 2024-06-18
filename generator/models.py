@@ -1,13 +1,14 @@
 from django.db import models
 from django.utils import timezone
 from account.models import Customer
-from common.models import Region,Zone,MP,FuelPumpDatabase
+from common.models import FuelPumpDatabase
+from tickets.mp_list import REGION_CHOICES,ZONE_CHOICES,MP_CHOICES
 
 
 class AddPGInfo(models.Model):
-    region = models.ForeignKey(Region,related_name='pgregion',on_delete=models.CASCADE)
-    zone = models.ForeignKey(Zone,related_name='pgzone',on_delete=models.CASCADE)
-    mp = models.ForeignKey(MP,related_name='pgmp',on_delete=models.CASCADE)
+    region = models.CharField(max_length=100,choices=REGION_CHOICES,null=True, blank=True)
+    zone = models.CharField(max_length=100,choices=ZONE_CHOICES,null=True, blank=True)
+    mp = models.CharField(max_length=100,choices=MP_CHOICES,null=True, blank=True)
     PG_code = models.CharField(max_length=50, default='None')
     PG_add_requester = models.ForeignKey(Customer, related_name='PGad_admin_user', on_delete=models.CASCADE)
     PGNumber = models.CharField(max_length=50,default='None')
@@ -57,9 +58,9 @@ class AddPGInfo(models.Model):
 
 
 class PGFuelRefill(models.Model):   
-    region = models.ForeignKey(Region,related_name='refilregion',on_delete=models.CASCADE,default=None)
-    zone = models.ForeignKey(Zone,related_name='refilzone',on_delete=models.CASCADE,default=None)
-    mp = models.ForeignKey(MP,related_name='refilmp',on_delete=models.CASCADE,default=None)
+    region = models.CharField(max_length=100,choices=REGION_CHOICES,null=True, blank=True)
+    zone = models.CharField(max_length=100,choices=ZONE_CHOICES,null=True, blank=True)
+    mp = models.CharField(max_length=100,choices=MP_CHOICES,null=True, blank=True)
     refill_requester = models.ForeignKey(Customer, related_name='pg_refill_requester_name', on_delete=models.CASCADE, null=True, blank=True)
     fuel_refill_code = models.CharField(max_length=50, default='None')
     refill_date = models.DateField(default=timezone.now)
@@ -103,9 +104,9 @@ class PGFuelRefill(models.Model):
 
 
 class PGFaultRecord(models.Model):
-     region = models.ForeignKey(Region,related_name='pgfaultregion',on_delete=models.CASCADE)
-     zone = models.ForeignKey(Zone,related_name='pgfaultzone',on_delete=models.CASCADE)
-     mp = models.ForeignKey(MP,related_name='pgfaultmp',on_delete=models.CASCADE)    
+     region = models.CharField(max_length=100,choices=REGION_CHOICES,null=True, blank=True)
+     zone = models.CharField(max_length=100,choices=ZONE_CHOICES,null=True, blank=True)
+     mp = models.CharField(max_length=100,choices=MP_CHOICES,null=True, blank=True)  
      pgnumber = models.ForeignKey(AddPGInfo, related_name='pgfault', on_delete=models.CASCADE, null=True, blank=True)
      fault_date = models.DateField(null=True, blank=True)
      repair_date = models.DateField(null=True, blank=True)

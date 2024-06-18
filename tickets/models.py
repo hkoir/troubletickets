@@ -13,7 +13,8 @@ from vehicle.models import AddVehicleInfo
 from generator.models import AddPGInfo
 from generator.models import PGFuelRefill
 
-from common.models import Region,Zone,MP,PGRdatabase
+from common.models import PGRdatabase
+from tickets.mp_list import REGION_CHOICES,ZONE_CHOICES,MP_CHOICES
 
 
 
@@ -35,9 +36,9 @@ class ChatMessage(models.Model):
 
 class eTicket(models.Model):
     created_at = models.DateTimeField(default=timezone.now)
-    region = models.ForeignKey(Region,related_name='ticket_region',on_delete=models.CASCADE)
-    zone = models.ForeignKey(Zone,related_name='ticket_zone',on_delete=models.CASCADE)
-    mp = models.ForeignKey(MP,related_name='ticket_mp',on_delete=models.CASCADE)
+    region = models.CharField(max_length=100,choices=REGION_CHOICES,null=True,blank=True)
+    zone = models.CharField(max_length=100,choices=ZONE_CHOICES,null=True,blank=True)
+    mp = models.CharField(max_length=100,choices=MP_CHOICES,null=True,blank=True)
     internal_ticket_number = models.CharField(max_length=50)
 
     customer_name_choices = [

@@ -25,29 +25,30 @@ from .forms import ExpenseRequisitionForm,SummaryExpensesForm,ExpenseRequisition
 from .models import MoneyRequisition,SummaryExpenses,DailyExpenseRequisition,AdhocRequisition
 
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from generator.models import  Region, Zone, MP
+
 from tickets.forms import SummaryReportChartForm
 from .forms import ZoneWiseExpensesForm,AdhocRequisitionStatusForm,AdhocRequisitionForm
 
-
-
+from common.models import FuelPumpDatabase
+from .forms import dailyExpenseSummaryForm
 
 
 
 def expense_advance_management(request):
     return render(request,'expenses/expense_advance_management.html')# for expense and advance management dashboard shortcut
 
-from common.models import FuelPumpDatabase
+
+
 
 
 def common_search(request):
     query = request.GET.get('q', '').lower()
-
+    
     eticket_results = eTicket.objects.filter(
-        Q(region__name__icontains=query) |
-        Q(zone__name__icontains=query) |
-        Q(mp__name__icontains=query)
-    ).values('id', 'region__name', 'zone__name', 'mp__name')
+        Q(region__icontains=query) |
+        Q(zone__icontains=query) |
+        Q(mp__icontains=query)
+    ).values('id', 'region', 'zone', 'mp')
 
     addpginfo_results = AddPGInfo.objects.filter(
         Q(PGNumber__icontains=query) |
@@ -64,20 +65,6 @@ def common_search(request):
         Q(fuel_pump_company_name__icontains=query)
     ).values('id', 'fuel_pump_name', 'fuel_pump_company_name')
 
-    region_results = Region.objects.filter(
-        Q(name__icontains=query)
-    ).values('id', 'name')
-
-    zone_results = Zone.objects.filter(
-        Q(name__icontains=query) |
-        Q(region__name__icontains=query)
-    ).values('id', 'name', 'region__name')
-
-    mp_results = MP.objects.filter(
-        Q(name__icontains=query) |
-        Q(zone__name__icontains=query)
-    ).values('id', 'name', 'zone__name')
-
     pgr_results = PGRdatabase.objects.filter(
         Q(name__icontains=query)
     ).values('id', 'name')
@@ -85,12 +72,12 @@ def common_search(request):
     results = []
 
     for et in eticket_results:
-        if query in et['region__name'].lower():
-            results.append({'id': et['id'], 'text': et['region__name'], 'model': 'eTicket'})
-        elif query in et['zone__name'].lower():
-            results.append({'id': et['id'], 'text': et['zone__name'], 'model': 'eTicket'})
-        elif query in et['mp__name'].lower():
-            results.append({'id': et['id'], 'text': et['mp__name'], 'model': 'eTicket'})
+        if query in et['region'].lower():
+            results.append({'id': et['id'], 'text': et['region'], 'model': 'eTicket'})
+        elif query in et['zone'].lower():
+            results.append({'id': et['id'], 'text': et['zone'], 'model': 'eTicket'})
+        elif query in et['mp'].lower():
+            results.append({'id': et['id'], 'text': et['mp'], 'model': 'eTicket'})
 
     for pg in addpginfo_results:
         if query in pg['PGNumber'].lower():
@@ -109,15 +96,6 @@ def common_search(request):
             results.append({'id': pump['id'], 'text': pump['fuel_pump_name'], 'model': 'FuelPumpDatabase'})
         elif query in pump['fuel_pump_company_name'].lower():
             results.append({'id': pump['id'], 'text': pump['fuel_pump_company_name'], 'model': 'FuelPumpDatabase'})
-
-    for region in region_results:
-        results.append({'id': region['id'], 'text': region['name'], 'model': 'Region'})
-
-    for zone in zone_results:
-        results.append({'id': zone['id'], 'text': f"{zone['name']} ({zone['region__name']})", 'model': 'Zone'})
-
-    for mp in mp_results:
-        results.append({'id': mp['id'], 'text': f"{mp['name']} ({mp['zone__name']})", 'model': 'MP'})
 
     for pgr in pgr_results:
         results.append({'id': pgr['id'], 'text': pgr['name'], 'model': 'PGRdatabase'})
@@ -188,11 +166,11 @@ def all_approval_status(request):
             money_requisitions = money_requisitions.filter(created_at__range=(start_date, end_date))
 
         if region:
-            money_requisitions = money_requisitions.filter(region__name=region)
+            money_requisitions = money_requisitions.filter(region=region)
         if zone:
-            money_requisitions = money_requisitions.filter(zone__name=zone)
+            money_requisitions = money_requisitions.filter(zone=zone)
         if mp:
-            money_requisitions = money_requisitions.filter(mp__name=mp)
+            money_requisitions = money_requisitions.filter(mp=mp)
 
         # Calculate region-wise and zone-wise summaries
         region_approvals = money_requisitions.values('region').annotate(
@@ -328,8 +306,8 @@ def download_money_requisition_data(request):
         worksheet.write(row, 0, str(update_at_str))
         worksheet.write(row, 1, str(requisition.requisition_number))      
         worksheet.write(row, 2, str(requisition.requester))
-        worksheet.write(row, 3, str(requisition.region.name))
-        worksheet.write(row, 4, str(requisition.zone.name))
+        worksheet.write(row, 3, str(requisition.region))
+        worksheet.write(row, 4, str(requisition.zone))
    
         worksheet.write(row, 5, requisition.purpose)
         worksheet.write(row, 6, float(requisition.requisition_amount))
@@ -617,7 +595,7 @@ def download_expense_requisition_data(request):
 
 
 
-from .forms import dailyExpenseSummaryForm
+
 
 
 def daily_expense_summary(request):
@@ -714,7 +692,7 @@ def daily_expense_summary(request):
             food_amount = data_grand.get('food_amount', 0)
 
             
-            grouped_data = data.values('region__name', 'zone__name', 'mp__name').annotate(
+            grouped_data = data.values('region', 'zone', 'mp').annotate(
                 total_requisition_amount=Sum('requisition_amount'),
                 total_approved_amount=Sum('approved_amount'),
                 local_conveyance_amount=Sum(
@@ -757,9 +735,9 @@ def daily_expense_summary(request):
         # Append the results to grouped_summary_data
         for entry in grouped_data:
             grouped_summary_data.append({
-                'region': entry['region__name'],
-                'zone': entry['zone__name'],
-                'mp': entry['mp__name'],
+                'region': entry['region'],
+                'zone': entry['zone'],
+                'mp': entry['mp'],
                 'total_requisition_amount': entry.get('total_requisition_amount', 0),
                 'total_approved_amount': entry.get('total_approved_amount', 0),
                 'local_conveyance_amount': entry.get('local_conveyance_amount', 0),
@@ -1255,9 +1233,8 @@ def summary_expenses_form_view(request):
 
 @login_required
 def zone_wise_expenses_view(request):
-    region_zone_data = SummaryExpenses.objects \
-    .select_related('id','region','zone','created_at','updated_at') \
-    .values('id','region__name', 'zone__name','created_at','updated_at').annotate(
+    region_zone_data = SummaryExpenses.objects.all() \
+    .values('id','region', 'zone','created_at','updated_at').annotate(
         total_balance_from_previous_month=Sum('balance_from_previous_month'),
         total_amount_received=Sum('total_amount_received'),
         total_this_month_cash=Sum('this_month_cash'),
@@ -1287,7 +1264,7 @@ def zone_wise_expenses_view(request):
 
     region_data = {}
     for data in region_zone_data:
-        region = data['region__name']
+        region = data['region']
         if region not in region_data:
             region_data[region] = []
         region_data[region].append(data)
@@ -1311,8 +1288,7 @@ def zone_wise_expenses_view2(request):
         end_date = form.cleaned_data['end_date']
         
         zone_data = SummaryExpenses.objects.filter(zone=zone, created_at__range=(start_date, end_date)) \
-       .select_related('region','zone') \
-        .values( 'id','region__name', 'zone__name', 'created_at','updated_at'
+        .values( 'id','region', 'zone', 'created_at','updated_at'
            
         ).annotate(
             total_balance_from_previous_month=Sum('balance_from_previous_month'),

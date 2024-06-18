@@ -10,7 +10,7 @@ from tickets.models import PGRdatabase
 
 from vehicle.models import AddVehicleInfo
 from generator.models import AddPGInfo
-from common.models import Region,Zone,MP
+from tickets.mp_list import REGION_CHOICES,ZONE_CHOICES,MP_CHOICES
 
 
 
@@ -177,9 +177,9 @@ class MonthlySalaryReport(models.Model):
 
 
 class Resource(models.Model):
-    region = models.ForeignKey(Region,on_delete=models.CASCADE)
-    zone = models.ForeignKey(Zone,on_delete=models.CASCADE)
-    mp = models.ForeignKey(MP,on_delete=models.CASCADE)
+    region = models.CharField(max_length=100,choices=REGION_CHOICES,null=True,blank=True)
+    zone = models.CharField(max_length=100,choices=MP_CHOICES,null=True,blank=True)
+    mp = models.CharField(max_length=100,choices=REGION_CHOICES,null=True,blank=True)
     total_site = models.IntegerField(null=True, blank=True)
     no_of_KPI_site = models.IntegerField(null=True, blank=True)
     num_of_PGTL = models.IntegerField(null=True, blank=True)
@@ -203,52 +203,51 @@ class Resource(models.Model):
         # Default num_of_other_staff to 0 if not set
         if self.num_of_other_staff is None:
             self.num_of_other_staff = 0
-
-        print(f"Saving Resource: region={self.region}, zone={self.zone}, mp={self.mp}")
+     
 
         # Calculate num_of_PGR based on PGRdatabase entries
         self.num_of_PGR = PGRdatabase.objects.filter(
-            region__name=self.region,
-            zone__name=self.zone,
-            mp__name=self.mp,
+            region=self.region,
+            zone=self.zone,
+            mp=self.mp,
             PGR_type='PGR'
         ).count()
-        print(f"num_of_PGR: {self.num_of_PGR}")
+   
 
         # Calculate num_of_PGTL based on PGRdatabase entries
         self.num_of_PGTL = PGRdatabase.objects.filter(
-            region__name=self.region,
-            zone__name=self.zone,
-            mp__name=self.mp,
+            region=self.region,
+            zone=self.zone,
+            mp=self.mp,
             PGR_type='PGTL'
         ).count()
-        print(f"num_of_PGTL: {self.num_of_PGTL}")
+    
 
         # Calculate num_of_vehicle based on AddVehicleInfo entries
         self.num_of_vehicle = AddVehicleInfo.objects.filter(
-            region__name=self.region,
-            zone__name=self.zone,
-            mp__name=self.mp
+            region=self.region,
+            zone=self.zone,
+            mp=self.mp
         ).count()
-        print(f"num_of_vehicle: {self.num_of_vehicle}")
+  
 
         # Calculate num_of_good_PG based on AddPGInfo entries
         self.num_of_good_PG = AddPGInfo.objects.filter(
-            region__name=self.region,
-            zone__name=self.zone,
-            mp__name=self.mp,
+            region=self.region,
+            zone=self.zone,
+            mp=self.mp,
             PG_status='good'
         ).count()
-        print(f"num_of_good_PG: {self.num_of_good_PG}")
+ 
 
         # Calculate num_of_faulty_PG based on AddPGInfo entries
         self.num_of_faulty_PG = AddPGInfo.objects.filter(
-            region__name=self.region,
-            zone__name=self.zone,
-            mp__name=self.mp,
+            region=self.region,
+            zone=self.zone,
+            mp=self.mp,
             PG_status='faulty'
         ).count()
-        print(f"num_of_faulty_PG: {self.num_of_faulty_PG}")
+   
 
         # Calculate total_human_resource
         self.total_human_resource = sum(filter(None, [
@@ -256,15 +255,14 @@ class Resource(models.Model):
             self.num_of_DG_repair_technician, self.num_of_operational_executive,
             self.num_of_admin_account_executive, self.num_of_manager, self.num_of_other_staff
         ]))
-        print(f"total_human_resource: {self.total_human_resource}")
+     
 
         # Calculate faulty_PG_percentage
         total_PG = self.num_of_good_PG + self.num_of_faulty_PG
         if total_PG:
             self.faulty_PG_percentage = self.num_of_faulty_PG / total_PG * 100
         else:
-            self.faulty_PG_percentage = 0
-        print(f"faulty_PG_percentage: {self.faulty_PG_percentage}")
+            self.faulty_PG_percentage = 0  
 
         super().save(*args, **kwargs)
 

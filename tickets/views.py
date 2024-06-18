@@ -47,9 +47,9 @@ def search_all(request):
 
     etickets = eTicket.objects.filter(
         Q(internal_ticket_number__icontains=query) | 
-        Q(region__name__icontains=query) |  # Assuming region has a 'name' field
-        Q(zone__name__icontains=query) |    # Assuming zone has a 'name' field
-        Q(mp__name__icontains=query) |      # Assuming mp has a 'name' field
+        Q(region__icontains=query) |  # Assuming region has a 'name' field
+        Q(zone__icontains=query) |    # Assuming zone has a 'name' field
+        Q(mp__icontains=query) |      # Assuming mp has a 'name' field
         Q(site_id__icontains=query) | 
         Q(ticket_status__icontains=query)
     )
@@ -359,11 +359,11 @@ def view_all_parent_tickets_with_children(request):
             parent_tickets = parent_tickets.filter(created_at__range=(start_date, end_date))
 
         if region:
-            parent_tickets = parent_tickets.filter(region__name=region)
+            parent_tickets = parent_tickets.filter(region=region)
         if zone:
-            parent_tickets = parent_tickets.filter(zone__name=zone)
+            parent_tickets = parent_tickets.filter(zone=zone)
         if mp:
-            parent_tickets = parent_tickets.filter(mp__name=mp)
+            parent_tickets = parent_tickets.filter(mp=mp)
 
     ticket_data = []
     tickets_per_page = 5
@@ -535,11 +535,11 @@ def view_tt_edotco(request):
             tickets = tickets.filter(created_at__range=(start_date, end_date))
           
         if region:
-            tickets = tickets.filter(region__name=region)
+            tickets = tickets.filter(region=region)
         if zone:
-            tickets = tickets.filter(zone__name=zone)
+            tickets = tickets.filter(zone=zone)
         if mp:
-            tickets = tickets.filter(mp__name=mp)
+            tickets = tickets.filter(mp=mp)
     
     # Pagination logic
     ticket_data = []
@@ -641,10 +641,8 @@ def summary_report_view(request):
         days = form.cleaned_data.get('days')
 
         if report_date:
-            summary = eTicket.objects.filter(created_at__date=report_date) \
-                .select_related('region', 'zone') \
-                .values('region__name', 'zone__name') \
-                .annotate(
+            summary = eTicket.objects.filter(created_at__date=report_date).values('region', 'zone') \
+            .annotate(
                     num_tickets=Count('id'),
                     num_closed_tickets=Count('id', filter=Q(ticket_status='closed')),
                     num_valid_tickets=Count('id', filter=Q(ticket_status='TT_Valid')),
@@ -670,9 +668,7 @@ def summary_report_view(request):
 
         elif days:
             start_date = datetime.now() - timedelta(days=days)
-            summary = eTicket.objects.filter(created_at__gte=start_date) \
-                .select_related('region', 'zone') \
-                .values('region__name', 'zone__name') \
+            summary = eTicket.objects.filter(created_at__gte=start_date).values('region', 'zone') \
                 .annotate(
                     num_tickets=Count('id'),
                     num_closed_tickets=Count('id', filter=Q(ticket_status='closed')),
@@ -717,9 +713,7 @@ def summary_report_view_region(request):
         days = form.cleaned_data.get('days')
 
         if report_date:          
-            summary = eTicket.objects.filter(created_at__date=report_date) \
-                .select_related('region', 'zone') \
-                .values('region__name', 'zone__name') \
+            summary = eTicket.objects.filter(created_at__date=report_date).values('region', 'zone') \
                 .annotate(
                     num_tickets=Count('id'),
                     num_closed_tickets=Count('id', filter=Q(ticket_status='closed')),
@@ -749,9 +743,7 @@ def summary_report_view_region(request):
 
         elif days:
             start_date = datetime.now() - timedelta(days=days)
-            summary = eTicket.objects.filter(created_at__gte=start_date) \
-                .select_related('region', 'zone') \
-                .values('region__name', 'zone__name') \
+            summary = eTicket.objects.filter(created_at__gte=start_date).values('region', 'zone') \
                 .annotate(
                     num_tickets=Count('id'),                   
                     num_valid_tickets=Count('id', filter=Q(ticket_status='TT_Valid')),
@@ -774,7 +766,7 @@ def summary_report_view_region(request):
                 ) \
                 .order_by('region', 'zone')
             for data in summary:
-                region = data['region__name']
+                region = data['region']
                 if region not in grouped_summary_data:
                     grouped_summary_data[region] = []
                 grouped_summary_data[region].append(data)
@@ -802,9 +794,7 @@ def summary_report_view_hourly(request):
         if hours is not None:         
             start_time = datetime.now() - timedelta(hours=hours)            
       
-            summary = eTicket.objects.filter(created_at__gte=start_time) \
-                .select_related('region', 'zone') \
-                .values('region__name', 'zone__name') \
+            summary = eTicket.objects.filter(created_at__gte=start_time).values('region', 'zone') \
                 .annotate(
                     num_tickets=Count('id'),
                     num_closed_tickets=Count('id', filter=Q(ticket_status='closed')),
@@ -826,7 +816,7 @@ def summary_report_view_hourly(request):
                 .order_by('region', 'zone')
                  
             for data in summary:
-                region = data['region__name']
+                region = data['region']
                 if region not in grouped_summary_data:
                     grouped_summary_data[region] = []
                 grouped_summary_data[region].append(data)
@@ -960,9 +950,8 @@ def mp_report_view(request):
 def aggregated_tt_run_hour_trend_summary(request):
     form = SummaryReportChartForm(request.GET or {'days': 7})  
 
-    query = eTicket.objects \
-    .select_related('zone') \
-    .values('zone__name', 'created_at').annotate(
+    query = eTicket.objects.values('zone', 'created_at') \
+        .annotate(
         trouble_tickets=Count('internal_ticket_number'),
         run_hours=Sum('internal_generator_running_hours')
     ).order_by('zone', 'created_at')    
@@ -1031,9 +1020,8 @@ def aggregated_tt_run_hour_trend_summary(request):
 def aggregated_tt_run_hour_trend(request):
     form = SummaryReportChartForm(request.GET or {'days': 20})
 
-    query = eTicket.objects \
-    .select_related('zone') \
-    .values('zone__name', 'created_at').annotate(
+    query = eTicket.objects.values('zone', 'created_at') \
+        .annotate(
         trouble_tickets=Count('internal_ticket_number'),
         run_hours=Sum('internal_generator_running_hours')
     ).order_by('zone', 'created_at')
@@ -1100,9 +1088,8 @@ def aggregated_tt_run_hour_trend(request):
 def individual_tt_run_hour_trend(request):
     form = SummaryReportChartForm(request.GET or {'days': 20})
 
-    query = eTicket.objects \
-    .select_related('zone') \
-    .values('zone__name', 'created_at').annotate(
+    query = eTicket.objects.values('zone', 'created_at') \
+        .annotate(
         trouble_tickets=Count('internal_ticket_number'),
         run_hours=Sum('internal_generator_running_hours')
     ).order_by('zone', 'created_at')
@@ -1174,9 +1161,8 @@ def individual_tt_run_hour_trend(request):
 
 @login_required
 def datewise_summary_edotco(request):
-    ticket_data = eTicket.objects \
-    .select_related('region','zone') \
-    .values('region_name', 'zone_name', 'ticket_origin_date').annotate(
+    ticket_data = eTicket.objects.values('region', 'zone', 'ticket_origin_date') \
+        .annotate(
         total_tickets=Count('id'),
         total_running_hours=Sum('customer_generator_running_hours')
     ).order_by('region', 'zone', 'ticket_origin_date')
@@ -1298,11 +1284,6 @@ def create_child_ticket_api(request, parent_ticket_id):
 
 
 
-
-
-
-
-## PGR database ###############################################
 
 
 @login_required

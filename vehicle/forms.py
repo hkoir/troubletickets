@@ -5,7 +5,7 @@ from datetime import timedelta
 from .models import AddVehicleInfo,VehicleRuniningData,FuelRefill
 from .models import VehicleRentalCost,Vehiclefault
 
-from common.models import Region,Zone,MP
+
 from tickets.mp_list import REGION_CHOICES,ZONE_CHOICES,MP_CHOICES
 
 
@@ -34,13 +34,7 @@ class AddVehicleExpensesForm(forms.ModelForm):
             'vehicle': forms.Select(attrs={'class': 'form-control'}),
         }
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['region'].queryset = Region.objects.all()
-        self.fields['zone'].queryset = Zone.objects.all()
-        self.fields['mp'].queryset = MP.objects.all()
-
-
+   
    
    
 class FuelRefillForm(forms.ModelForm):   
@@ -72,13 +66,8 @@ class UpdateVehicleDatabaeForm(forms.ModelForm):
         model = AddVehicleInfo
         exclude = ['vehicle_id',' vehicle_add_requester'] 
 
-    def __init__(self, *args, **kwargs): 
-        user_role = kwargs.pop('user_role', None)
-        super().__init__(*args, **kwargs)        
-       
-        # if user_role == 'external':
-        #     self.fields['hepta_generator_start_time'].widget = forms.HiddenInput()
-        #     self.fields['hepta_generator_stop_time'].widget = forms.HiddenInput()
+   
+     
      
 
 class vehicleSummaryReportForm(forms.Form):
@@ -99,30 +88,19 @@ class vehicleSummaryReportForm(forms.Form):
     )
     region = forms.ChoiceField(
         label='Select Region',
-        required=False
+        required=False,
+        choices=REGION_CHOICES
     )
     zone = forms.ChoiceField(
         label='Select Zone',
-        required=False
+        required=False,
+        choices=ZONE_CHOICES
     )
     mp = forms.ChoiceField(
         label='Select MP',
-        required=False
+        required=False,
+        choices=MP_CHOICES
     )
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        # Fetching data from the models to populate choices
-        self.fields['region'].choices = [('', '------')] + [(region.id, region.name) for region in Region.objects.all()]
-        self.fields['zone'].choices = [('', '------')] + [(zone.id, zone.name) for zone in Zone.objects.all()]
-        self.fields['mp'].choices = [('', '------')] + [(mp.id, mp.name) for mp in MP.objects.all()]
-
-        # Debugging: Print choices to verify
-        print("Region choices:", self.fields['region'].choices)
-        print("Zone choices:", self.fields['zone'].choices)
-        print("MP choices:", self.fields['mp'].choices)
-
 
    
 class VehicleDetailsForm(forms.Form):   
@@ -221,21 +199,18 @@ class vehicleSummaryReportForm(forms.Form):
     )
     region = forms.ChoiceField(
         label='Select Region',
-        required=False
+        required=False,
+        choices=REGION_CHOICES
     )
     zone = forms.ChoiceField(
         label='Select Zone',
-        required=False
+        required=False,
+        choices=ZONE_CHOICES
     )
     mp = forms.ChoiceField(
         label='Select MP',
-        required=False
+        required=False,
+        choices=MP_CHOICES
     )
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        # Fetching data from the models to populate choices
-        self.fields['region'].choices = [('', '------')] + [(region.id, region.name) for region in Region.objects.all()]
-        self.fields['zone'].choices = [('', '------')] + [(zone.id, zone.name) for zone in Zone.objects.all()]
-        self.fields['mp'].choices = [('', '------')] + [(mp.id, mp.name) for mp in MP.objects.all()]
+   

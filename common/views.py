@@ -1,13 +1,11 @@
 from django.shortcuts import render,redirect
 from django.contrib import messages
-from.forms import CombinedForm
 from django.contrib.auth.decorators import login_required
 from .forms import FuelPumpDatabaseForm
 from tickets .views import generate_unique_finance_requisition_number
 from django.shortcuts import render, redirect,get_object_or_404
 from django.db.models import Sum, Avg,Count,Q,Case, When, IntegerField,F,Max,DurationField, DecimalField
 import random,json,uuid,base64,csv
-
 
 
 from django.shortcuts import render
@@ -19,28 +17,8 @@ import pandas as pd
 from.forms import PGRForm
 from tickets.views import generate_unique_ticket_number
 
-from .models import MP
-
-
-
-def create_region_zone_database(request):
-    if request.method == 'POST':
-        form = CombinedForm(request.POST)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "Entries created successfully")
-            return redirect('common:view_region_zone')  # Change to your view name
-    else:
-        form = CombinedForm()
-
-    return render(request, 'common/create_region_zone.html', {'form': form})
-
-
-def view_region_zone(request):
-    data =MP.objects.all()
-    return render(request,'common/view_region_zone.html',{'data':data})
-
-
+from datetime import datetime,timedelta
+from.forms import PGRViewForm
 
 @login_required
 def create_fuel_pump_database(request):
@@ -52,7 +30,7 @@ def create_fuel_pump_database(request):
             pump_record.save()  
             form.save()
             messages.success(request, "Entries created successfully")
-            return redirect('common:reate_fuel_pump_database')
+            return redirect('common:create_fuel_pump_database')
     else:
         form = FuelPumpDatabaseForm()
 
@@ -76,10 +54,47 @@ def create_pgr(request):
 
 
 
-def view_pgr_database(request):
+def view_pgr_database(request):    
+    form = PGRViewForm(request.GET or {'days': 20})
     pgr_list = PGRdatabase.objects.all().order_by('-created_at')
+    
+    if form.is_valid():
+        start_date = form.cleaned_data.get('start_date')
+        end_date = form.cleaned_data.get('end_date')
+        days = form.cleaned_data.get('days')
+        region = form.cleaned_data.get('region')
+        zone = form.cleaned_data.get('zone')
+        mp = form.cleaned_data.get('mp')
+        
+        if start_date and end_date:
+            pgr_list = pgr_list.filter(created_at__range=(start_date, end_date))
+            if region:
+                pgr_list = pgr_list.filter(region=region)
+        elif days:
+            end_date = datetime.today()
+            start_date = end_date - timedelta(days=days)
+            pgr_list = pgr_list.filter(created_at__range=(start_date, end_date))
+          
+        if region:
+            pgr_list = pgr_list.filter(region=region)
+        if zone:
+            pgr_list = pgr_list.filter(zone=zone)
+        if mp:
+            pgr_list = pgr_list.filter(mp=mp)
 
-    return render(request,'common/view_pgr_database.html',{'pgr_list':pgr_list})
+    else:
+        form = PGRViewForm()
+    form = PGRViewForm()
+    return render(request,'common/view_pgr_database.html',
+        {
+        'pgr_list':pgr_list,
+        'form':form,
+        'days':days,
+        'start_date':start_date,
+        'end_date':end_date
+        })
+
+
 
 def update_pgr_database(request, pgr_id):
     pgr_instance = get_object_or_404(PGRdatabase, id=pgr_id)
@@ -96,10 +111,10 @@ def update_pgr_database(request, pgr_id):
 
 
 def pgr_summary_view(request):   
-    summary_data = PGRdatabase.objects.values('region__name', 'zone__name', 'mp__name').annotate(
+    summary_data = PGRdatabase.objects.values('region', 'zone', 'mp').annotate(
         total_pgr=Count('id', filter=Q(PGR_type='PGR')),
         total_pgtl=Count('id', filter=Q(PGR_type='PGTL'))
-    ).order_by('region__name', 'zone__name', 'mp__name')
+    ).order_by('region', 'zone', 'mp')
 
     overall_summary = PGRdatabase.objects.aggregate(
         total_pgr=Count('id', filter=Q(PGR_type='PGR')),
@@ -147,23 +162,9 @@ def upload_pgr_excel(request):
                 return redirect('tickets:view_pgr_database')
             except Exception as e:
                 messages.error(request, f"Error processing file: {e}")
-
     else:
         form = ExcelUploadForm()
-
     return render(request, 'common/upload_pgr_excel.html', {'form': form})
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

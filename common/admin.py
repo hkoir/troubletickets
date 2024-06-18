@@ -1,3 +1,10 @@
 from django.contrib import admin
 
-# Register your models here.
+from .models import fuelPumpPayment,FuelPumpDatabase,PGRdatabase
+
+
+
+admin.site.register(fuelPumpPayment)
+admin.site.register(FuelPumpDatabase)
+admin.site.register(PGRdatabase)
+

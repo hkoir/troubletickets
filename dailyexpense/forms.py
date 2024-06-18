@@ -1,11 +1,11 @@
 
 from django import forms
 from account.models import Customer
-from common.models import Region,Zone,MP
+
 from .models import MoneyRequisition, SummaryExpenses
 from datetime import timedelta
 from .models import DailyExpenseRequisition,SummaryExpenses,AdhocRequisition
-
+from tickets.mp_list import REGION_CHOICES,ZONE_CHOICES,MP_CHOICES
 
 
 
@@ -120,10 +120,10 @@ class SummaryExpensesForm(forms.ModelForm):
 
 
 
-from .models import Region, Zone, MP
 
-class ZoneWiseExpensesForm(forms.Form):
-    zone = forms.ModelChoiceField(queryset=Zone.objects.all(), required=False)
+
+class ZoneWiseExpensesForm(forms.Form):   
+    zone = forms.ChoiceField(choices=ZONE_CHOICES,required=False)   
     start_date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}), required=True)
     end_date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}), required=True)
 
@@ -138,7 +138,7 @@ class ExpenseRequisitionForm(forms.ModelForm):
    
 
 
-from tickets.mp_list import REGION_CHOICES,ZONE_CHOICES,MP_CHOICES
+
 class ExpenseRequisitionStatusForm(forms.Form):
     start_date = forms.DateField(
         label='Start Date',
@@ -210,24 +210,28 @@ class AdhocRequisitionStatusForm(forms.Form):
     )
     region = forms.ChoiceField(
         label='Select Region',
-        required=False
+        required=False,
+        choices=REGION_CHOICES
     )
     zone = forms.ChoiceField(
         label='Select Zone',
-        required=False
+        required=False,
+        choices=ZONE_CHOICES
     )
     mp = forms.ChoiceField(
         label='Select MP',
-        required=False
+        required=False,
+        choices=MP_CHOICES
+
     )
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    # def __init__(self, *args, **kwargs):
+    #     super().__init__(*args, **kwargs)
 
-        # Fetching data from the models to populate choices
-        self.fields['region'].choices = [('', '------')] + [(region.id, region.name) for region in Region.objects.all()]
-        self.fields['zone'].choices = [('', '------')] + [(zone.id, zone.name) for zone in Zone.objects.all()]
-        self.fields['mp'].choices = [('', '------')] + [(mp.id, mp.name) for mp in MP.objects.all()]
+    #     # Fetching data from the models to populate choices
+    #     self.fields['region'].choices = [('', '------')] + [(region.id, region.name) for region in Region.objects.all()]
+    #     self.fields['zone'].choices = [('', '------')] + [(zone.id, zone.name) for zone in Zone.objects.all()]
+    #     self.fields['mp'].choices = [('', '------')] + [(mp.id, mp.name) for mp in MP.objects.all()]
 
 
 
@@ -237,6 +241,6 @@ class dailyExpenseSummaryForm(forms.Form):
     start_date = forms.DateField(required=False, widget=forms.TextInput(attrs={'type': 'date'}))
     end_date = forms.DateField(required=False, widget=forms.TextInput(attrs={'type': 'date'}))
     days = forms.IntegerField(required=False)
-    region = forms.ModelChoiceField(queryset=Region.objects.all(), required=False)
-    zone = forms.ModelChoiceField(queryset=Zone.objects.all(), required=False)
-    mp = forms.ModelChoiceField(queryset=MP.objects.all(), required=False)
+    region = forms.ChoiceField(choices=REGION_CHOICES,required=False)
+    zone = forms.ChoiceField(choices=ZONE_CHOICES,required=False)
+    mp = forms.ChoiceField(choices=MP_CHOICES,required=False)

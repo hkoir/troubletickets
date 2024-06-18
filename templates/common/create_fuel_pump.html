@@ -186,38 +186,7 @@
 
     
 
-
-<!-- 
-<script>
-    $(document).ready(function() {
-        $('#id_region, #id_zone ,#id_mp').select2({
-            width: '100%', 
-            ajax: {
-                url: "{% url 'dailyexpense:common_search' %}",
-                dataType: 'json',
-                delay: 250,
-                data: function(params) {
-                    return {
-                        q: params.term
-                    };
-                },
-                processResults: function(data) {
-                    return {
-                        results: data.results
-                    };
-                },
-                cache: true
-            },
-            minimumInputLength: 1, 
-            placeholder: 'Search ',
-            allowClear: true
-        });
-    });
-</script>
-
- -->
-
-<!--     
+  
 <script>
     $(document).ready(function(){      
         var regionZoneMapping = {
@@ -266,7 +235,7 @@
 
 });          
 
-</script> -->
+</script> 
 
 
 

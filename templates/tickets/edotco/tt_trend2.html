@@ -86,7 +86,7 @@ const data = JSON.parse(document.getElementById('data-json').textContent);
 const zoneDataMap = {};
 
 data.forEach(item => {
-    const zone = item.zone__name;
+    const zone = item.zone;
     const date = item.created_at;
     const troubleTickets = item.trouble_tickets;
     const runHours = item.run_hours;

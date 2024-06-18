@@ -17,7 +17,7 @@ from django.db.models import Sum, Avg,Count,Q,Case, When, IntegerField,F,Max,Dur
 
 from vehicle.models import AddVehicleInfo
 from generator.models import AddPGInfo
-from common.models import Region,Zone,MP
+from tickets.mp_list import REGION_CHOICES,ZONE_CHOICES,MP_CHOICES
 
 
 class MoneyRequisition(models.Model):
@@ -27,8 +27,8 @@ class MoneyRequisition(models.Model):
     money_sending_date = models.DateTimeField(default=timezone.now,null=True, blank=True)
     receiving_status = models.CharField(max_length=50, default='None',null=True, blank=True)
    
-    region = models.ForeignKey(Region,related_name='requisition_region',on_delete=models.CASCADE)
-    zone = models.ForeignKey(Zone,related_name='requisition_zone',on_delete=models.CASCADE)
+    region = models.CharField(max_length=100,choices=REGION_CHOICES,null=True, blank=True)
+    zone = models.CharField(max_length=100,choices=ZONE_CHOICES,null=True, blank=True)
 
     purpose_choices=[
         ('CM_work','CM_work'),
@@ -71,8 +71,8 @@ class MoneyRequisition(models.Model):
     level3_approval_date = models.DateTimeField(null=True, blank=True)
 
 class SummaryExpenses(models.Model):
-    region = models.ForeignKey(Region,related_name='sum_expense_region',on_delete=models.CASCADE)
-    zone = models.ForeignKey(Zone,related_name='sum_expense_zone',on_delete=models.CASCADE)
+    region = models.CharField(max_length=100,choices=REGION_CHOICES,null=True, blank=True)
+    zone = models.CharField(max_length=100,choices=ZONE_CHOICES,null=True, blank=True)
    
     balance_from_previous_month = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
     total_amount_received = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
@@ -158,9 +158,9 @@ class DailyExpenseRequisition(models.Model):
 
     receiving_status = models.CharField(max_length=50, default='None')
    
-    region = models.ForeignKey(Region,related_name='daily_expense_region',on_delete=models.CASCADE)
-    zone = models.ForeignKey(Zone,related_name='daily_expense_zone',on_delete=models.CASCADE)
-    mp = models.ForeignKey(MP,related_name='daily_expense_mp',on_delete=models.CASCADE)
+    region = models.CharField(max_length=100,choices=REGION_CHOICES,null=True, blank=True)
+    zone = models.CharField(max_length=100,choices=ZONE_CHOICES,null=True, blank=True)
+    mp = models.CharField(max_length=100,choices=MP_CHOICES,null=True, blank=True)
 
     expense_requisition_choices=[
         ('local_conveyance','local_conveyance'),
@@ -233,9 +233,8 @@ class AdhocRequisition(models.Model):
     receiving_status = models.CharField(max_length=50, default='None')
     sending_document = models.FileField(upload_to='Adhoc_money_sending_documents/', null=True, blank=True)
     money_sending_date = models.DateTimeField(default=timezone.now,null=True, blank=True)
-    region = models.ForeignKey(Region,related_name='adhoc_req_region',on_delete=models.CASCADE)
-    zone = models.ForeignKey(Zone,related_name='adhoc_req_zone',on_delete=models.CASCADE)
-   
+    region = models.CharField(max_length=100,choices=REGION_CHOICES,null=True, blank=True)
+    zone = models.CharField(max_length=100,choices=ZONE_CHOICES,null=True, blank=True)
     no_of_adhoc_man_day = models.IntegerField(null=True,blank=True)
     no_of_adhoc_vehicle_day = models.IntegerField(null=True,blank=True)
    

@@ -4,7 +4,7 @@ from .mp_list import REGION_CHOICES,ZONE_CHOICES,MP_CHOICES
 from .models import ChildTicketExternal
 
 from generator.models import AddPGInfo
-from .models import eTicket,Region, Zone, MP, PGRdatabase
+from .models import eTicket,PGRdatabase
 from vehicle.models import AddVehicleInfo
 
 
@@ -29,13 +29,7 @@ class CreateTicketFormEdotco2(forms.ModelForm):
     class Meta:
         model = eTicket
         fields = ['region', 'zone', 'mp', 'site_id', 'customer_ticket_ref', 'customer_name']
-        widgets = {
-            'region': forms.Select(attrs={'class': 'form-control', 'id': 'id_region'}),
-            'zone': forms.Select(attrs={'class': 'form-control', 'id': 'id_zone'}),
-            'mp': forms.Select(attrs={'class': 'form-control', 'id': 'id_mp'}),
-        }
-
-
+       
 
 
 
@@ -135,18 +129,16 @@ class SummaryReportForm2(forms.Form):
         min_value=1,
         required=False
     )
-from common.models import Region, Zone, MP
-from.mp_list import REGION_CHOICES,ZONE_CHOICES,MP_CHOICES
+
+
+
 class SummaryReportForm(forms.Form):
     report_date = forms.DateField(required=False, widget=forms.TextInput(attrs={'type': 'date'}))
     days = forms.IntegerField(required=False)
-    region = forms.ModelChoiceField(queryset=Region.objects.all(), required=False)
-    zone = forms.ModelChoiceField(queryset=Zone.objects.all(), required=False)
-    mp = forms.ModelChoiceField(queryset=MP.objects.all(), required=False)
-    # region = forms.ChoiceField(choices=REGION_CHOICES, required=False)
-    # zone = forms.ChoiceField(choices=ZONE_CHOICES, required=False)
-    # mp = forms.ChoiceField(choices=MP_CHOICES, required=False)
-
+    region = forms.ChoiceField(choices=REGION_CHOICES,required=False)
+    zone = forms.ChoiceField(choices=ZONE_CHOICES,required=False)
+    mp = forms.ChoiceField(choices=MP_CHOICES,required=False)
+  
 
 
 
@@ -155,7 +147,7 @@ class MPReportForm(forms.Form):
      start_date = forms.DateField(required=False, widget=forms.TextInput(attrs={'type': 'date'}))
      end_date = forms.DateField(required=False, widget=forms.TextInput(attrs={'type': 'date'}))
      days = forms.IntegerField(required=False)     
-     mp = forms.ModelChoiceField(queryset=MP.objects.all(), required=False)
+     mp = forms.ChoiceField(choices=MP_CHOICES,required=False)
 
 
 
@@ -165,7 +157,7 @@ class ZoneReportForm(forms.Form):
      start_date = forms.DateField(required=False, widget=forms.TextInput(attrs={'type': 'date'}))
      end_date = forms.DateField(required=False, widget=forms.TextInput(attrs={'type': 'date'}))
      days = forms.IntegerField(required=False)     
-     zone = forms.ModelChoiceField(queryset=Zone.objects.all(), required=False)
+     zone = forms.ChoiceField(choices=ZONE_CHOICES,required=False)
 
 
 

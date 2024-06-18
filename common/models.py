@@ -1,31 +1,11 @@
 from django.db import models
 from django.utils import timezone
-
-
-class Region(models.Model):
-    name = models.CharField(max_length=100,)
-    def __str__(self):
-        return self.name
-
-class Zone(models.Model):
-    name = models.CharField(max_length=100)
-    region = models.ForeignKey(Region, on_delete=models.CASCADE, related_name='zones')
-
-    def __str__(self):
-        return self.name
-
-class MP(models.Model):
-    name = models.CharField(max_length=100)
-    zone = models.ForeignKey(Zone, on_delete=models.CASCADE, related_name='mps')
-    def __str__(self):
-        return self.name
-
-
+from tickets.mp_list import REGION_CHOICES,ZONE_CHOICES,MP_CHOICES
 
 class FuelPumpDatabase(models.Model):
-    region = models.ForeignKey(Region,related_name='pumpregion',on_delete=models.CASCADE)
-    zone = models.ForeignKey(Zone,related_name='pumpzone',on_delete=models.CASCADE)
-    mp = models.ForeignKey(MP,related_name='pumpmp',on_delete=models.CASCADE)
+    region = models.CharField(max_length=100,choices=REGION_CHOICES,null=True,blank=True)
+    zone = models.CharField(max_length=100,choices=ZONE_CHOICES,null=True,blank=True)
+    mp = models.CharField(max_length=100,choices= MP_CHOICES,null=True,blank=True)
     fuel_pump_name = models.CharField(max_length=100,null=True,blank=True)
     fuel_pump_id = models.CharField(max_length=50, default='None',null=True,blank=True)  
     fuel_pump_company_name = models.CharField(max_length=100,null=True,blank=True)
@@ -60,9 +40,9 @@ class fuelPumpPayment(models.Model):
 
 
 class PGRdatabase(models.Model):   
-    region = models.ForeignKey(Region,on_delete=models.CASCADE, related_name='pgr_region')
-    zone = models.ForeignKey(Zone, on_delete=models.CASCADE, related_name='pgr_zone')
-    mp = models.ForeignKey(MP, on_delete=models.CASCADE, related_name='pgr_mp')
+    region = models.CharField(max_length=100,choices=REGION_CHOICES,null=True,blank=True)
+    zone = models.CharField(max_length=100,choices=ZONE_CHOICES,null=True,blank=True)
+    mp = models.CharField(max_length=100,choices= MP_CHOICES,null=True,blank=True)
     name = models.CharField(max_length=100)   
     pgr_id = models.CharField(max_length=150,null=True, blank=True)
 

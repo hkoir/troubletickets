@@ -7,9 +7,7 @@ app_name = 'common'
 
 
 urlpatterns = [   
-    path('create_region_zone_database/', views.create_region_zone_database, name='create_region_zone_database'),
-     path('view_region_zone/', views.view_region_zone, name='view_region_zone'),
-   
+     
     path('create_fuel_pump_database/', views.create_fuel_pump_database, name='create_fuel_pump_database'), 
     path('operational_resource_management/', views.operational_resource_management, name='operational_resource_management'),   
 
