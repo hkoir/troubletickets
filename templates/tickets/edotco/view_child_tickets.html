@@ -96,11 +96,17 @@ table {
             <th class="text-center p-2"style="white-space:normal">Customer Ticket Number</th>
             <th class="text-center p-2">Site ID</th>
             <th class="text-center p-2">Ticket origin date</th>
+            <th class="text-center p-2">Customer name</th>
+
             <th class="text-center p-2">Ticket Status</th>
+
             <th class="text-center p-2">Assigned PGR Name</th>
             <th class="text-center p-2">Assigned PGR type</th>
+            <th class="text-center p-2">PGR Category</th>
+            <th class="text-center p-2">Team leader</th>
+
             <th class="text-center p-2">Assigned Vehicle Type</th>
-            <th class="text-center p-2">Customer name</th>
+       
             <th class="text-center p-2">Assigned Vehicle Reg.</th>
             <th class="text-center p-2">Assigned PG number</th>
 
@@ -137,11 +143,17 @@ table {
                 <td class="text-center p-2" style="font-size: 14px; white-space: nowrap;color:black">{{ parent_ticket.customer_ticket_ref }}</td>
                 <td class="text-center p-2" style="font-size: 14px; white-space: nowrap;color:black">{{ parent_ticket.site_id }}</td>
                 <td class="text-center p-2" style="font-size: 14px; white-space: nowrap;color:black">{{ parent_ticket.ticket_origin_date }}</td>
-                <td class="text-center p-2" style="font-size: 14px; white-space: nowrap;color:black">{{ parent_ticket.ticket_status }}</td>
-                <td class="text-center p-2" style="font-size: 14px; white-space: nowrap;color:black">{{ parent_ticket.assigned_to }}</td>
-                <td class="text-center p-2" style="font-size: 14px; white-space: nowrap;color:black">{{ parent_ticket.assigned_pg_runner_type }}</td> 
-                <td class="text-center p-2" style="font-size: 14px; white-space: nowrap;color:black">{{ parent_ticket.assigned_vehicle_type }}</td>
                 <td class="text-center p-2" style="font-size: 14px; white-space: nowrap;color:black">{{ parent_ticket.customer_name }}</td>
+
+                <td class="text-center p-2" style="font-size: 14px; white-space: nowrap;color:black">{{ parent_ticket.ticket_status }}</td>
+
+                <td class="text-center p-2" style="font-size: 14px; white-space: nowrap;color:black">{{ parent_ticket.assigned_to }}</td>
+                <td class="text-center p-2" style="font-size: 14px; white-space: nowrap;color:black">{{ parent_ticket.assigned_to.PGR_type }}</td>
+                <td class="text-center p-2" style="font-size: 14px; white-space: nowrap;color:black">{{ parent_ticket.assigned_to.PGR_category }}</td>
+                <td class="text-center p-2" style="font-size: 14px; white-space: nowrap;color:black">{{ parent_ticket.team_leader_name.name }}</td>
+
+                <td class="text-center p-2" style="font-size: 14px; white-space: nowrap;color:black">{{ parent_ticket.vehicle.vehicle_rental_type }}</td>
+
                 <td class="text-center p-2" style="font-size: 14px; white-space: nowrap;color:black">{{ parent_ticket.vehicle.vehicle_reg_number }}</td>
                 <td class="text-center p-2" style="font-size: 14px; white-space: nowrap;color:black">{{ parent_ticket.pgnumber.PGNumber }}</td>
               

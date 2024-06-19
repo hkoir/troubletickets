@@ -93,7 +93,8 @@ white-space: normal;
                         <th class="text-center p-2">Team assign</th>   
                         <th class="text-center p-2">TT Open</th>   
                         <th class="text-center p-2">TT invalid</th>    
-                        <th class="text-center p-2">No of adhoc used</th>                   
+                        <th class="text-center p-2">No of adhoc man used</th>  
+                        <th class="text-center p-2">No of adhoc vehicle used</th>                 
                    
 
                         <th class="text-center p-2" >Internal Running Hours</th>
@@ -119,7 +120,17 @@ white-space: normal;
                         <td class="text-center p-2">{{ item.num_team_assign_tickets }}</td>
                         <td class="text-center p-2">{{ item.num_open_tickets }}</td>
                         <td class="text-center p-2">{{ item.num_invalid_tickets }}</td>
-                        <td class="text-center p-2" style="background-color: chocolate;">{{ item.num_adhoc_PGR }}</td>
+                        {% if item.num_adhoc_PGR %}
+                        <td class="text-center p-2" style="background-color: red; color:white">{{ item.num_adhoc_PGR }}</td>
+                        {% else %}
+                        <td class="text-center p-2" style="background-color: rgb(64, 234, 59);">{{ item.num_adhoc_PGR }}</td>
+                        {% endif %}
+
+                        {% if item.num_adhoc_vehicle %}
+                        <td class="text-center p-2" style="background-color: red; color:white">{{ item.num_adhoc_vehicle }}</td>
+                        {% else %}
+                        <td class="text-center p-2" style="background-color: rgb(64, 234, 59);">{{ item.num_adhoc_vehicle }}</td>
+                        {% endif %}
                       
                         <td class="text-center p-2">{{ item.total_hepta_running_hours }}</td>
                         <td class="text-center p-2">{{ item.total_edotco_running_hours }}</td>

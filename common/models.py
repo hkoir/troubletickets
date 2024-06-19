@@ -2,6 +2,25 @@ from django.db import models
 from django.utils import timezone
 from tickets.mp_list import REGION_CHOICES,ZONE_CHOICES,MP_CHOICES
 
+
+
+
+
+class Notice(models.Model):
+    title = models.CharField(max_length=255,null=True,blank=True)
+    content = models.TextField(null=True,blank=True)
+    notice_image = models.ImageField(upload_to='notices',null=True,blank=True)
+    created_at = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return self.title
+
+
+
+
+
+
+
 class FuelPumpDatabase(models.Model):
     region = models.CharField(max_length=100,choices=REGION_CHOICES,null=True,blank=True)
     zone = models.CharField(max_length=100,choices=ZONE_CHOICES,null=True,blank=True)
@@ -11,7 +30,7 @@ class FuelPumpDatabase(models.Model):
     fuel_pump_company_name = models.CharField(max_length=100,null=True,blank=True)
     fuel_pump_phone = models.CharField(max_length=100,null=True,blank=True)
     fuel_pump_email = models.EmailField(null=True,blank=True)
-    fuel_pump_address = models.TextField(null=True,blank=True)
+    fuel_pump_address = models.TextField(null=True,blank=True)     
     pump_type_choices=[
         ('prepaid','prepaid'),
         ('postpaid','postpaid')
@@ -20,7 +39,7 @@ class FuelPumpDatabase(models.Model):
     fuel_pump_supporting_documents = models.FileField(upload_to='fuel_pump_supporting_documents/', null=True, blank=True)
     advance_amount_given = models.DecimalField(max_digits=20,decimal_places=2,null=True,blank=True)
     contact_date = models.DateField(null=True,blank=True)
-    contact_period = models.DurationField(null=True,blank=True)
+    contact_period = models.DecimalField(max_digits=10, decimal_places=1,null=True,blank=True)
     created_at = models.DateField(default=timezone.now)
 
     def __str__(self):

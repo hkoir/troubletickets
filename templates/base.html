@@ -110,8 +110,16 @@ html, body {
             <div class="collapse navbar-collapse" id="navbarSupportedContent">               
         
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">  <!-- master ul start -->
-                    <li class="nav-item">
-                        <a class="nav-link active menu-color" style="color:white; font-weight: bold;" aria-current="page" href="{% url 'tickets:dash_board' %}">Home</a>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle menu-color" style="color: blue;" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fa fa-bullhorn" aria-hidden="true"></i> Notices
+                        </a>
+
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown" style="max-height: 400px; overflow-y: auto;">
+                          
+                            <li><a class="dropdown-item" href="{% url 'common:view_notices' %}" style="color:red">View Notices</a></li>
+                            <li><a class="dropdown-item" href="{% url 'common:add_notice' %}" style="color:blue">Add notices</a></li>
+                        </ul>
                     </li>
                   
                     
@@ -242,10 +250,14 @@ html, body {
 {% endif %}
 
    <div class="col" style="height:120px"></div>
-    <div class="container">
+
+    <div class="container">    
         {% block content %}
         {% endblock %}
     </div>
+
+
+
 
 </body>
 </html>

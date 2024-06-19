@@ -44,19 +44,7 @@ class UpdateTicketFormEdotco(forms.ModelForm):
         ('team_assign', 'team_assign'),
         ('TT_invalid', 'TT_invalid'),
     ]
-
-    ASSIGNED_PG_RUNNER_CHOICES = [
-        ('Permanent', 'Permanent'),
-        ('Adhoc', 'Adhoc'),
-    ]
-
-    VEHICLE_TYPE_CHOICES = [
-        ('Permanent', 'Permanent'),
-        ('Adhoc', 'Adhoc'),
-    ]
-
-    assigned_pg_runner_type = forms.ChoiceField(choices=ASSIGNED_PG_RUNNER_CHOICES, required=False)
-    assigned_vehicle_type = forms.ChoiceField(choices=VEHICLE_TYPE_CHOICES, required=False)
+   
     ticket_status = forms.ChoiceField(choices=TICKET_STATUS_CHOICES, label='Ticket Status')
     vehicle = forms.ModelChoiceField(queryset=AddVehicleInfo.objects.all(), required=False)
     pgnumber = forms.ModelChoiceField(queryset=AddPGInfo.objects.all(), required=False)
@@ -64,7 +52,7 @@ class UpdateTicketFormEdotco(forms.ModelForm):
     class Meta:
         model = eTicket
         fields = [
-            'assigned_to', 'assigned_pg_runner_type','team_leader_name', 'vehicle', 'assigned_vehicle_type', 'pgnumber', 'ticket_status'
+            'assigned_to','team_leader_name', 'vehicle','pgnumber', 'ticket_status'
         ]
 
     def __init__(self, *args, **kwargs):
@@ -78,9 +66,6 @@ class UpdateTicketFormEdotco(forms.ModelForm):
      
 
 
-
-# this form actually will be used for PG start time input only. for TT stop time- ajax function will be used. no
-# form for PG stop is needed as ajax can update stop time directly
 class CreateChildTicketForm(forms.ModelForm):
     parent_ticket_number = forms.CharField(max_length=50, label='Parent Ticket Number', required=True, widget=forms.TextInput(attrs={'readonly': 'readonly'}))   
     TakePicture = forms.ImageField(required=False, widget=forms.ClearableFileInput(attrs={'accept': 'image/*', 'capture': 'camera'}))  # File input field with 'capture' attribute for camera capture
@@ -190,6 +175,3 @@ class SummaryReportChartForm(forms.Form):
     region = forms.ChoiceField(choices=REGION_CHOICES, required=False)
     zone = forms.ChoiceField(choices=ZONE_CHOICES, required=False)
     mp = forms.ChoiceField(choices=MP_CHOICES, required=False)
-    # region = forms.ModelChoiceField(queryset=Region.objects.all(), required=False)
-    # zone = forms.ModelChoiceField(queryset=Zone.objects.all(), required=False)
-    # mp = forms.ModelChoiceField(queryset=MP.objects.all(), required=False)

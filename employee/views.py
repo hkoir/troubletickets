@@ -725,6 +725,7 @@ def view_resource2(request):
     })
 
 
+
 @login_required
 def view_resource(request):   
     region = None
@@ -891,6 +892,9 @@ def view_resource_summary(request):
             )
         ) \
         .order_by('region', 'zone')
+
+    # Debug: Print intermediate data
+    print("Summary Data:", summary)
 
     for data in summary:
         region = data['region']

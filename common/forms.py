@@ -1,16 +1,33 @@
 from django import forms
-from.models import FuelPumpDatabase,PGRdatabase
+from.models import FuelPumpDatabase,PGRdatabase,Notice
 
 from tickets.mp_list import REGION_CHOICES,ZONE_CHOICES,MP_CHOICES
 
 
 
 
+
+
+class NoticeForm(forms.ModelForm):
+    class Meta:
+        model = Notice
+        exclude =['created_at']
+
+
 class FuelPumpDatabaseForm(forms.ModelForm):
     contact_date = forms.DateField(label='contact date', required=False, widget=forms.DateInput(attrs={'type': 'date'}))
     class Meta:
         model = FuelPumpDatabase
-        exclude =['created_at','fuel_pump_id']        
+        exclude =['created_at','fuel_pump_id']    
+
+
+
+class viewFuelPumpForm(forms.Form):  
+    region = forms.ChoiceField(choices=REGION_CHOICES, required=False)
+    zone = forms.ChoiceField(choices=ZONE_CHOICES, required=False)
+    mp = forms.ChoiceField(choices=MP_CHOICES, required=False)  
+    fuel_pump_name = forms.ChoiceField(required=False)  
+
 
 
 

@@ -25,10 +25,8 @@ from .forms import ExpenseRequisitionForm,SummaryExpensesForm,ExpenseRequisition
 from .models import MoneyRequisition,SummaryExpenses,DailyExpenseRequisition,AdhocRequisition
 
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-
 from tickets.forms import SummaryReportChartForm
 from .forms import ZoneWiseExpensesForm,AdhocRequisitionStatusForm,AdhocRequisitionForm
-
 from common.models import FuelPumpDatabase
 from .forms import dailyExpenseSummaryForm
 

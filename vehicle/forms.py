@@ -66,6 +66,13 @@ class UpdateVehicleDatabaeForm(forms.ModelForm):
         model = AddVehicleInfo
         exclude = ['vehicle_id',' vehicle_add_requester'] 
 
+    def __init__(self, *args, **kwargs):
+        user_role = kwargs.pop('user_role', None)
+        super(UpdateVehicleDatabaeForm, self).__init__(*args, **kwargs)      
+        if user_role == 'general_user':
+            for field in self.fields.values():
+                field.widget.attrs['readonly'] = True
+
    
      
      

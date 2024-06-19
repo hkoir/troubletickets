@@ -57,14 +57,7 @@ class eTicket(models.Model):
 
     assigned_to = models.ForeignKey(PGRdatabase, related_name='ticket_PGR', null=True, blank=True, on_delete=models.CASCADE)
     team_leader_name =models.ForeignKey(PGRdatabase, related_name='ticket_PGTL', null=True, blank=True, on_delete=models.CASCADE)
-   
-    ASSIGNED_VEHICLE_CHOICES = [
-        ('Permanent', 'Permanent'),
-        ('Adhoc', 'Adhoc'),
-    ]
-   
-    assigned_vehicle_type = models.CharField(max_length=20, choices=ASSIGNED_VEHICLE_CHOICES)
-
+      
     vehicle = models.ForeignKey(AddVehicleInfo,on_delete=models.SET_NULL, null=True, blank=True)
     pgnumber = models.ForeignKey(AddPGInfo, related_name='pgtickets', on_delete=models.SET_NULL, null=True, blank=True)
     pg_fuel_refill = models.ForeignKey(PGFuelRefill, related_name='pg_fuel',default=None,null=True,blank=True, on_delete=models.CASCADE)

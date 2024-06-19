@@ -159,10 +159,10 @@
                             <td class="text-center p-2" style="background-color: greenyellow;">{{ ticket.fuel_difference|floatformat:'2' }}</td>
                             {% endif %}
                                                        
-                            {% if ticket.assigned_vehicle_type == "Adhoc" %}
-                            <td class="text-center p-2" style="background-color: red;">{{ ticket.assigned_vehicle_type}}</td>
+                            {% if ticket.vehicle.vehicle_rental_type == "adhoc" %}
+                            <td class="text-center p-2" style="background-color: red;color:white">{{ ticket.vehicle.vehicle_rental_type}}</td>
                             {% else %}
-                            <td class="text-center p-2">{{ ticket.assigned_vehicle_type}}</td>
+                            <td class="text-center p-2" style="background-color: greenyellow;">{{ ticket.vehicle.vehicle_rental_type}}</td>
                             {% endif %}
                           
                             <td class="text-center p-2">{{ ticket.pgnumber.PGNumber }}</td>

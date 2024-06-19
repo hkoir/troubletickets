@@ -65,6 +65,11 @@ class AddVehicleInfo(models.Model):
         ('daily','daily')
     ]
     vehicle_rental_category = models.CharField(max_length=50, choices=rental_category_choices, default='None')
+    vehicle_rental_type_choices=[
+        ('permanent','permanent'),
+        ('adhoc','adhoc')
+    ]
+    vehicle_rental_type = models.CharField(max_length=50, choices=vehicle_rental_type_choices,null=True,blank=True, default='None')
     vehicle_rent = models.DecimalField(max_digits=10, decimal_places=2,null=True, blank=True)
 
     vehicle_operational_mode_choices =[

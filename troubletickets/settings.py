@@ -122,3 +122,4 @@ LOGIN_URL = "/account/login/"
 
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'

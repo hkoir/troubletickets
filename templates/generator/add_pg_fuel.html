@@ -96,10 +96,10 @@
             var refillType = $('#id_refill_type').val();
             if (refillType === 'pump') {
                 $('#id_fuel_pump').closest('.form-group').show();
-                $('#id_fuel_supplier_name,#id_fuel_supplier_phone,#id_fuel_supplier_address').closest('.form-group').hide();
+                $('#id_fuel_supplier_name,#id_fuel_supplier_phone,#id_fuel_supplier_address,#id_fuel_rate').closest('.form-group').hide();
             } else if (refillType === 'local_purchase') {
                 $('#id_fuel_pump').closest('.form-group').hide();
-                $('#id_fuel_supplier_name,#id_fuel_supplier_phone,#id_fuel_supplier_address').closest('.form-group').show();
+                $('#id_fuel_supplier_name,#id_fuel_supplier_phone,#id_fuel_supplier_address,#id_fuel_rate').closest('.form-group').show();
             }
         }
         

@@ -7,18 +7,45 @@ from django.shortcuts import render, redirect,get_object_or_404
 from django.db.models import Sum, Avg,Count,Q,Case, When, IntegerField,F,Max,DurationField, DecimalField
 import random,json,uuid,base64,csv
 
-
-from django.shortcuts import render
-from django.db.models import Count
-from .models import PGRdatabase
-
-from.forms import ExcelUploadForm
 import pandas as pd
 from.forms import PGRForm
 from tickets.views import generate_unique_ticket_number
 
 from datetime import datetime,timedelta
-from.forms import PGRViewForm
+from.forms import PGRViewForm,ExcelUploadForm
+from.models import FuelPumpDatabase,PGRdatabase,Notice
+from.forms import viewFuelPumpForm,NoticeForm
+
+from dailyexpense.views import manager_level_required
+
+
+
+
+
+@manager_level_required('first_level')
+@login_required
+def add_notice(request):
+    if request.method == 'POST':
+        form = NoticeForm(request.POST,request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('common:view_notices')
+    else:
+        form = NoticeForm()
+    return render(request, 'common/add_notice.html', {'form': form})
+
+
+
+@login_required
+def view_notices(request):
+    notices = Notice.objects.all().order_by('-created_at')
+    form = NoticeForm()
+    return render(request, 'common/view_notices.html', {'notices': notices, 'form': form})
+
+
+
+
+
 
 @login_required
 def create_fuel_pump_database(request):
@@ -33,8 +60,46 @@ def create_fuel_pump_database(request):
             return redirect('common:create_fuel_pump_database')
     else:
         form = FuelPumpDatabaseForm()
-
     return render(request, 'common/create_fuel_pump.html', {'form': form})
+
+
+
+def view_fuel_pump(request):
+    pump_data = FuelPumpDatabase.objects.all().order_by('-created_at')    
+    form = viewFuelPumpForm(request.GET)
+    if form.is_valid():
+        region= form.cleaned_data.get('region')
+        zone=form.cleaned_data.get('zone')
+        mp = form.cleaned_data.get('mp')
+        fuel_pump_name = form.cleaned_data.get('fuel_pump_name')  
+        if region:
+            pump_data = pump_data.filter(region=region)
+        if zone:
+            pump_data = pump_data.filter(zone=zone)
+        if mp:
+            pump_data = pump_data.filter(mp=mp)
+        if fuel_pump_name:
+            pump_data = pump_data.filter(fuel_pump_name = fuel_pump_name)
+    else:
+        form=viewFuelPumpForm()
+    form=viewFuelPumpForm()                   
+    return render(request,'common/view_fuel_pump_database.html',{'pump_data':pump_data,'form':form})
+
+
+
+def update_fuel_pump_database(request, pump_id):
+    pump_instance = get_object_or_404(FuelPumpDatabase, id=pump_id)
+    if request.method == 'POST':
+        form = FuelPumpDatabaseForm(request.POST, request.FILES, instance=pump_instance)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Entries updated successfully")
+            return redirect('common:view_fuel_pump')  # Replace 'success_page' with the name of your success page
+    else:
+        form = FuelPumpDatabaseForm(instance=pump_instance)
+    return render(request, 'common/create_fuel_pump.html', {'form': form, 'pump_instance': pump_instance})
+
+
 
 
 
@@ -107,6 +172,8 @@ def update_pgr_database(request, pgr_id):
     else:
         form = PGRForm(instance=pgr_instance)
     return render(request, 'common/update_pgr_database.html', {'form': form, 'pgr_instance': pgr_instance})
+
+
 
 
 

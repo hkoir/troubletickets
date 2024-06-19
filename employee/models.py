@@ -176,6 +176,8 @@ class MonthlySalaryReport(models.Model):
     total_salary = models.DecimalField(max_digits=10, decimal_places=2 , null=True, blank=True)
 
 
+
+
 class Resource(models.Model):
     region = models.CharField(max_length=100,choices=REGION_CHOICES,null=True,blank=True)
     zone = models.CharField(max_length=100,choices=MP_CHOICES,null=True,blank=True)
@@ -212,6 +214,13 @@ class Resource(models.Model):
             mp=self.mp,
             PGR_type='PGR'
         ).count()
+
+        self.num_of_adhoc_PGR = PGRdatabase.objects.filter(
+            region=self.region,
+            zone=self.zone,
+            mp=self.mp,
+            PGR_category='adhoc'
+        ).count()
    
 
         # Calculate num_of_PGTL based on PGRdatabase entries
@@ -228,6 +237,14 @@ class Resource(models.Model):
             region=self.region,
             zone=self.zone,
             mp=self.mp
+        ).count()
+
+        self.num_of_adhoc_vehicle = AddVehicleInfo.objects.filter(
+            region=self.region,
+            zone=self.zone,
+            mp=self.mp,
+            vehicle_rental_type ='adhoc'
+
         ).count()
   
 

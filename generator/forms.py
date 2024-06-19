@@ -1,7 +1,6 @@
 from django import forms
 from.models import AddPGInfo,PGFaultRecord,PGFuelRefill
 
-
 from tickets.mp_list import REGION_CHOICES,ZONE_CHOICES,MP_CHOICES
 
 
@@ -39,11 +38,7 @@ class PGDatabaseViewForm(forms.Form):
     mp = forms.ChoiceField(choices=MP_CHOICES, required=False)
     PGNumber = forms.CharField(required=False)
    
-    # class Meta:
-    #     model = AddPGInfo
-    #     fields = ['PGNumber'] 
-
-
+   
 
 
 

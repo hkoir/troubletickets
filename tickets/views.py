@@ -653,7 +653,8 @@ def summary_report_view(request):
                     num_otw_tickets=Count('id', filter=Q(ticket_status='onTheWay')),
                     num_open_tickets=Count('id', filter=Q(ticket_status='open')),
                     num_team_assign_tickets=Count('id', filter=Q(ticket_status='team_assign')),
-                    num_adhoc_PGR=Count('id', filter=Q(assigned_to__PGR_type='Adhoc')),
+                    num_adhoc_PGR=Count('id', filter=Q(assigned_to__PGR_category='adhoc')),
+                    num_adhoc_vehicle=Count('id', filter=Q(vehicle__vehicle_rental_type='adhoc')),
                     total_hepta_running_hours=Sum('internal_generator_running_hours', output_field=DurationField()),
                     total_edotco_running_hours=Sum('customer_generator_running_hours', output_field=DurationField()),
                     total_hepta_calculated_fuel=Sum('internal_calculated_fuel_litre', output_field=DurationField()),
@@ -680,7 +681,8 @@ def summary_report_view(request):
                     num_otw_tickets=Count('id', filter=Q(ticket_status='onTheWay')),
                     num_open_tickets=Count('id', filter=Q(ticket_status='open')),
                     num_team_assign_tickets=Count('id', filter=Q(ticket_status='team_assign')),
-                    num_adhoc_PGR=Count('id', filter=Q(assigned_to__PGR_type='Adhoc')),
+                    num_adhoc_PGR=Count('id', filter=Q(assigned_to__PGR_category='adhoc')),
+                    num_adhoc_vehicle=Count('id', filter=Q(vehicle__vehicle_rental_type='adhoc')),
                     total_hepta_running_hours=Sum('internal_generator_running_hours', output_field=DurationField()),
                     total_edotco_running_hours=Sum('customer_generator_running_hours', output_field=DurationField()),
                     total_hepta_calculated_fuel=Sum('internal_calculated_fuel_litre', output_field=DurationField()),
@@ -728,7 +730,8 @@ def summary_report_view_region(request):
                     num_team_assign_tickets=Count('id', filter=Q(ticket_status='team_assign')),                  
               
                    
-                    num_adhoc_pgr_used=Count('id', filter=Q(assigned_pg_runner_type='Adhoc')),
+                    num_adhoc_PGR=Count('id', filter=Q(assigned_to__PGR_category='adhoc')),
+                    num_adhoc_vehicle=Count('id', filter=Q(vehicle__vehicle_rental_type='adhoc')),
                     total_hepta_running_hours=Sum('internal_generator_running_hours', output_field=DurationField()),
                     total_edotco_running_hours=Sum('customer_generator_running_hours', output_field=DurationField()),
                     total_fuel_difference=Sum('fuel_difference', output_field=DecimalField(max_digits=10, decimal_places=2)),
@@ -756,10 +759,8 @@ def summary_report_view_region(request):
                     num_open_tickets=Count('id', filter=Q(ticket_status='open')), 
                     num_team_assign_tickets=Count('id', filter=Q(ticket_status='team_assign')),                  
               
-               
-                    num_adhoc_pgr_used=Count('id', filter=Q(assigned_to__PGR_type='Adhoc')),                 
-                    num_adhoc_vehicle=Count('id', filter=Q( assigned_vehicle_type='Adhoc')),
-
+                    num_adhoc_PGR=Count('id', filter=Q(assigned_to__PGR_category='adhoc')),
+                    num_adhoc_vehicle=Count('id', filter=Q(vehicle__vehicle_rental_type='adhoc')),
                     total_hepta_running_hours=Sum('internal_generator_running_hours', output_field=DurationField()),
                     total_edotco_running_hours=Sum('customer_generator_running_hours', output_field=DurationField()),
                     total_fuel_difference=Sum('customer_calculated_fuel_litre', output_field=DecimalField(max_digits=10, decimal_places=2)) -Sum('internal_calculated_fuel_litre', output_field=DecimalField(max_digits=10, decimal_places=2))
@@ -807,8 +808,8 @@ def summary_report_view_hourly(request):
                     num_otw_tickets=Count('id', filter=Q(ticket_status='onTheWay')),   
                     num_open_tickets=Count('id', filter=Q(ticket_status='open')), 
                     num_team_assign_tickets=Count('id', filter=Q(ticket_status='team_assign')),                 
-                    num_adhoc_PGR=Count('id', filter=Q(assigned_to__PGR_type='Adhoc')), 
-                    num_adhoc_vehicle=Count('id', filter=Q( assigned_vehicle_type='Adhoc')),
+                    num_adhoc_PGR=Count('id', filter=Q(assigned_to__PGR_category='adhoc')), 
+                    num_adhoc_vehicle=Count('id', filter=Q( vehicle__vehicle_rental_type='adhoc')),
                     total_hepta_running_hours=Sum('internal_generator_running_hours', output_field=DurationField()),
                     total_edotco_running_hours=Sum('customer_generator_running_hours', output_field=DurationField()),
                     total_fuel_difference=Sum('customer_calculated_fuel_litre', output_field=DecimalField(max_digits=10, decimal_places=2)) -Sum('internal_calculated_fuel_litre', output_field=DecimalField(max_digits=10, decimal_places=2))

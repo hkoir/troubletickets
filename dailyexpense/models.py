@@ -1,4 +1,3 @@
-
 from django.db import models
 from django.contrib.auth.models import User
 from datetime import datetime
@@ -18,6 +17,13 @@ from django.db.models import Sum, Avg,Count,Q,Case, When, IntegerField,F,Max,Dur
 from vehicle.models import AddVehicleInfo
 from generator.models import AddPGInfo
 from tickets.mp_list import REGION_CHOICES,ZONE_CHOICES,MP_CHOICES
+
+
+
+
+
+
+
 
 
 class MoneyRequisition(models.Model):
@@ -69,6 +75,13 @@ class MoneyRequisition(models.Model):
     level1_approval_date = models.DateTimeField(null=True, blank=True)
     level2_approval_date = models.DateTimeField(null=True, blank=True)
     level3_approval_date = models.DateTimeField(null=True, blank=True)
+
+
+
+
+
+
+
 
 class SummaryExpenses(models.Model):
     region = models.CharField(max_length=100,choices=REGION_CHOICES,null=True, blank=True)
