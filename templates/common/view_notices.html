@@ -3,15 +3,13 @@
 
 {% block content %}
     <style>
-        .notice-board {    
-       
-                  
-         
+        .notice-board {
             background-color: #f8f9fa;
             border: 1px solid #ddd;
             padding: 15px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             z-index: 1000;
+            width: 100%;
         }
         .notice-board-header {
             display: flex;
@@ -25,58 +23,72 @@
             margin: 0;
         }
         .notice-board-body {
-            max-height: 450px;  /* Adjust height as necessary */
+            max-height: 450px; /* Adjust height as necessary */
             overflow-y: auto;
-         
         }
         .notice-board-footer {
             text-align: right;
         }
-        .main-content {   
+        .main-content {
             overflow-y: auto;
             margin-left: 0px;
             position: absolute;
             width: 100%;
             left: 0;
         }
+        .custom-col {
+            width: 100%;
+            max-width: 100%;
+        }
+        @media (min-width: 768px) {
+            .custom-col {
+                width: 75%; /* Medium screens */
+                max-width: 75%;
+            }
+        }
+        @media (min-width: 992px) {
+            .custom-col {
+                width: 70%; /* Large screens */
+                max-width: 70%;
+                margin-left:200px;
+            }
+        }
     </style>
 
-    <div class="container-fluid main-content">
-        <div class="row ">
-        
-            <div class="col">
-                <div class="notice-board">
-                    <div class="notice-board-header">
-                        <h5>Notice Board</h5>
-                        <button type="button" class="btn-close" aria-label="Close" onclick="closeNoticeBoard()"></button>
-                    </div>
-                    <div class="notice-board-body">
-                        <ul class="list-group">
-                            {% for notice in notices %}
-                                <li class="list-group-item" style="border:1px solid green;margin-bottom:2px">
-                                    Date: {{ notice.created_at }}<br>
-                                    <strong>{{ notice.title }}</strong>: {{ notice.content }}
-                                    <p class="text-center">
-                                        {% if notice.notice_image %}
-                                            <a href="{{ notice.notice_image.url }}" target="_blank">
-                                                <img 
-                                                    src="{{ notice.notice_image.url }}" 
-                                                    alt="Notice Image" 
-                                                    style="cursor: pointer; width:50px;height:50px">
-                                            </a>
-                                        {% else %}
-                                            No attachment available
-                                        {% endif %}
-                                    </p>
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    </div>
+<div class="container-fluid main-content">
+    <div class="row">
+        <div class="col custom-col">
+            <div class="notice-board">
+                <div class="notice-board-header">
+                    <h5>Notice Board</h5>
+                    <button type="button" class="btn-close" aria-label="Close" onclick="closeNoticeBoard()"></button>
+                </div>
+                <div class="notice-board-body">
+                    <ul class="list-group">
+                        {% for notice in notices %}
+                            <li class="list-group-item" style="border:1px solid green;margin-bottom:2px">
+                                Date: {{ notice.created_at }}<br>
+                                <strong>{{ notice.title }}</strong>: {{ notice.content }}
+                                <p class="text-center">
+                                    {% if notice.notice_image %}
+                                        <a href="{{ notice.notice_image.url }}" target="_blank">
+                                            <img 
+                                                src="{{ notice.notice_image.url }}" 
+                                                alt="Notice Image" 
+                                                style="cursor: pointer; width:50px;height:50px">
+                                        </a>
+                                    {% else %}
+                                        No attachment available
+                                    {% endif %}
+                                </p>
+                            </li>
+                        {% endfor %}
+                    </ul>
                 </div>
             </div>
-          
         </div>
     </div>
+</div>
 
     <script>
         function closeNoticeBoard() {

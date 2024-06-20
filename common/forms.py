@@ -1,5 +1,5 @@
 from django import forms
-from.models import FuelPumpDatabase,PGRdatabase,Notice
+from.models import FuelPumpDatabase,PGRdatabase,Notice,PGTLdatabase
 
 from tickets.mp_list import REGION_CHOICES,ZONE_CHOICES,MP_CHOICES
 
@@ -39,8 +39,8 @@ class PGRForm(forms.ModelForm):
     class Meta:
         model = PGRdatabase
         fields = [
-            'region', 'zone', 'mp', 'name','PGR_type', 'PGR_category','phone', 'email',
-            'address','joining_date','reference_person_name','reference_person_phone', 'PGR_birth_certificate'
+            'region', 'zone', 'mp', 'name','PGR_category','phone', 'email',
+            'address','joining_date','pgtl','reference_person_name','reference_person_phone', 'PGR_birth_certificate'
         ]
 
     def clean(self):
@@ -62,6 +62,44 @@ class PGRForm(forms.ModelForm):
             instance.PGR_photo = take_picture
         elif upload_picture:
             instance.PGR_photo = upload_picture
+
+        if commit:
+            instance.save()
+
+        return instance
+    
+
+class PGTLForm(forms.ModelForm):
+    TakePicture = forms.ImageField(required=False, widget=forms.ClearableFileInput(attrs={'accept': 'image/*', 'capture': 'camera'})) 
+    UploadPicture = forms.ImageField(required=False,widget=forms.ClearableFileInput(attrs={'accept': 'image/*'}))  
+    joining_date = forms.DateField(label='joining_date', required=False, widget=forms.DateInput(attrs={'type': 'date'}))
+    
+    class Meta:
+        model = PGTLdatabase
+        fields = [
+            'region', 'zone', 'mp', 'name','phone', 'email',
+            'address','joining_date','reference_person_name','reference_person_phone', 'PGTL_birth_certificate'
+        ]
+
+    def clean(self):
+        cleaned_data = super().clean()
+        upload_picture = cleaned_data.get('UploadPicture')
+        take_picture = cleaned_data.get('TakePicture')
+
+        if upload_picture and take_picture:
+            raise forms.ValidationError("Please choose either Upload Picture or Take Picture, not both.")
+
+        return cleaned_data
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        upload_picture = self.cleaned_data.get('UploadPicture')
+        take_picture = self.cleaned_data.get('TakePicture')
+
+        if take_picture:
+            instance.PGTL_photo = take_picture
+        elif upload_picture:
+            instance.PGTL_photo = upload_picture
 
         if commit:
             instance.save()

@@ -45,7 +45,12 @@ class AddPGInfo(models.Model):
     PG_purchase_date = models.DateField(default=timezone.now)
     PG_hire_date = models.DateField(default=timezone.now)
     PG_supporting_documents = models.FileField(upload_to='PG_documents/', null=True, blank=True)
-    
+    deployment_choices=[
+        ('movable','movable'),
+        ('fixed','fixed')
+    ]
+    PG_deployment_type =models.CharField(max_length=100,choices=deployment_choices,null=True,blank=True) 
+    fixed_PG_site_code = models.CharField(max_length=100,null=True,blank=True)   
     
     created_at = models.DateField(default=timezone.now)
     updated_at = models.DateField(default=timezone.now)

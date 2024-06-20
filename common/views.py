@@ -13,8 +13,8 @@ from tickets.views import generate_unique_ticket_number
 
 from datetime import datetime,timedelta
 from.forms import PGRViewForm,ExcelUploadForm
-from.models import FuelPumpDatabase,PGRdatabase,Notice
-from.forms import viewFuelPumpForm,NoticeForm
+from.models import FuelPumpDatabase,PGRdatabase,Notice,PGTLdatabase
+from.forms import viewFuelPumpForm,NoticeForm,PGTLForm
 
 from dailyexpense.views import manager_level_required
 
@@ -118,6 +118,21 @@ def create_pgr(request):
     return render(request, 'common/create_pgr.html', {'form': form})
 
 
+def create_pgtl(request):
+    if request.method == 'POST':
+        form = PGTLForm(request.POST,request.FILES)
+        if form.is_valid():
+            pgtl_record = form.save(commit=False) 
+            pgtl_record.pgtl_id = generate_unique_ticket_number() 
+            pgtl_record.save()  
+            form.save()
+            messages.success(request, "Entries created successfully")
+            return redirect('common:view_pgr_database')  # Replace 'success_page' with the name of your success page
+    else:
+        form = PGTLForm()
+    return render(request, 'common/create_pgtl.html', {'form': form})
+
+
 
 def view_pgr_database(request):    
     form = PGRViewForm(request.GET or {'days': 20})
@@ -173,6 +188,18 @@ def update_pgr_database(request, pgr_id):
         form = PGRForm(instance=pgr_instance)
     return render(request, 'common/update_pgr_database.html', {'form': form, 'pgr_instance': pgr_instance})
 
+
+def update_pgtl_database(request, pgtl_id):
+    pgtl_instance = get_object_or_404(PGTLdatabase, id=pgtl_id)
+    if request.method == 'POST':
+        form = PGTLForm(request.POST, request.FILES, instance=pgtl_instance)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Entries updated successfully")
+            return redirect('common:view_pgr_database')  # Replace 'success_page' with the name of your success page
+    else:
+        form = PGTLForm(instance=pgtl_instance)
+    return render(request, 'common/update_pgtl_database.html', {'form': form, 'pgtl_instance': pgtl_instance})
 
 
 

@@ -81,8 +81,10 @@
 
                 <th class="text-center p-2">PG capacity</th>
                 <th class="text-center p-2"> PG supplier</th>
-                <th class="text-center p-2">PG purchase date</th>
+                <th class="text-center p-2"> PG deployment type</th>
+                <th class="text-center p-2"> PG deployed site code</th>
 
+                <th class="text-center p-2">PG purchase date</th>
                 <th class="text-center p-2"> PG hire date</th>
                 <th class="text-center p-2"> PG supporting documents</th>                
                 <th class="text-center p-2">Created at</th>
@@ -111,6 +113,14 @@
                 <td class="text-center p-2"style="white-space: nowrap;">{{ pg.PG_serial_number }}</td>
                 <td class="text-center p-2"style="white-space: nowrap;">{{ pg.PG_capacity }}</td>
                 <td class="text-center p-2"style="white-space: nowrap;">{{ pg.PG_supplier }}</td>
+
+                <td class="text-center p-2"style="white-space: nowrap;">{{ pg.PG_deployment_type }}</td>
+                {% if pg.PG_deployment_type == 'fixed'  %}
+                <td class="text-center p-2"style="white-space: nowrap;">{{ pg.fixed_PG_site_code }}</td>
+                {% else %}
+                <td class="text-center p-2"style="white-space: nowrap;">Movable</td>
+                {% endif %}
+
                 <td class="text-center p-2"style="white-space: nowrap;">{{ pg.PG_purchase_date }}</td>
                 <td class="text-center p-2"style="white-space: nowrap;">{{ pg.PG_hire_date }}</td>
                 <td class="text-center p-2"style="white-space: nowrap;">

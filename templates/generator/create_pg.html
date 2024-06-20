@@ -75,7 +75,13 @@
                        
                         <form method="post" enctype="multipart/form-data">
                             {% csrf_token %}
-                            {{ form.as_p }}
+
+                            {% for field in form %}
+                            <div class="form-group" style="padding:5px">   
+                                <label for="{{ field.id_for_label }}">{{ field.label }}</label>                          
+                                {{ field }}
+                            </div>
+                            {% endfor %}
                            
                             <div><button type="submit" class="btn btn-primary">Submit</button></div>
                         </form>
@@ -233,9 +239,29 @@
 
 
 
+
+        function toggleFields() {
+            var purposeValue = $('#id_PG_deployment_type').val();
+
+            if (purposeValue === 'fixed') {
+                $('#id_fixed_PG_site_code').closest('.form-group').show();
+            } else {
+                $('#id_fixed_PG_site_code').closest('.form-group').hide();
+            }          
+
+        }
+
+        toggleFields();
+        $('#id_PG_deployment_type').change(function() {
+            toggleFields();
+        });
+
+
+
 });          
 
 </script> 
+
 
 
 
