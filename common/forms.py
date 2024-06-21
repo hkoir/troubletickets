@@ -1,6 +1,5 @@
 from django import forms
 from.models import FuelPumpDatabase,PGRdatabase,Notice,PGTLdatabase
-
 from tickets.mp_list import REGION_CHOICES,ZONE_CHOICES,MP_CHOICES
 
 
@@ -129,6 +128,8 @@ class PGRViewForm(forms.Form):
     region = forms.ChoiceField(choices=REGION_CHOICES, required=False)
     zone = forms.ChoiceField(choices=ZONE_CHOICES, required=False)
     mp = forms.ChoiceField(choices=MP_CHOICES, required=False)
+
+
 
 class ExcelUploadForm(forms.Form):
     excel_file = forms.FileField()

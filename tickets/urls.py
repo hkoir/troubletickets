@@ -21,7 +21,6 @@ urlpatterns = [
      path('view_child_tickets_external/<int:parent_ticket_id>/', views.view_child_tickets_external, name='view_child_tickets_external'),
      path('update_child_ticket_data_external/', views.UpdateChildTicketDataExternal.as_view(), name='update_child_ticket_data_external'),
     
-
      path('view_tt_edotco/', views.view_tt_edotco, name='view_tt_edotco'),  
      path('update_ticket_edotco/<int:ticket_id>/', views.update_ticket_edotco, name='update_ticket_edotco'),
      path('delete_tt_edotco/<int:ticket_id>/', views.delete_ticket_edotco, name='delete_ticket_edotco'), 

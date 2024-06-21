@@ -49,3 +49,9 @@ def calculate_faulty_percentage(faulty_count, total_count):
 def subtract_with_multiplier(value, arg):
     return (value*2.4) - (arg * 2.4)
 
+
+
+
+@register.filter
+def get_item(dictionary, key):
+    return dictionary.get(key)

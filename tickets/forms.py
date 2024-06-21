@@ -1,11 +1,13 @@
 from django import forms
-from .models import eTicket,ChatMessage,ChildTicket
 from .mp_list import REGION_CHOICES,ZONE_CHOICES,MP_CHOICES
-from .models import ChildTicketExternal
 
-from generator.models import AddPGInfo
-from .models import eTicket,PGRdatabase
+from .models import eTicket,PGRdatabase, ChildTicketExternal
+from .models import eTicket,ChatMessage,ChildTicket
 from vehicle.models import AddVehicleInfo
+from common.models import PGTLdatabase
+from generator.models import AddPGInfo
+
+
 
 
 class ChatForm(forms.ModelForm):
@@ -23,14 +25,11 @@ class CreateTicketFormEdotco(forms.ModelForm):
         fields = ['region', 'zone', 'mp', 'site_id','customer_ticket_ref','customer_name']
    
  
-
-
 class CreateTicketFormEdotco2(forms.ModelForm):
     class Meta:
         model = eTicket
         fields = ['region', 'zone', 'mp', 'site_id', 'customer_ticket_ref', 'customer_name']
        
-
 
 
 class UpdateTicketFormEdotco(forms.ModelForm):
@@ -49,10 +48,13 @@ class UpdateTicketFormEdotco(forms.ModelForm):
     vehicle = forms.ModelChoiceField(queryset=AddVehicleInfo.objects.all(), required=False)
     pgnumber = forms.ModelChoiceField(queryset=AddPGInfo.objects.all(), required=False)
 
+    assigned_to = forms.ModelChoiceField(queryset=PGRdatabase.objects.all(), required=False)
+    
+
     class Meta:
         model = eTicket
         fields = [
-            'assigned_to','team_leader_name', 'vehicle','pgnumber', 'ticket_status'
+            'assigned_to','vehicle','pgnumber', 'ticket_status'
         ]
 
     def __init__(self, *args, **kwargs):
@@ -64,7 +66,6 @@ class UpdateTicketFormEdotco(forms.ModelForm):
             self.fields['internal_generator_stop_time'].widget = forms.HiddenInput()
 
      
-
 
 class CreateChildTicketForm(forms.ModelForm):
     parent_ticket_number = forms.CharField(max_length=50, label='Parent Ticket Number', required=True, widget=forms.TextInput(attrs={'readonly': 'readonly'}))   
@@ -98,6 +99,8 @@ class TicketStatusUpdateForm(forms.ModelForm):
         model =  eTicket
         fields = ['internal_ticket_number','ticket_status']      
       
+
+
 class DateFormEdotco(forms.ModelForm):
     report_date = forms.DateField(label='Report Date', widget=forms.DateInput(attrs={'type': 'date'}))
 

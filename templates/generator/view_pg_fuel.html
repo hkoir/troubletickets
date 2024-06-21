@@ -93,8 +93,13 @@
 
                 <td class="text-center p-2" style="white-space: nowrap;">{{ fuel.refill_date}}</td>
                 <td class="text-center p-2" style="white-space: nowrap;">{{ fuel.pgnumber.PGNumber }}</td>
-                <td class="text-center p-2"style="white-space: nowrap;">{{ fuel.refill_amount }}</td>                
-                <td class="text-center p-2" style="white-space: nowrap;">{{ fuel.fuel_rate}}</td>
+                <td class="text-center p-2"style="white-space: nowrap;">{{ fuel.refill_amount }}</td>  
+
+                {% if fuel.fuel_pump.fuel_unit_price %}
+                <td class="text-center p-2" style="white-space: nowrap;">{{ fuel.fuel_pump.fuel_unit_price}}</td>
+               {% else %}
+               <td class="text-center p-2" style="white-space: nowrap;">{{ fuel.fuel_rate}}</td>
+               {% endif %}
                 <td class="text-center p-2" style="white-space: nowrap;">{{ fuel.fuel_cost}}</td>
 
                 {% if fuel.fuel_pump %}

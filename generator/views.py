@@ -1,18 +1,12 @@
 from django.shortcuts import render
-import xlsxwriter
-import random
-import calendar
-import csv
-
+import xlsxwriter,random,calendar,csv
 from itertools import groupby
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse,JsonResponse
 from django.http import HttpResponseBadRequest
-
 from django.shortcuts import render, redirect,get_object_or_404
-from django.db.models import Sum, Avg,Count,Q,Case, When, IntegerField,F,Max,DurationField, DecimalField,FloatField
-from django.db.models import Value,ExpressionWrapper
+from django.db.models import Sum, Avg,Count,Q,Case, When, IntegerField,F,Max,DurationField, DecimalField,FloatField,Value,ExpressionWrapper
 from datetime import datetime, timedelta
 from django.utils import timezone
 from decimal import Decimal
@@ -20,16 +14,13 @@ from decimal import Decimal
 from tickets.forms import SummaryReportChartForm
 from tickets.models import eTicket
 from tickets .views import generate_unique_finance_requisition_number
-
 from vehicle.forms import vehicleSummaryReportForm
+from dailyexpense.models import DailyExpenseRequisition
 
-from .forms import AddPgForm,PGDatabaseViewForm,PGFuelRefillForm,UpdatePgStatusForm,UpdatePgDataBaseForm
-from.forms import PGFaultRecordForm,UpdatePGFaultRecordForm,PGNumberForm
+from .forms import AddPgForm,PGDatabaseViewForm,PGFuelRefillForm,UpdatePgStatusForm,UpdatePgDataBaseForm,PGFaultRecordForm,UpdatePGFaultRecordForm,PGNumberForm
 from .models import AddPGInfo,PGFuelRefill,PGFaultRecord
 
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from tickets.forms import SummaryReportChartForm
-from dailyexpense.models import DailyExpenseRequisition
 
 
 
@@ -64,8 +55,6 @@ def create_pg(request):
     return render(request, 'generator/create_pg.html', {'form': form, 'page_obj': page_obj})
 
 
-
-
 @login_required
 def update_pg_database(request, pg_PGNumber):
     pg_info= AddPGInfo.objects.get(id=pg_PGNumber)
@@ -96,8 +85,6 @@ def update_pg_status(request, pg_PGNumber):
         form = UpdatePgStatusForm(instance=pg_info, initial=initial_data)
        
     return render(request, 'generator/update_pg.html', {'form': form,'pg_info':pg_info})
-
-
 
 
 
@@ -154,8 +141,6 @@ def view_pg_info(request):
 
 
 
-
-
 @login_required
 def add_pg_fuel2(request):
     if request.method == 'POST':   
@@ -177,19 +162,18 @@ def add_pg_fuel(request):
     if request.method == 'POST':   
         form = PGFuelRefillForm(request.POST, request.FILES)
         if form.is_valid():
-            pg_number = form.cleaned_data.get('pgnumber')  # Assuming the form has a field for PG number
-            try:
-                pg_instance = AddPGInfo.objects.get(PGNumber=pg_number)
-                if pg_instance.PG_status == 'faulty':
+            pg_number = form.cleaned_data.get('pgnumber')  
+     
+            pg_instance = AddPGInfo.objects.get(PGNumber=pg_number)
+            if pg_instance.PG_status == 'faulty':
                     messages.error(request, f'Thiss is a faulty PG: {pg_number} and you can not refil faulty PG. If the PG is repaired then pls update PG database first and then try again')
-                else:
-                    form.instance.refill_requester = request.user
-                    form.instance.fuel_refill_code = generate_unique_finance_requisition_number()
-                    form.save()
-                    messages.success(request, f'Fuel refilled successfully for PG: {pg_number}')
-                    return redirect('generator:view_pg_fuel')
-            except AddPGInfo.DoesNotExist:
-                messages.error(request, f'PG: {pg_number} does not exist')
+            else:
+                form.instance.refill_requester = request.user
+                form.instance.fuel_refill_code = generate_unique_finance_requisition_number()
+                form.save()
+                messages.success(request, f'Fuel refilled successfully for PG: {pg_number}')
+                return redirect('generator:view_pg_fuel')
+       
     else:
         form = PGFuelRefillForm()
     return render(request, 'generator/add_pg_fuel.html', {'form': form})
@@ -285,7 +269,12 @@ def pg_summary_report(request):
             region = data.region
             zone = data.zone
 
-            # Handle missing AddPGInfo
+            if data.pgnumber:
+                PG_deployment_type = data.pgnumber.PG_deployment_type if data.pgnumber.PG_deployment_type else 'None'
+                PG_deployed_site_code = data.pgnumber.fixed_PG_site_code if data.pgnumber.fixed_PG_site_code else 'None'
+            else:
+                PG_deployment_type = 'None'
+                PG_deployed_site_code = 'None'
             try:
                 pgnumber = data.pgnumber
             except AddPGInfo.DoesNotExist:
@@ -302,8 +291,10 @@ def pg_summary_report(request):
                 pg_summary_reports[region][zone] = {}
             if pgnumber not in pg_summary_reports[region][zone]:
                 pg_summary_reports[region][zone][pgnumber] = {
+                    'PG_deploymeny_type':PG_deployment_type,
+                    'PG_deployed_site_code':PG_deployed_site_code,
                     'total_refill_amount': 0,
-                    'total_fuel_others_purchase': 0,
+                    'total_fuel_local_purchase': 0,
                     'total_fuel_cash_advance_taken': 0,
                     'total_fuel_cash_advance': 0,
                     'total_tt_handle': 0,
@@ -311,18 +302,23 @@ def pg_summary_report(request):
                     'total_fuel_cost': 0,
                     'fuel_consumed_per_tt': 0,
                     'fuel_consumed_per_run_hour': 0,
+                    'total_fuel_consumed':0,
+                    'fuel_balance':0,
+                    'total_refill_from_pump':0
                 }
 
             pgfuel_advance_from_daily_expense = pgfuel_advance_from_daily_expense.filter(pgnumber=pgnumber, purpose='pg_local_fuel_purchase')
             total_fuel_cash_advance_taken = pgfuel_advance_from_daily_expense.aggregate(total_fuel_cash_advance_taken=Sum('requisition_amount'))['total_fuel_cash_advance_taken'] or 0
+          
 
             related_refills = pg_fuel_refill.filter(pgnumber=data.pgnumber)
-
             total_refill_amount = related_refills.aggregate(total_refill_amount=Sum('refill_amount'))['total_refill_amount'] or 0
+                    
+            others_refills = related_refills.filter(refill_type='local_purchase')
+            total_fuel_local_purchase = others_refills.aggregate(total_fuel_local_purchase=Sum('refill_amount'))['total_fuel_local_purchase'] or 0
 
-            others_refills = related_refills.filter(fuel_supplier_name='Others')
-            total_fuel_others_purchase = others_refills.aggregate(total_refill_amount=Sum('refill_amount'))['total_refill_amount'] or 0
-
+            pump_refills = related_refills.filter(refill_type='pump')
+            total_refill_from_pump =  pump_refills.aggregate(total_refill_from_pump=Sum('refill_amount'))['total_refill_from_pump'] or 0
             total_fuel_cost = related_refills.aggregate(total_fuel_cost=Sum('fuel_cost'))['total_fuel_cost'] or 0
 
             total_tt_handle = tickets.filter(pgnumber=data.pgnumber).aggregate(total_tt_handle=Count('internal_ticket_number'))['total_tt_handle'] or 0
@@ -330,20 +326,27 @@ def pg_summary_report(request):
             total_run_hour_seconds = total_run_hour.total_seconds() if isinstance(total_run_hour, timedelta) else 0
             total_run_hour_hours = total_run_hour_seconds / 3600
             fuel_consumed_per_tt = total_fuel_cost / total_tt_handle
+            total_fuel_consumed =  Decimal(total_run_hour_hours) * Decimal(2.4)
 
             if total_run_hour_hours != 0:
                 fuel_consumed_per_run_hour = float(total_refill_amount) / float(total_run_hour_hours)
             else:
                 fuel_consumed_per_run_hour = 0
+            fuel_balance = total_refill_amount - total_fuel_consumed
 
             pg_summary_reports[region][zone][pgnumber]['total_refill_amount'] += total_refill_amount
-            pg_summary_reports[region][zone][pgnumber]['total_fuel_others_purchase'] += total_fuel_others_purchase
+            pg_summary_reports[region][zone][pgnumber]['total_fuel_local_purchase'] += total_fuel_local_purchase
+            pg_summary_reports[region][zone][pgnumber]['total_refill_from_pump'] += total_refill_from_pump
+            
             pg_summary_reports[region][zone][pgnumber]['total_fuel_cash_advance_taken'] += total_fuel_cash_advance_taken
             pg_summary_reports[region][zone][pgnumber]['total_fuel_cost'] += total_fuel_cost
+            pg_summary_reports[region][zone][pgnumber]['total_fuel_consumed'] += total_fuel_consumed
+            
             pg_summary_reports[region][zone][pgnumber]['total_tt_handle'] += total_tt_handle
             pg_summary_reports[region][zone][pgnumber]['total_run_hour'] += total_run_hour_hours
             pg_summary_reports[region][zone][pgnumber]['fuel_consumed_per_tt'] += fuel_consumed_per_tt
             pg_summary_reports[region][zone][pgnumber]['fuel_consumed_per_run_hour'] += fuel_consumed_per_run_hour
+            pg_summary_reports[region][zone][pgnumber]['fuel_balance'] += fuel_balance
 
     paginator = Paginator(list(pg_summary_reports.items()), 10)
     page_number = request.GET.get('page')
@@ -390,7 +393,6 @@ def faulty_pg_report(request):
         )
     )
     
-
     zonewise_data = []
     for entry in zonewise_report:
         region = entry['region']
@@ -404,8 +406,7 @@ def faulty_pg_report(request):
             'faulty_count': entry['faulty_count'],
             'faulty_percentage': faulty_percentage,
         })
-  
-       
+        
     report = AddPGInfo.objects.values('PG_supplier', 'region', 'zone', 'mp').annotate(
         total_count=Count('id'),
         good_count=Count('id', filter=Q(PG_status='good')),
@@ -441,13 +442,11 @@ def faulty_pg_report(request):
 @login_required
 def create_pg_fault_record(request):
     if request.method == 'POST':
-        print("POST data:", request.POST)  # Debug print
         form = PGFaultRecordForm(request.POST)
         if form.is_valid():
             pg_fault_record = form.save(commit=False)
             pg_fault_record.pg_fault_code = generate_unique_finance_requisition_number()
             pg_fault_record.save()
-
             pg_info = pg_fault_record.pgnumber
             if pg_info.PG_status != 'faulty':
                 pg_info.PG_status = 'faulty'
@@ -456,8 +455,7 @@ def create_pg_fault_record(request):
         else:
             print("Form is not valid:", form.errors)  # Debug print
     else:
-        form = PGFaultRecordForm()
-    
+        form = PGFaultRecordForm()    
     return render(request, 'generator/pg_fault_record.html', {'form': form})
 
 
@@ -540,8 +538,6 @@ def view_pg_details_fault(request):
         form = PGNumberForm()
 
     return render(request, 'generator/pg_fault_record_details.html', {'form': form, 'pg_details': pg_details})
-
-
 
 
 def pg_management(request):

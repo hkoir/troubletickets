@@ -1,10 +1,6 @@
 from django import forms
 from.models import AddPGInfo,PGFaultRecord,PGFuelRefill
-
 from tickets.mp_list import REGION_CHOICES,ZONE_CHOICES,MP_CHOICES
-
-
-
 
 
 class AddPgForm(forms.ModelForm):
@@ -14,7 +10,6 @@ class AddPgForm(forms.ModelForm):
         model = AddPGInfo
         exclude = ['PG_add_requester','created_at','PG_code','updated_at'] 
  
-
 
 class UpdatePgDataBaseForm(forms.ModelForm):
     PG_purchase_date = forms.DateField(label='PG_purchase_date', required=False, widget=forms.DateInput(attrs={'type': 'date'}))
@@ -31,7 +26,6 @@ class UpdatePgStatusForm(forms.ModelForm):
  
 
 
-
 class PGDatabaseViewForm(forms.Form):   
     region = forms.ChoiceField(choices=REGION_CHOICES, required=False)
     zone = forms.ChoiceField(choices=ZONE_CHOICES, required=False)
@@ -39,9 +33,6 @@ class PGDatabaseViewForm(forms.Form):
     PGNumber = forms.CharField(required=False)
    
    
-
-
-
 class PGFuelRefillForm(forms.ModelForm):
     refill_date = forms.DateField(label='PG refil date', required=False, widget=forms.DateInput(attrs={'type': 'date'}))
     pgnumber = forms.ModelChoiceField(queryset=AddPGInfo.objects.all(), required=False, label='PG Number', widget=forms.Select(attrs={'class': 'form-control'}))
@@ -55,8 +46,6 @@ class PGFuelRefillForm(forms.ModelForm):
         if not refill_date:
             raise forms.ValidationError("Refill date is required.")
         return refill_date
-
-
 
 
 
@@ -97,8 +86,6 @@ class UpdatePGFaultRecordForm(forms.ModelForm):
         return refill_date
   
   
-
-
 class PGNumberForm(forms.Form):
     pg_number = forms.CharField(label='PG Number', max_length=50)
 

@@ -1,18 +1,14 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
-from datetime import timedelta
-
-from decimal import Decimal, ROUND_DOWN
-
-from django.db.models import Max,Min,Sum
-
-from decimal import Decimal
 from datetime import datetime, timedelta
+from decimal import Decimal, ROUND_DOWN
+from django.db.models import Max,Min,Sum
+from decimal import Decimal
+
 from vehicle.models import AddVehicleInfo
 from generator.models import AddPGInfo
 from generator.models import PGFuelRefill
-
 from common.models import PGRdatabase
 from tickets.mp_list import REGION_CHOICES,ZONE_CHOICES,MP_CHOICES
 
@@ -23,14 +19,11 @@ def get_current_time():
 
 
 
-
 class ChatMessage(models.Model):
     ticket_id = models.CharField(max_length=100)
     sender = models.CharField(max_length=100)
     message = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
-
-
 
 
 
@@ -121,7 +114,6 @@ class ChildTicket(models.Model):
    
     child_tt_image = models.ImageField(upload_to='child_tt_image/', blank=True, null=True)
 
-
     child_external_generator_start_date = models.DateField(null=True, blank=True, default=timezone.now)
     child_external_generator_start_time = models.TimeField(null=True, blank=True)
     child_external_generator_stop_date = models.DateField(null=True, blank=True, default=timezone.now)
@@ -129,7 +121,6 @@ class ChildTicket(models.Model):
    
     child_external_generator_running_hours = models.DurationField(null=True, blank=True)
     child_external_calculated_fuel_litre = models.DecimalField(null=True, blank=True, max_digits=10, decimal_places=2)
-
 
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -147,7 +138,6 @@ class ChildTicket(models.Model):
             self.child_internal_calculated_fuel_litre = calculated_fuel
         else:
             self.child_internal_calculated_fuel_litre = Decimal(0)
-
         
 
         if (self.child_external_generator_start_date and self.child_external_generator_stop_date and
@@ -178,7 +168,6 @@ class ChildTicket(models.Model):
         total_calculated_fuel_internal = parent_ticket.child_tickets.aggregate(total_fuel=Sum('child_internal_calculated_fuel_litre'))['total_fuel']
         parent_ticket.internal_calculated_fuel_litre = total_calculated_fuel_internal
         parent_ticket.save(update_fields=['internal_calculated_fuel_litre'])
-
      
         total_running_hours_external = parent_ticket.child_tickets.aggregate(total_hours=Sum('child_external_generator_running_hours'))['total_hours']
         parent_ticket.customer_generator_running_hours = total_running_hours_external
@@ -187,7 +176,6 @@ class ChildTicket(models.Model):
         total_calculated_fuel_external = parent_ticket.child_tickets.aggregate(total_fuel=Sum('child_external_calculated_fuel_litre'))['total_fuel']
         parent_ticket.customer_calculated_fuel_litre = total_calculated_fuel_external
         parent_ticket.save(update_fields=['customer_calculated_fuel_litre'])
-
 
 
 

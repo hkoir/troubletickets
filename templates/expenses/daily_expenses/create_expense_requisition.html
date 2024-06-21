@@ -51,7 +51,7 @@
                 <div class="card form-group" style="background-color: bisque; padding:10px;">
                     <div class="card-body">
                         <h4 class="card-title" style="margin-bottom:20px">Field Force Expense Req.Form</h4>
-                        <form method="post" enctype="multipart/form-data" id="expense-requisition-form">
+                        <form method="post" enctype="multipart/form-data" action="{% url 'dailyexpense:create_expense_requisition' %}" id="expense-requisition-form">
                             {% csrf_token %}
                             {% for field in form %}
                                 <div class="form-group" style="padding:5px">

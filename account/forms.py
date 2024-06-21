@@ -45,11 +45,20 @@ class UserLoginForm(AuthenticationForm):
     ))
 
 
-
+from employee.models import EmployeeModel
 
 class RegistrationForm(forms.ModelForm):
     name = forms.CharField(
         label='Enter Username', min_length=4, max_length=50, help_text='Required')
+    
+    employee = forms.ModelChoiceField(
+        queryset=EmployeeModel.objects.all(),
+        label='Employee',
+        required=False,
+        empty_label="Select Employee"
+    )
+    
+    
     email = forms.EmailField(max_length=100, help_text='Required', error_messages={
         'required': 'Sorry, you will need an email'})
   
@@ -61,7 +70,7 @@ class RegistrationForm(forms.ModelForm):
 
     class Meta:
         model = Customer
-        fields = ('name', 'email', 'profile_picture')
+        fields = ('name', 'email', 'profile_picture','employee')
    
 
 

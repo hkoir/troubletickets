@@ -28,19 +28,15 @@
 <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-timepicker/0.5.2/css/bootstrap-timepicker.min.css" rel="stylesheet">
 
     
-
-
-    
-    </head>
-    
-    <body>
+  
+ 
         <!-- Your HTML content here -->
     
         <!-- Bootstrap Datepicker JavaScript -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
         <!-- Bootstrap Timepicker JavaScript -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-timepicker/0.5.2/js/bootstrap-timepicker.min.js"></script>
-    </body>
+  
     
 
 
@@ -202,6 +198,7 @@ html, body {
                         <ul class="dropdown-menu" aria-labelledby="navbarDropdown" style="max-height: 400px; overflow-y: auto;">
                             {% if user.is_authenticated %}                                      
                             <li><a  class="dropdown-item" href="{% url "account:logout" %}" style="text-decoration: none;">Logout</a></li>  
+                            <li><a  class="dropdown-item" href="{% url "account:dashboard" %}" style="text-decoration: none;">Your account</a></li> 
                             <li><a  class="dropdown-item" href="{% url "account:pwdreset" %}" style="text-decoration: none;">Change Password</a></li>                                                    
                                 {% else %}
                             <li><a  class="dropdown-item" href="{% url "account:login" %}" style="text-decoration: none;">Login</a></li>

@@ -6,15 +6,14 @@ from itertools import groupby
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect,get_object_or_404
-from django.db.models import Sum, Avg,Count,Q,Case, When, IntegerField,F,Max,DurationField, DecimalField
+from django.db.models import Sum, Avg,Count,Q,Case, When, IntegerField,F,Max,DurationField, DecimalField,Prefetch,ExpressionWrapper, DecimalField
 import random,json,uuid,base64,csv
 
-from django.db.models import Prefetch
 from .serializers import eTicketSerializer
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import api_view
-from django.shortcuts import get_object_or_404
+
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 from django.views.decorators.csrf import csrf_exempt
@@ -22,17 +21,18 @@ from django.utils.decorators import method_decorator
 from django.views import View
 
 from .models import eTicket,ChatMessage,ChildTicket,ChildTicketExternal,PGRdatabase
-from employee.models import EmployeeModel
-from generator.models import AddPGInfo
 from .forms import CreateTicketFormEdotco,UpdateTicketFormEdotco,ChatForm,SummaryReportForm,MPReportForm,ZoneReportForm,UpdateTicketFormEdotco
 from .forms import SummaryReportFormHourly,SummaryReportChartForm,CreateChildTicketForm,TicketStatusUpdateForm
 
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from employee.models import EmployeeModel
+from generator.models import AddPGInfo
 from account.models import AudioModel
+
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction, IntegrityError
-from django.contrib.auth.decorators import login_required
-from django.db.models import Sum, ExpressionWrapper, DecimalField
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+
+
 
 
 @login_required
@@ -54,9 +54,9 @@ def search_all(request):
         Q(ticket_status__icontains=query)
     )
     
-    child_tickets = ChildTicket.objects.none()  # Initialize with an empty queryset
+    child_tickets = ChildTicket.objects.none()  
 
-    if etickets.exists():  # Check if any parent tickets were found
+    if etickets.exists():
         child_tickets = ChildTicket.objects.filter(parent_ticket__in=etickets)
    
     employees = EmployeeModel.objects.filter(
@@ -76,7 +76,6 @@ def search_all(request):
     })
 
 
-
 def generate_unique_ticket_number():   
     random_number = random.randint(100000, 999999)  
     ticket_number = f'{timezone.now().strftime("%Y%m%d%H%M%S")}{random_number}'
@@ -87,20 +86,16 @@ def generate_unique_finance_requisition_number2():
     ticket_number = f'{timezone.now().strftime("%Y%m%d%H%M%S")}{random_number}'
     return ticket_number
 
-
 def generate_unique_finance_requisition_number3():
     random_number = random.randint(100000, 999999)
     ticket_number = f'{timezone.now().strftime("%Y%m%d%H%M%S")}{random_number}'
     return str(ticket_number)
-
 
 def generate_unique_finance_requisition_number():
     random_number = str(random.randint(100000, 999999))
     timestamp = timezone.now().strftime("%Y%m%d%H%M%S")
     ticket_number = f'{timestamp}{random_number}'
     return ticket_number
-
-
 
 
 @login_required
@@ -118,6 +113,8 @@ def create_ticket_edotco2(request):
         form = CreateTicketFormEdotco()
     return render(request, 'tickets/edotco/create_tt.html', {'form': form})
 
+
+
 @login_required
 def create_ticket_edotco(request):
     if request.method == 'POST':
@@ -132,18 +129,15 @@ def create_ticket_edotco(request):
             messages.error(request, "Something went wrong. Please check the form and try again.")
     else:
         form = CreateTicketFormEdotco()
-
     return render(request, 'tickets/edotco/create_tt.html', {'form': form})
 
 @login_required
 def update_ticket_edotco(request, ticket_id):
-    ticket = get_object_or_404(eTicket, id=ticket_id)
-    
+    ticket = get_object_or_404(eTicket, id=ticket_id)    
     if request.user.is_authenticated:
         user_role = request.user.manager_level
     else:
-        return redirect('account:login')
-    
+        return redirect('account:login')    
     if request.method == 'POST':
         form = UpdateTicketFormEdotco(request.POST, instance=ticket, user_role=user_role)
         
@@ -174,9 +168,7 @@ def update_ticket_edotco(request, ticket_id):
              messages.error(request, " Something went wrong. Please try again carefully")
     else:
         form = UpdateTicketFormEdotco(instance=ticket, user_role=user_role)
-    
     return render(request, 'tickets/edotco/update_tt.html', {'form': form})
-
 
 
 @login_required
@@ -192,8 +184,6 @@ def delete_ticket_edotco(request, ticket_id):
             return redirect('tickets:view_tt_edotco')
 
     return render(request, 'tickets/edotco/delete_record.html', {'ticket': ticket})
-
-
 
 
 @login_required
@@ -215,8 +205,6 @@ def parent_ticket_status_update(request,ticket_id):
 
    
 
-
-
 @login_required
 def chat(request, ticket_id):
     ticket = get_object_or_404(eTicket, pk=ticket_id)
@@ -234,8 +222,6 @@ def chat(request, ticket_id):
         form = ChatForm()
     messages = ChatMessage.objects.filter(ticket_id=ticket_id).order_by('timestamp')
     return render(request, 'tickets/edotco/tchat.html', {'ticket': ticket, 'messages': messages, 'form': form})
-
-
 
 
 ############### Child ticket start #################################################################
@@ -258,10 +244,8 @@ def create_child_ticket(request, parent_ticket_id):
                 ticket.child_tt_image = form.cleaned_data['UploadPicture']
             elif form.cleaned_data['TakePicture']:
                 ticket.child_tt_image = form.cleaned_data['TakePicture']
-
             ticket.child_ticket_number = generate_unique_ticket_number()
             ticket.save()
-
             # Update the parent ticket's status
             parent_ticket.ticket_status = form.cleaned_data.get('ticket_status', parent_ticket.ticket_status)
             parent_ticket.save()
@@ -278,8 +262,6 @@ def create_child_ticket(request, parent_ticket_id):
 
 
 
-
-
 @login_required
 def view_child_tickets(request, parent_ticket_id):
     parent_ticket = get_object_or_404(eTicket, pk=parent_ticket_id)  
@@ -288,8 +270,7 @@ def view_child_tickets(request, parent_ticket_id):
     return render(request, 'tickets/edotco/view_child_tickets_single.html', {'parent_ticket': parent_ticket, 'child_tickets': child_tickets})
 
 
-# ajax view to update for PG stop
-
+################## ajax view to update for PG stop################################
 @method_decorator(csrf_exempt, name='dispatch')
 class UpdateChildTicketData(View):
     def post(self, request):
@@ -322,7 +303,6 @@ class UpdateChildTicketData(View):
         except Exception as e:
             print(f'Error: {e}')  # Debugging
             return JsonResponse({'error': str(e)}, status=400)
-
 
 
 
@@ -446,9 +426,7 @@ def view_all_parent_tickets_with_children(request):
 
 
 
-
 ############## child Ticket external start ##############################
-
 @login_required
 def view_child_tickets_external(request, parent_ticket_id):
     parent_ticket = get_object_or_404(eTicket, pk=parent_ticket_id)  
@@ -500,11 +478,7 @@ def view_all_parent_tickets_with_children_external(request):
 
 
 
-
-
 ############# parent ticket reporting view start from here ##################################################
-
-
 @login_required
 def view_tt_edotco(request):
     days = None
@@ -516,6 +490,14 @@ def view_tt_edotco(request):
     
     form = SummaryReportChartForm(request.GET or {'days': 20})
     tickets = eTicket.objects.all().order_by('-created_at')
+
+    user = request.user
+    user_name = None  # Initialize user_name with a default value
+    if user.employee:
+        user_name = user.employee.name
+        print(user_name)
+    else:
+        print("User does not have an associated employee.")
     
     if form.is_valid():
         start_date = form.cleaned_data.get('start_date')
@@ -554,7 +536,6 @@ def view_tt_edotco(request):
     except EmptyPage:
         page_obj = paginator.page(paginator.num_pages)
 
-    # Calculate ticket statistics
     total_valid_ticket = sum(1 for ticket in page_obj if ticket.ticket_status == 'TT_Valid')
     total_invalid_ticket = sum(1 for ticket in page_obj if ticket.ticket_status == 'TT_invalid')
     total_missed_ticket = sum(1 for ticket in page_obj if ticket.ticket_status == 'TT_Miss')
@@ -569,7 +550,6 @@ def view_tt_edotco(request):
         total_connected_ticket + total_assigned_ticket
     )
 
-    # Handle CSV download
     if 'download_csv' in request.GET:
         response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = 'attachment; filename="view_ticket.csv"'
@@ -832,8 +812,6 @@ def summary_report_view_hourly(request):
 
 
 
-
-
 @login_required
 def zone_report_view(request):
     days = None
@@ -866,7 +844,6 @@ def zone_report_view(request):
             fuel_difference = (internal_hours * 2.4) - (customer_hours * 2.4)
             ticket.fuel_difference = fuel_difference
 
-
       
     # Pagination logic
     page_obj = None
@@ -894,11 +871,8 @@ def zone_report_view(request):
 
 
 
-
-
 @login_required
-def mp_report_view(request):
-    # Initialize form with default 20 days if no data is submitted
+def mp_report_view(request): 
     form = MPReportForm(request.GET or {'days': 20})
     etickets = []
     mp = None
@@ -911,7 +885,7 @@ def mp_report_view(request):
         days = form.cleaned_data.get('days')
         start_date = form.cleaned_data.get('start_date')
         end_date = form.cleaned_data.get('end_date')
-
+        
         query = eTicket.objects.filter(mp=mp)
 
         if days is not None:
@@ -924,7 +898,6 @@ def mp_report_view(request):
                 etickets = []
 
         etickets = list(query)
-
         for ticket in etickets:
             internal_hours = ticket.internal_generator_running_hours.total_seconds() / 3600 if ticket.internal_generator_running_hours else 0
             customer_hours = ticket.customer_generator_running_hours.total_seconds() / 3600 if ticket.customer_generator_running_hours else 0
@@ -943,10 +916,6 @@ def mp_report_view(request):
 
 
 
-
-
-
-
 @login_required
 def aggregated_tt_run_hour_trend_summary(request):
     form = SummaryReportChartForm(request.GET or {'days': 7})  
@@ -959,18 +928,15 @@ def aggregated_tt_run_hour_trend_summary(request):
 
     if form.is_valid():
         cleaned_data = form.cleaned_data        
-
         start_date = cleaned_data.get('start_date')
         end_date = cleaned_data.get('end_date')
         days = cleaned_data.get('days')        
-
         if start_date and end_date:
             query = query.filter(created_at__range=(start_date, end_date))
         elif days:
             end_date = datetime.today()
             start_date = end_date - timedelta(days=days)
-            query = query.filter(created_at__range=(start_date, end_date))        
-
+            query = query.filter(created_at__range=(start_date, end_date))       
         data_list = list(query)        
 
         for item in data_list:
@@ -983,36 +949,30 @@ def aggregated_tt_run_hour_trend_summary(request):
                 elif isinstance(item['run_hours'], timedelta):
                     item['run_hours'] = item['run_hours'].total_seconds() / 3600
                 else:
-                    item['run_hours'] = float(item['run_hours'])                    
-
-            item['trouble_tickets'] = int(item.get('trouble_tickets', 0))            
-
+                    item['run_hours'] = float(item['run_hours'])                  
+            item['trouble_tickets'] = int(item.get('trouble_tickets', 0))           
             if item['trouble_tickets'] > 0:
                 item['avg_run_hour_per_tt'] = item['run_hours'] / item['trouble_tickets']
             else:
 
-                item['avg_run_hour_per_tt'] = 0        
+                item['avg_run_hour_per_tt'] = 0       
 
         json_data = json.dumps(data_list)
-        form=SummaryReportChartForm()        
-
+        form=SummaryReportChartForm()      
         context = {
             'json_data': json_data,
             'form': form,  
             'days':days,
             'start_date':start_date,
             'end_date':end_date
-        }
-             
+        }             
     
-        return render(request, 'tickets/edotco/tt_trend_summary.html', context)
-    
+        return render(request, 'tickets/edotco/tt_trend_summary.html', context)    
     else:
         context = {
             'form': form,
         }
-        form=SummaryReportChartForm()
-       
+        form=SummaryReportChartForm()       
         return render(request, 'tickets/edotco/tt_trend_summary.html', context)
 
 
@@ -1020,7 +980,6 @@ def aggregated_tt_run_hour_trend_summary(request):
 @login_required
 def aggregated_tt_run_hour_trend(request):
     form = SummaryReportChartForm(request.GET or {'days': 20})
-
     query = eTicket.objects.values('zone', 'created_at') \
         .annotate(
         trouble_tickets=Count('internal_ticket_number'),
@@ -1029,11 +988,9 @@ def aggregated_tt_run_hour_trend(request):
 
     if form.is_valid():
         cleaned_data = form.cleaned_data
-
         start_date = cleaned_data.get('start_date')
         end_date = cleaned_data.get('end_date')
         days = cleaned_data.get('days')
-
         if start_date and end_date:
             query = query.filter(created_at__range=(start_date, end_date))
         elif days:
@@ -1042,7 +999,6 @@ def aggregated_tt_run_hour_trend(request):
             query = query.filter(created_at__range=(start_date, end_date))
 
         data_list = list(query)
-
         for item in data_list:
             if 'created_at' in item:
                 item['created_at'] = item['created_at'].strftime('%Y-%m-%d')
@@ -1063,7 +1019,6 @@ def aggregated_tt_run_hour_trend(request):
                 item['avg_run_hour_per_tt'] = 0        
 
         json_data = json.dumps(data_list)
-
         cleared_form = SummaryReportChartForm()
 
         context = {
@@ -1119,11 +1074,9 @@ def individual_tt_run_hour_trend(request):
             query = query.filter(mp=mp)
 
         data_list = list(query)
-
         for item in data_list:
             if 'created_at' in item:
                 item['created_at'] = item['created_at'].strftime('%Y-%m-%d')
-
             if 'run_hours' in item:
                 if item['run_hours'] is None:
                     item['run_hours'] = 0
@@ -1140,9 +1093,7 @@ def individual_tt_run_hour_trend(request):
                 item['avg_run_hour_per_tt'] = 0
 
         json_data = json.dumps(data_list)
-
         cleared_form = SummaryReportChartForm()
-
         context = {
             'json_data': json_data,
             'form': cleared_form,
@@ -1198,7 +1149,6 @@ def tt_management(request):
 
 ####################### API setting/views ##################################################
 
-
 @api_view(['GET', 'POST'])
 def eTickets_details_api2(request):
     if request.method == 'GET':
@@ -1242,8 +1192,6 @@ def eTicket_update_api(request, id):
 
 
 
-
-
 @api_view(['POST'])
 def create_child_ticket_api(request, parent_ticket_id):
     parent_ticket_id = request.data.get('parent_ticket_id')
@@ -1252,13 +1200,12 @@ def create_child_ticket_api(request, parent_ticket_id):
     child_tt_image = request.data.get('child_tt_image')
 
     file_path = None
-
     
     try:
         child_internal_generator_start_time = datetime.strptime(child_internal_generator_start_time_str, '%H:%M %p').time()
         child_internal_generator_stop_time = datetime.strptime(child_internal_generator_stop_time_str, '%H:%M %p').time()
         if child_tt_image:
-            unique_filename = str(uuid.uuid4())  # Generate a unique UUID for the file name
+            unique_filename = str(uuid.uuid4()) 
             file_name = 'child_tt_image/' + unique_filename
             file_path = default_storage.save(file_name, ContentFile(base64.b64decode(child_tt_image)))
 
@@ -1266,7 +1213,6 @@ def create_child_ticket_api(request, parent_ticket_id):
         return Response({'error': 'Invalid time format'}, status=status.HTTP_400_BAD_REQUEST)
 
     parent_ticket = get_object_or_404(eTicket, id=parent_ticket_id)
-
     if request.method == 'POST':
         child_ticket = ChildTicket(
             parent_ticket=parent_ticket,
@@ -1313,10 +1259,8 @@ def datewise_summary_edotco(request):
         summary_data[date][zone]['total_internal_hours'] += internal_hours
         zones.add(zone)
 
-    # Sort the zones for consistent header order
     sorted_zones = sorted(zones)
 
-    # Create a structured data list for the template
     structured_data = []
     for date, zone_counts in summary_data.items():
         row = {'date': date}
@@ -1324,7 +1268,6 @@ def datewise_summary_edotco(request):
             row[zone] = zone_counts.get(zone, {'total_tt': 0, 'total_internal_hours': 0})
         structured_data.append(row)
 
-    # Sort the structured data by date
     structured_data.sort(key=lambda x: x['date'])
 
     return render(request, 'tickets/edotco/date_wise_summary_edotco.html', {

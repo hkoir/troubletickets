@@ -55,12 +55,7 @@
     </div>
 </div>
 
-
-
-
 <div class="col" style="height:1200px"></div>
-
-
 
 
 
@@ -68,7 +63,7 @@
 
 <script>
     $(document).ready(function() {
-        $('#id_pgnumber,#id_fuel_pump').select2({
+        $('#id_pgnumber, #id_fuel_pump').select2({
             width: '100%', 
             ajax: {
                 url: "{% url 'dailyexpense:common_search' %}",
@@ -91,24 +86,27 @@
             allowClear: true
         });
 
-
         function toggleFields() {
             var refillType = $('#id_refill_type').val();
+            console.log('Refill Type Selected:', refillType); // Debugging line
+
             if (refillType === 'pump') {
                 $('#id_fuel_pump').closest('.form-group').show();
-                $('#id_fuel_supplier_name,#id_fuel_supplier_phone,#id_fuel_supplier_address,#id_fuel_rate').closest('.form-group').hide();
+                $('#id_fuel_supplier_name, #id_fuel_supplier_phone, #id_fuel_supplier_address, #id_fuel_rate').closest('.form-group').hide();
             } else if (refillType === 'local_purchase') {
                 $('#id_fuel_pump').closest('.form-group').hide();
-                $('#id_fuel_supplier_name,#id_fuel_supplier_phone,#id_fuel_supplier_address,#id_fuel_rate').closest('.form-group').show();
+                $('#id_fuel_supplier_name, #id_fuel_supplier_phone, #id_fuel_supplier_address, #id_fuel_rate').closest('.form-group').show();
+            } else {
+                $('#id_fuel_pump, #id_fuel_supplier_name, #id_fuel_supplier_phone, #id_fuel_supplier_address, #id_fuel_rate').closest('.form-group').hide();
             }
+
+            console.log('Fields Toggled'); // Debugging line
         }
         
         toggleFields();
         $('#id_refill_type').change(function() {
             toggleFields();
         });
-
-
     });
 </script>
 

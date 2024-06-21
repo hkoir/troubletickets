@@ -180,7 +180,7 @@
                             <th class="text-center p-2">Team Leader</th>                     
                             <th class="text-center p-2">Assigned PGR Name</th>
                             <th class="text-center p-2">Assigned PGR type</th>
-                            <th class="text-center p-2">Assigned PGR category</th>
+                         
 
                             <th class="text-center p-2">Assigned Vehicle Type</th>
 
@@ -239,11 +239,11 @@
 
                            
                             <td class="text-center" style="font-size: 14px; white-space: nowrap;color:black">{{ ticket.ticket_status }}</td>
-                            <td class="text-center" style="font-size: 14px; white-space: nowrap;color:black">{{ ticket.team_leader_name }}</td>
+                            <td class="text-center" style="font-size: 14px; white-space: nowrap;color:black">{{ ticket.assigned_to.pgtl.name }}</td>
                                                                                                       
                             <td class="text-center" style="font-size: 14px; white-space: nowrap;color:black">{{ ticket.assigned_to }}</td>
-                            <td class="text-center" style="font-size: 14px; white-space: nowrap;color:black">{{ ticket.assigned_to.PGR_type }}</td> 
                             <td class="text-center" style="font-size: 14px; white-space: nowrap;color:black">{{ ticket.assigned_to.PGR_category }}</td> 
+
                             <td class="text-center" style="font-size: 14px; white-space: nowrap;color:black">{{ ticket.vehicle.vehicle_rental_type  }}</td>
 
 

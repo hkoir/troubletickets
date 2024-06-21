@@ -83,6 +83,10 @@
                     <tr>
                         <th class="text-center p-2">Total requisition Amount</th>
                         <th class="text-center p-2">Total approved amount</th>
+
+                        <th class="text-center p-2">Total PG local fuel purchase</th>
+                        <th class="text-center p-2">Total Vehicle local fuel purchase</th>
+
                         <th class="text-center p-2">Total local conveyance</th>
                         <th class="text-center p-2">Total PG carrying cost</th>
                         <th class="text-center p-2">Total food bill</th>
@@ -96,6 +100,10 @@
                 <tr>
                     <td class="text-center p-2">{{ total_requisition_amount_count}}</td>
                     <td class="text-center p-2">{{ total_approved_amount_count}}</td>
+
+                    <td class="text-center p-2">{{ pg_local_fuel_purchase }}</td>
+                    <td class="text-center p-2">{{ vehicle_local_fuel_purchase }}</td>
+
                     <td class="text-center p-2">{{ local_conveyance_amount }}</td>
                     <td class="text-center p-2">{{pg_carrying_cost_amount }}</td>
                     <td class="text-center p-2">{{ food_amount}}</td>
@@ -117,6 +125,11 @@
             <th class="text-center p-2">MP</th>
             <th class="text-center p-2">Total Requisition Amount</th>
             <th class="text-center p-2">Total Approved Amount</th>
+
+            <th class="text-center p-2">Total PG local fuel purchase</th>
+            <th class="text-center p-2">Total Vehicle local fuel purchase</th>
+
+
             <th class="text-center p-2" >Local Conveyance Amount</th>
             <th class="text-center p-2">PG Carrying Cost Amount</th>
             <th class="text-center p-2">Toll Amount</th>
@@ -132,6 +145,10 @@
             <td class="text-center p-2">{{ entry.mp }}</td>
             <td class="text-center p-2" >{{ entry.total_requisition_amount }}</td>
             <td class="text-center p-2">{{ entry.total_approved_amount }}</td>
+           
+            <td class="text-center p-2">{{ entry.pg_local_fuel_purchase }}</td>
+            <td class="text-center p-2">{{ entry.vehicle_local_fuel_purchase }}</td>
+
             <td class="text-center p-2">{{ entry.local_conveyance_amount }}</td>
             <td class="text-center p-2">{{ entry.pg_carrying_cost_amount }}</td>
             <td class="text-center p-2">{{ entry.toll_amount }}</td>

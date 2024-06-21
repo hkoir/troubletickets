@@ -3,10 +3,10 @@ from datetime import datetime
 from django.utils import timezone
 from datetime import timedelta
 from decimal import Decimal
-from account.models import Customer
+# from account.models import Customer
 from decimal import Decimal, ROUND_DOWN
 
-from tickets.models import PGRdatabase
+from common.models import PGRdatabase,PGTLdatabase
 
 from vehicle.models import AddVehicleInfo
 from generator.models import AddPGInfo
@@ -120,7 +120,7 @@ class EmployeeModel(models.Model):
 
 
     def __str__(self):
-        return f"{self.first_name} {self.last_name}"
+        return self.name
 
 
 
@@ -211,24 +211,15 @@ class Resource(models.Model):
         self.num_of_PGR = PGRdatabase.objects.filter(
             region=self.region,
             zone=self.zone,
-            mp=self.mp,
-            PGR_type='PGR'
+            mp=self.mp,         
         ).count()
 
-        self.num_of_adhoc_PGR = PGRdatabase.objects.filter(
-            region=self.region,
-            zone=self.zone,
-            mp=self.mp,
-            PGR_category='adhoc'
-        ).count()
-   
-
+         
         # Calculate num_of_PGTL based on PGRdatabase entries
-        self.num_of_PGTL = PGRdatabase.objects.filter(
+        self.num_of_PGTL = PGTLdatabase.objects.filter(
             region=self.region,
             zone=self.zone,
-            mp=self.mp,
-            PGR_type='PGTL'
+            mp=self.mp,          
         ).count()
     
 

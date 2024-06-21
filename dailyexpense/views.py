@@ -1,42 +1,33 @@
-import xlsxwriter
-import random
-import calendar
-import csv
-
+import xlsxwriter,csv,random,calendar
 from itertools import groupby
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse,JsonResponse
 from django.http import HttpResponseBadRequest
-
-from django.shortcuts import render, redirect,get_object_or_404
-from django.db.models import Sum, Avg,Count,Q,Case, When, IntegerField,F,Max,DurationField, DecimalField,FloatField
-from django.db.models import Value,ExpressionWrapper
 from datetime import datetime, timedelta
 from django.utils import timezone
 from decimal import Decimal
+from django.shortcuts import render, redirect,get_object_or_404
+from django.db.models import Sum, Avg,Count,Q,Case, When, IntegerField,F,Max,DurationField, DecimalField,FloatField
+from django.db.models import Value,ExpressionWrapper
 
-from tickets.forms import SummaryReportChartForm
-from tickets.models import eTicket,PGRdatabase
-from tickets .views import generate_unique_finance_requisition_number
-from vehicle.models import AddVehicleInfo
-from generator.models import AddPGInfo
 from .forms import ExpenseRequisitionForm,SummaryExpensesForm,ExpenseRequisitionStatusForm,MoneyRequisitionForm
 from .models import MoneyRequisition,SummaryExpenses,DailyExpenseRequisition,AdhocRequisition
+from .forms import ZoneWiseExpensesForm,AdhocRequisitionStatusForm,AdhocRequisitionForm,dailyExpenseSummaryForm
+
+from common.models import FuelPumpDatabase,PGTLdatabase
+from tickets.forms import SummaryReportChartForm
+from tickets.models import eTicket,PGRdatabase
+from tickets.views import generate_unique_finance_requisition_number
+from vehicle.models import AddVehicleInfo
+from generator.models import AddPGInfo
 
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from tickets.forms import SummaryReportChartForm
-from .forms import ZoneWiseExpensesForm,AdhocRequisitionStatusForm,AdhocRequisitionForm
-from common.models import FuelPumpDatabase
-from .forms import dailyExpenseSummaryForm
 
 
 
 def expense_advance_management(request):
     return render(request,'expenses/expense_advance_management.html')# for expense and advance management dashboard shortcut
-
-
-
 
 
 def common_search(request):
@@ -67,7 +58,14 @@ def common_search(request):
         Q(name__icontains=query)
     ).values('id', 'name')
 
+    pgtl_results = PGTLdatabase.objects.filter(
+        Q(name__icontains=query)
+    ).values('id', 'name')
+
+
     results = []
+
+   
 
     for et in eticket_results:
         if query in et['region'].lower():
@@ -97,6 +95,9 @@ def common_search(request):
 
     for pgr in pgr_results:
         results.append({'id': pgr['id'], 'text': pgr['name'], 'model': 'PGRdatabase'})
+        
+    for pgtl in pgtl_results:
+        results.append({'id': pgtl['id'], 'text': pgtl['name'], 'model': 'PGTLdatabase'})
 
     return JsonResponse({'results': results})
 
@@ -300,7 +301,6 @@ def download_money_requisition_data(request):
     for row, requisition in enumerate(requisitions, start=1):
         update_at_str = timezone.localtime(requisition.update_at).strftime('%Y-%m-%d %H:%M:%S')
       
-
         worksheet.write(row, 0, str(update_at_str))
         worksheet.write(row, 1, str(requisition.requisition_number))      
         worksheet.write(row, 2, str(requisition.requester))
@@ -425,7 +425,6 @@ def expense_approval_status(request):
         if mp:
             expense_requisitions =  expense_requisitions.filter(mp=mp)
 
-        # Calculate region-wise and zone-wise summaries
         region_approvals = expense_requisitions.values('region').annotate(
             total_requisition=Sum('requisition_amount'),
             total_approved=Sum('approved_amount'),
@@ -593,9 +592,6 @@ def download_expense_requisition_data(request):
 
 
 
-
-
-
 def daily_expense_summary(request):
     form = dailyExpenseSummaryForm(request.GET or {'days': 7})
     grouped_summary_data = []
@@ -628,7 +624,6 @@ def daily_expense_summary(request):
             start_date = end_date - timedelta(days=days)
             data = DailyExpenseRequisition.objects.filter(created_at__range=(start_date, end_date))
 
-        # Filter data based on region, zone, and mp if specified
         if data is not None:
             if region:
                 data = data.filter(region=region)
@@ -637,10 +632,26 @@ def daily_expense_summary(request):
             if mp:
                 data = data.filter(mp=mp)
 
-
+    ### aggregate as a whole expenditure ################################################
             data_grand = data.aggregate(
             total_requisition_amount=Sum('requisition_amount'),
-            total_approved_amount=Sum('approved_amount'),           
+            total_approved_amount=Sum('approved_amount'), 
+
+             pg_local_fuel_purchase=Sum(
+                    Case(
+                        When(purpose='pg_local_fuel_purchase', then=F('requisition_amount')),
+                        default=0,
+                        output_field=FloatField()
+                    )
+                ),
+
+                 vehicle_local_fuel_purchase=Sum(
+                    Case(
+                        When(purpose='vehicle_local_fuel_purchase', then=F('requisition_amount')),
+                        default=0,
+                        output_field=FloatField()
+                    )
+                ),          
             local_conveyance_amount=Sum(
                 Case(
                     When(purpose='local_conveyance', then=F('requisition_amount')),
@@ -684,15 +695,36 @@ def daily_expense_summary(request):
             total_requisition_amount_count = data_grand.get('total_requisition_amount', 0)
             total_approved_amount_count = data_grand.get('total_approved_amount', 0)
             local_conveyance_amount = data_grand.get('local_conveyance_amount', 0)
+
+            pg_local_fuel_purchase = data_grand.get('pg_local_fuel_purchase', 0),
+            vehicle_local_fuel_purchase = data_grand.get('vehicle_local_fuel_purchase', 0),
+
             pg_carrying_cost_amount = data_grand.get('pg_carrying_cost_amount', 0)
             toll_amount = data_grand.get('toll_amount', 0)
             night_bill_amount = data_grand.get('night_bill_amount', 0)
             food_amount = data_grand.get('food_amount', 0)
 
-            
+     ###### annotate for individual cost item as per region zone #################
+
             grouped_data = data.values('region', 'zone', 'mp').annotate(
                 total_requisition_amount=Sum('requisition_amount'),
                 total_approved_amount=Sum('approved_amount'),
+
+                pg_local_fuel_purchase=Sum(
+                    Case(
+                        When(purpose='pg_local_fuel_purchase', then=F('requisition_amount')),
+                        default=0,
+                        output_field=FloatField()
+                    )
+                ),
+
+                 vehicle_local_fuel_purchase=Sum(
+                    Case(
+                        When(purpose='vehicle_local_fuel_purchase', then=F('requisition_amount')),
+                        default=0,
+                        output_field=FloatField()
+                    )
+                ),
                 local_conveyance_amount=Sum(
                     Case(
                         When(purpose='local_conveyance', then=F('requisition_amount')),
@@ -738,6 +770,8 @@ def daily_expense_summary(request):
                 'mp': entry['mp'],
                 'total_requisition_amount': entry.get('total_requisition_amount', 0),
                 'total_approved_amount': entry.get('total_approved_amount', 0),
+                'pg_local_fuel_purchase': entry.get('pg_local_fuel_purchase', 0),
+                'vehicle_local_fuel_purchase': entry.get('vehicle_local_fuel_purchase', 0),
                 'local_conveyance_amount': entry.get('local_conveyance_amount', 0),
                 'pg_carrying_cost_amount': entry.get('pg_carrying_cost_amount', 0),
                 'toll_amount': entry.get('toll_amount', 0),
@@ -755,6 +789,8 @@ def daily_expense_summary(request):
         'grouped_summary_data': grouped_summary_data,
          'total_requisition_amount_count': total_requisition_amount_count,
         'total_approved_amount_count': total_approved_amount_count,
+        'pg_local_fuel_purchase': pg_local_fuel_purchase,
+        'vehicle_local_fuel_purchase': vehicle_local_fuel_purchase,
         'local_conveyance_amount': local_conveyance_amount,
         'pg_carrying_cost_amount': pg_carrying_cost_amount,
          'toll_amount':toll_amount,
@@ -987,7 +1023,6 @@ def daily_expense_summary2(request):
 
 ########### adhoc-man and adhoc vehicle requisition management#######################
 
-
 @login_required
 def create_adhoc_requisition(request):
     if request.method == 'POST':   
@@ -1038,7 +1073,6 @@ def adhoc_approval_status(request):
         if mp:
             expense_requisitions =  expense_requisitions.filter(mp=mp)
 
-        # Calculate region-wise and zone-wise summaries
         region_approvals = expense_requisitions.values('region').annotate(
             total_requisition=Sum('requisition_amount'),
             total_approved=Sum('approved_amount'),
@@ -1053,7 +1087,6 @@ def adhoc_approval_status(request):
 
 
 
-    # Pagination logic
     page_obj = None
     money_per_page = 2
     paginator = Paginator(expense_requisitions, money_per_page)
@@ -1108,8 +1141,7 @@ def adhoc_requisition_approval(request, adhoc_requisition_id):
             except ValueError:
                  messages.error(request, "Invalid approved amount")
                  return redirect('dailyexpense:expense_approval_status', adhoc_requisition_id=adhoc_requisition_id)
-            
-            
+                        
             adhoc_requisitions.approved_amount = approved_amount
             
             if required_level == 'first_level':

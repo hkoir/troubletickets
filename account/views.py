@@ -148,7 +148,7 @@ def add_address(request):
             address_form = address_form.save(commit=False)
             address_form.customer = request.user
             address_form.save()
-            return HttpResponseRedirect(reverse("payment:checkout"))
+            return HttpResponseRedirect(reverse("account:dashboard"))
     else:
         address_form = UserAddressForm()
     return render(request, "account/dashboard/edit_addresses.html", {"form": address_form})
@@ -206,9 +206,7 @@ def admin_view(request):
     User = get_user_model()
     user = User.objects.get(pk=user_id)
     user_name = user.name
-
    
-
     if not request.user.is_staff:     
         messages.error(request, "You are not authorized to view this page.")  
         return HttpResponseRedirect(reverse("login"))

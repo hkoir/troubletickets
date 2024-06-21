@@ -20,23 +20,19 @@ class AddPGInfo(models.Model):
     ]
     PG_brand = models.CharField(max_length=50, choices= PG_brand_choices,default='None')
     PG_serial_number = models.CharField(max_length=50,default='None')
-
     PG_capacity_choices=[
         ('5kva','5kva'),
         ('6kva','6kva'),
         ('8kva','8kva')
         ]
     PG_capacity = models.CharField(max_length=50,choices=PG_capacity_choices,default='None')
-
     PG_supplier_choices=[
         ('vendor1','vendor1'),
         ('vendor2','vendor2'),
         ('vendor3','vendor3'),
         ('own','own'),
     ]
-
-    PG_supplier=models.CharField(max_length=50,choices=PG_supplier_choices,default='None')
-    
+    PG_supplier=models.CharField(max_length=50,choices=PG_supplier_choices,default='None')    
     PG_status_choices =[
         ('good','good'),
         ('faulty','faulty')
@@ -59,9 +55,6 @@ class AddPGInfo(models.Model):
             return self.PGNumber
  
 
-
-
-
 class PGFuelRefill(models.Model):   
     region = models.CharField(max_length=100,choices=REGION_CHOICES,null=True, blank=True)
     zone = models.CharField(max_length=100,choices=ZONE_CHOICES,null=True, blank=True)
@@ -79,18 +72,14 @@ class PGFuelRefill(models.Model):
     fuel_type = models.CharField(max_length=100, choices=fuel_type_choices, null=True, blank=True, default='None')
 
     REFILL_CHOICES = [
-        ('pump', 'pump'),
-        ('local_purchase', 'Local Purchase')
-    ]
-    
+        ('pump','pump'),
+        ('local_purchase','local_purchase')
+    ]    
     refill_type = models.CharField(max_length=20, choices=REFILL_CHOICES, default='pump')
-    fuel_pump = models.ForeignKey(FuelPumpDatabase, related_name='pump_data_info', on_delete=models.CASCADE, default=None)
-   
+    fuel_pump = models.ForeignKey(FuelPumpDatabase, related_name='pump_data_info', on_delete=models.CASCADE, default=None,null=True,blank=True)
     refill_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)
     fuel_rate = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)
-    fuel_cost = models.DecimalField(max_digits=10, decimal_places=2, default=0.0, null=True, blank=True)
-   
-   
+    fuel_cost = models.DecimalField(max_digits=10, decimal_places=2, default=0.0, null=True, blank=True)     
     fuel_supplier_name = models.CharField(max_length=50, default='None')
     fuel_supplier_phone = models.CharField(max_length=50, default='None')
     fuel_supplier_address = models.TextField(default='None', null=True, blank=True)
@@ -98,13 +87,15 @@ class PGFuelRefill(models.Model):
     created_at = models.DateField(default=timezone.now)
 
     def save(self, *args, **kwargs):
-        if self.refill_amount is not None:
+        if self.refill_amount is not None and self.fuel_pump is not None and self.fuel_pump.fuel_unit_price is not None:
+            self.fuel_cost = self.refill_amount * self.fuel_pump.fuel_unit_price
+        else:
             self.fuel_cost = self.refill_amount * self.fuel_rate
+
         super(PGFuelRefill, self).save(*args, **kwargs)
 
     def __str__(self):
         return self.pgnumber.PGNumber if self.pgnumber else ''
-
 
 
 

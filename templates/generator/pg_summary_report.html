@@ -85,14 +85,23 @@
             <th class="text-center p-2">Region</th>
             <th class="text-center p-2">Zone</th>
             <th class="text-center p-2">PG Number</th>
+            <th class="text-center p-2">PG deployement type</th>
+
+            <th class="text-center p-2">PG deployement site code</th>
+
+
             <th class="text-center p-2">Total Refill Amount</th>
-            <th class="text-center p-2">Total fuel purchase others</th> 
+            <th class="text-center p-2">Total pump refill</th>
+            <th class="text-center p-2">Total fuel local Purchase</th> 
             <th class="text-center p-2">total fuel cash advance taken</th> 
             <th class="text-center p-2">Total fuel cost</th>
             <th class="text-center p-2"> Total Tickets Handled</th>
-            <th class="text-center p-2">Fuel cost/TT</th>
+
             <th class="text-center p-2">Total Run Hours</th>
-            <th class="text-center p-2">fuel consumed/Hour</th>
+
+            <th class="text-center p-2">Total fuel consumed</th>
+
+            <th class="text-center p-2">Total fuel balance</th>
           </tr>
         </thead>
         <tbody>
@@ -103,19 +112,29 @@
                       <td class="text-center p-2">{{ region }}</td>
                       <td class="text-center p-2">{{ zone }}</td>
                       <td class="text-center p-2">{{ pgnumber }}</td>
+                      <td class="text-center p-2">{{ summary.PG_deploymeny_type }}</td>
+
+                      {% if summary.PG_deployed_site_code %}
+                      <td class="text-center p-2">{{ summary.PG_deployed_site_code }}</td>
+                      {% else %}
+                      <td class="text-center p-2">Movable</td>
+                      {% endif %}
+                      
+                      
+
                       <td class="text-center p-2">{{ summary.total_refill_amount }}</td>
-                      <td class="text-center p-2">{{ summary.total_fuel_others_purchase}}</td>
+                      <td class="text-center p-2">{{ summary.total_refill_from_pump}}</td>
+                      <td class="text-center p-2">{{ summary.total_fuel_local_purchase}}</td>
+
                       <td class="text-center p-2">{{ summary.total_fuel_cash_advance_taken}}</td>
                
                       <td class="text-center p-2">{{ summary.total_fuel_cost }}</td> <!-- Check this line -->
                       <td class="text-center p-2">{{ summary.total_tt_handle }}</td>
-                      <td class="text-center p-2">{{ summary.fuel_consumed_per_tt|floatformat:'2' }}</td>
+                    
                       <td class="text-center p-2">{{ summary.total_run_hour|floatformat:'2' }}</td>
-                      {% if summary.fuel_consumed_per_run_hour > 2.4 %}
-                          <td class="text-center p-2" style="background-color: red; color:white">{{ summary.fuel_consumed_per_run_hour|floatformat:'2' }}</td>
-                      {% else %}
-                          <td class="text-center p-2" style="background-color: green;">{{ summary.fuel_consumed_per_run_hour|floatformat:'2' }}</td>
-                      {% endif %}
+                      <td class="text-center p-2">{{ summary.total_fuel_consumed|floatformat:'2'}}</td>
+                      <td class="text-center p-2">{{ summary.fuel_balance|floatformat:'2'}}</td>
+                    
                   </tr>
               {% endfor %}
           {% endfor %}

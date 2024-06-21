@@ -1,6 +1,5 @@
 
-from django.contrib.auth.models import (AbstractBaseUser, BaseUserManager,
-                                        PermissionsMixin,Group,Permission)
+from django.contrib.auth.models import (AbstractBaseUser, BaseUserManager,PermissionsMixin,Group,Permission)
 from django.core.mail import send_mail
 from django.db import models
 from django.utils.translation import gettext_lazy as _
@@ -9,7 +8,6 @@ import uuid
 
 
 class CustomAccountManager(BaseUserManager):
-
     def create_superuser(self, email, name, password, **other_fields):
 
         other_fields.setdefault('is_staff', True)
@@ -39,7 +37,8 @@ class CustomAccountManager(BaseUserManager):
         return user
 
 
-class Customer(AbstractBaseUser, PermissionsMixin):
+class Customer(AbstractBaseUser, PermissionsMixin):   
+    employee = models.ForeignKey('employee.EmployeeModel', related_name='employee_data', on_delete=models.CASCADE, null=True, blank=True)
     email = models.EmailField(_('email address'), unique=True)
     name = models.CharField(max_length=150)
     mobile = models.CharField(max_length=20, blank=True)
@@ -94,6 +93,9 @@ class Customer(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.name
+   
+
+
 
 class Address(models.Model):  
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

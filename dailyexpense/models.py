@@ -4,21 +4,15 @@ from datetime import datetime
 from django.utils import timezone
 from datetime import timedelta
 from decimal import Decimal
-from django.db import models
-from account.models import Customer
 from decimal import Decimal, ROUND_DOWN
 
-from django.db import models
-from django.utils import timezone
 from django.core.validators import FileExtensionValidator
-
 from django.db.models import Sum, Avg,Count,Q,Case, When, IntegerField,F,Max,DurationField, DecimalField
 
 from vehicle.models import AddVehicleInfo
 from generator.models import AddPGInfo
 from tickets.mp_list import REGION_CHOICES,ZONE_CHOICES,MP_CHOICES
-
-
+from account.models import Customer
 
 
 
@@ -114,7 +108,6 @@ class SummaryExpenses(models.Model):
     updated_at = models.DateTimeField(default=timezone.now)
 
     def save(self, *args, **kwargs):
-        # Calculate total zone cost
         self.total_zone_cost = (
             (self.office_expenses or Decimal(0)) +
             (self.local_expenses or Decimal(0)) +
@@ -133,27 +126,21 @@ class SummaryExpenses(models.Model):
             (self.advance_due or Decimal(0))
         )
 
-        # Fetch the previous record for the same zone
         previous_record = SummaryExpenses.objects.filter(zone=self.zone, created_at__lt=self.created_at).order_by('-created_at').first()
 
-        # Set balance from previous month based on the latest previous record for the same zone
         if previous_record:
             self.balance_from_previous_month = previous_record.balance_forward or Decimal(0)
         else:
             self.balance_from_previous_month = Decimal(0)
 
-        # Calculate balance forward
         if self.total_amount_received is not None:
             self.balance_forward = self.balance_from_previous_month + self.total_amount_received - self.total_zone_cost
             self.this_month_cash = self.total_amount_received + self.balance_from_previous_month
         else:
-            self.balance_forward = self.balance_from_previous_month - self.total_zone_cost
-
-     
+            self.balance_forward = self.balance_from_previous_month - self.total_zone_cost     
 
         super().save(*args, **kwargs)
 
-        # Update the balance_from_previous_month of the next record if it exists
         next_record = SummaryExpenses.objects.filter(zone=self.zone, created_at__gt=self.created_at).order_by('created_at').first()
         if next_record:
             next_record.balance_from_previous_month = self.balance_forward
@@ -184,7 +171,7 @@ class DailyExpenseRequisition(models.Model):
         ('toll','toll'),
         ('food','food'),
         ('item_purchase','item_purchase'),
-        ('personal_load','personal_loan'),
+        ('field_advance','field_advance'),
         ('others','others')   
 
     ]
@@ -228,8 +215,7 @@ class DailyExpenseRequisition(models.Model):
     
     level1_comments = models.TextField(blank=True)
     level2_comments = models.TextField(blank=True)
-    level3_comments = models.TextField(blank=True)
- 
+    level3_comments = models.TextField(blank=True) 
 
     level1_approval_date = models.DateTimeField(null=True, blank=True)
     level2_approval_date = models.DateTimeField(null=True, blank=True)

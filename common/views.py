@@ -17,8 +17,7 @@ from.models import FuelPumpDatabase,PGRdatabase,Notice,PGTLdatabase
 from.forms import viewFuelPumpForm,NoticeForm,PGTLForm
 
 from dailyexpense.views import manager_level_required
-
-
+from collections import defaultdict
 
 
 
@@ -45,8 +44,6 @@ def view_notices(request):
 
 
 
-
-
 @login_required
 def create_fuel_pump_database(request):
     if request.method == 'POST':
@@ -57,7 +54,7 @@ def create_fuel_pump_database(request):
             pump_record.save()  
             form.save()
             messages.success(request, "Entries created successfully")
-            return redirect('common:create_fuel_pump_database')
+            return redirect('common:view_fuel_pump')
     else:
         form = FuelPumpDatabaseForm()
     return render(request, 'common/create_fuel_pump.html', {'form': form})
@@ -116,6 +113,8 @@ def create_pgr(request):
     else:
         form = PGRForm()
     return render(request, 'common/create_pgr.html', {'form': form})
+
+
 
 
 def create_pgtl(request):
@@ -204,7 +203,7 @@ def update_pgtl_database(request, pgtl_id):
 
 
 
-def pgr_summary_view(request):   
+def pgr_summary_view2(request):   
     summary_data = PGRdatabase.objects.values('region', 'zone', 'mp').annotate(
         total_pgr=Count('id', filter=Q(PGR_type='PGR')),
         total_pgtl=Count('id', filter=Q(PGR_type='PGTL'))
@@ -214,13 +213,56 @@ def pgr_summary_view(request):
         total_pgr=Count('id', filter=Q(PGR_type='PGR')),
         total_pgtl=Count('id', filter=Q(PGR_type='PGTL'))
     )
-
-
     return render(request, 'common/summary_pgr.html', 
             {
             'summary_data': summary_data,
             'overall_summary':overall_summary
             })
+
+
+
+
+def pgr_summary_view(request):
+    PGR_summary_data = PGRdatabase.objects.values('region', 'zone', 'mp').annotate(
+        total_pgr=Count('id'),
+        total_adhoc_pgr = Count('id',filter=Q(PGR_category ='adhoc')),
+        total_permanent_pgr = Count('id',filter=Q(PGR_category ='permanent'))
+
+    ).order_by('region', 'zone', 'mp')
+
+    PGTL_summary_data = PGTLdatabase.objects.values('region', 'zone', 'mp').annotate(
+        total_pgtl=Count('id')
+    ).order_by('region', 'zone', 'mp')
+
+ 
+    combined_summary_data = defaultdict(lambda: {'total_pgr': 0, 'total_pgtl': 0,'total_adhoc_pgr':0,'total_permanent_pgr':0})
+
+    for item in PGR_summary_data:
+        key = (item['region'], item['zone'], item['mp'])
+        combined_summary_data[key]['total_pgr'] = item['total_pgr']
+        combined_summary_data[key]['total_adhoc_pgr'] = item['total_adhoc_pgr']
+        combined_summary_data[key]['total_permanent_pgr'] = item['total_permanent_pgr']
+
+    for item in PGTL_summary_data:
+        key = (item['region'], item['zone'], item['mp'])
+        combined_summary_data[key]['total_pgtl'] = item['total_pgtl']
+
+
+
+    pgr_overall_summary = PGRdatabase.objects.aggregate(
+        total_pgr=Count('id')
+    )
+    pgtl_overall_summary = PGTLdatabase.objects.aggregate(
+        total_pgtl=Count('id')
+    )
+
+    return render(request, 'common/summary_pgr.html', 
+        {
+            'combined_summary_data': dict(combined_summary_data),
+            'pgr_overall_summary': pgr_overall_summary,
+            'pgtl_overall_summary': pgtl_overall_summary,
+        }
+    )
 
 
 
