@@ -59,22 +59,33 @@
 
 
 
-
 <form method="GET" action="{% url 'tickets:zone_report_view' %}">
-
     <div class="container-fluid">
-        <div class="row row-cols-1 row-cols-md-3">
-            <div class="col">    Start Date:  {{ form.start_date }} </div>
-            <div class="col">    End Date:  {{ form.end_date }} </div>
-            <div class="col">  or Select no of days:  {{ form.days }} </div>
-            <div class="col">    Slect Zone: {{ form.zone }}</div>
-            <div class="col"> <button type="submit" class='btn btn-primary'>Generate Data</button></div>
-                 
+        <div class="row g-3"> <!-- Added g-3 for gutter spacing -->
+            <div class=" col-6 col-md-3">
+                <label for="start_date" class="form-label">Start Date:</label>
+                {{ form.start_date }}
+            </div>
+            <div class="col-6 col-md-3">
+                <label for="end_date" class="form-label">End Date:</label>
+                {{ form.end_date }}
+            </div>
+            <div class="col-6 col-md-3">
+                <label for="days" class="form-label">No of Days:</label>
+                {{ form.days }}
+            </div>
+            <div class="col-6 col-md-3">
+                <label for="zone" class="form-label">Select Zone:</label>
+                {{ form.zone }}
+            </div>
+            <div class="col-6 col-md-3">
+                <label>&nbsp;</label> <!-- Add an empty label to align the button -->
+                <button type="submit" class="btn btn-primary d-block">Generate Data</button> <!-- Added d-block to make the button take the full width -->
+            </div>
         </div>
-      
     </div>
-      
-    </form>
+</form>
+
 
 
     <div style="left:0px; margin-left:0px">

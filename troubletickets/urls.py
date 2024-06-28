@@ -12,10 +12,12 @@ urlpatterns = [
     path("account/", include("account.urls", namespace="account")),
     path("employee/", include("employee.urls", namespace="employee")),
     # path("expenses/", include("expenses.urls", namespace="expenses")),
-     path("dailyexpense/", include("dailyexpense.urls", namespace="dailyexpense")),
+    path("dailyexpense/", include("dailyexpense.urls", namespace="dailyexpense")),
     path("vehicle/", include("vehicle.urls", namespace="vehicle")),
-     path("generator/", include("generator.urls", namespace="generator")),
+    path("generator/", include("generator.urls", namespace="generator")),
     path("common/", include("common.urls", namespace="common")),
+    path("disaster/", include("disaster.urls", namespace="disaster")),
+    path("adhocman/", include("adhocman.urls", namespace="adhocman")),
 ]
 
 

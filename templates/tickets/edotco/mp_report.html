@@ -49,23 +49,15 @@
 
 
 <form method="GET" action="{% url 'tickets:mp_report_view' %}">
-
     <div class="container-fluid" style="margin-bottom:30px">
-        <div class="row">
-            <div class="col-12"style= padding:10px>
-               Start Date:  {{ form.start_date }} 
-               End Date:  {{ form.end_date }} 
-               or Select no of days:  {{ form.days }}              
-              
-            </div>
-            <div class="col-12">
-                Slect MP: {{ form.mp }}
-            
-                <button type="submit" class='btn btn-primary'>Generate Data</button>
+        <div class="row row-cols-2 row-cols-md-4">
+            <div class="col">Start Date:  {{ form.start_date }}</div>
+            <div class="col"> End Date:  {{ form.end_date }} </div>
+            <div class="col"> or Select no of days:  {{ form.days }}</div>
+            <div class="col"> Select MP: {{ form.mp }}</div>
+            <div class="col"><button type="submit" class='btn btn-primary'>Generate Data</button></div>                                             
 
-            </div>
-        </div>
-      
+        </div>    
     </div>
       
     </form>

@@ -74,102 +74,81 @@
     </h4>
     
 
+    <h2 class="text-center p-2"> PG run Summary report</h2>
 
-
-<h2 class="text-center p-2"> PG run Summary report</h2>
-
-<div class="container-fluid main-content">
-    <table>
-        <thead>
-          <tr>
-            <th class="text-center p-2">Region</th>
-            <th class="text-center p-2">Zone</th>
-            <th class="text-center p-2">PG Number</th>
-            <th class="text-center p-2">PG deployement type</th>
-
-            <th class="text-center p-2">PG deployement site code</th>
-
-
-            <th class="text-center p-2">Total Refill Amount</th>
-            <th class="text-center p-2">Total pump refill</th>
-            <th class="text-center p-2">Total fuel local Purchase</th> 
-            <th class="text-center p-2">total fuel cash advance taken</th> 
-            <th class="text-center p-2">Total fuel cost</th>
-            <th class="text-center p-2"> Total Tickets Handled</th>
-
-            <th class="text-center p-2">Total Run Hours</th>
-
-            <th class="text-center p-2">Total fuel consumed</th>
-
-            <th class="text-center p-2">Total fuel balance</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for region, zones in pg_summary_reports %}
-          {% for zone, pgnumbers in zones.items %}
-              {% for pgnumber, summary in pgnumbers.items %}
-                  <tr>
-                      <td class="text-center p-2">{{ region }}</td>
-                      <td class="text-center p-2">{{ zone }}</td>
-                      <td class="text-center p-2">{{ pgnumber }}</td>
-                      <td class="text-center p-2">{{ summary.PG_deploymeny_type }}</td>
-
-                      {% if summary.PG_deployed_site_code %}
-                      <td class="text-center p-2">{{ summary.PG_deployed_site_code }}</td>
-                      {% else %}
-                      <td class="text-center p-2">Movable</td>
-                      {% endif %}
-                      
-                      
-
-                      <td class="text-center p-2">{{ summary.total_refill_amount }}</td>
-                      <td class="text-center p-2">{{ summary.total_refill_from_pump}}</td>
-                      <td class="text-center p-2">{{ summary.total_fuel_local_purchase}}</td>
-
-                      <td class="text-center p-2">{{ summary.total_fuel_cash_advance_taken}}</td>
-               
-                      <td class="text-center p-2">{{ summary.total_fuel_cost }}</td> <!-- Check this line -->
-                      <td class="text-center p-2">{{ summary.total_tt_handle }}</td>
-                    
-                      <td class="text-center p-2">{{ summary.total_run_hour|floatformat:'2' }}</td>
-                      <td class="text-center p-2">{{ summary.total_fuel_consumed|floatformat:'2'}}</td>
-                      <td class="text-center p-2">{{ summary.fuel_balance|floatformat:'2'}}</td>
-                    
-                  </tr>
-              {% endfor %}
-          {% endfor %}
-      {% endfor %}
-      
-        </tbody>
-      </table>
+    <div class="container-fluid main-content">
+        <table>
+            <thead>
+                <tr>
+                    <th class="text-center p-2">Region</th>
+                    <th class="text-center p-2">Zone</th>
+                    <th class="text-center p-2">PG Number</th>
+                    <th class="text-center p-2">PG deployment type</th>
+                    <th class="text-center p-2">PG deployed site code</th>
+                    <th class="text-center p-2">Total Refill Amount</th>
+                    <th class="text-center p-2">Total pump refill</th>
+                    <th class="text-center p-2">Total fuel local Purchase</th>
+                    <th class="text-center p-2">Total fuel cash advance taken</th>
+                    <th class="text-center p-2">Total fuel cost</th>
+                    <th class="text-center p-2">Total Tickets Handled</th>
+                    <th class="text-center p-2">Total Run Hours</th>
+                    <th class="text-center p-2">Total fuel consumed</th>
+                    <th class="text-center p-2">Total fuel balance</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in page_obj %}
+                <tr>
+                    <td class="text-center p-2">{{ item.0 }}</td> <!-- Region -->
+                    <td class="text-center p-2">{{ item.1 }}</td> <!-- Zone -->
+                    <td class="text-center p-2">{{ item.2 }}</td> <!-- PG Number -->
+                    <td class="text-center p-2">{{ item.3.PG_deploymeny_type }}</td> <!-- PG deployment type -->
     
-      <!-- Pagination -->
-      <div class="pagination" style="padding: 10px;">
-        <span class="step-links">
-          {% if pg_summary_reports.has_previous %}
-            <a href="?page=1">&laquo; First</a>
-            <a href="?page={{ pg_summary_reports.previous_page_number }}">Previous</a>
-          {% endif %}
+                    {% if item.3.PG_deployed_site_code %}
+                    <td class="text-center p-2">{{ item.3.PG_deployed_site_code }}</td>
+                    {% else %}
+                    <td class="text-center p-2">Movable</td>
+                    {% endif %}
     
-          <span class="current">
-            Page {{ pg_summary_reports.number }} of {{ pg_summary_reports.paginator.num_pages }}.
-          </span>
+                    <td class="text-center p-2">{{ item.3.total_refill_amount }}</td>
+                    <td class="text-center p-2">{{ item.3.total_refill_from_pump }}</td>
+                    <td class="text-center p-2">{{ item.3.total_fuel_local_purchase }}</td>
+                    <td class="text-center p-2">{{ item.3.total_fuel_cash_advance_taken }}</td>
+                    <td class="text-center p-2">{{ item.3.total_fuel_cost }}</td>
+                    <td class="text-center p-2">{{ item.3.total_tt_handle }}</td>
+                    <td class="text-center p-2">{{ item.3.total_run_hour|floatformat:'2' }}</td>
+                    <td class="text-center p-2">{{ item.3.total_fuel_consumed|floatformat:'2' }}</td>
+                    <td class="text-center p-2">{{ item.3.fuel_balance|floatformat:'2' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     
-          {% if pg_summary_reports.has_next %}
-            <a href="?page={{ pg_summary_reports.next_page_number }}">Next</a>
-            <a href="?page={{ pg_summary_reports.paginator.num_pages }}">Last &raquo;</a>
-          {% endif %}
-        </span>
-      </div>
-
-
-
+        <!-- Pagination -->
+        <div class="pagination" style="padding: 10px;">
+            <span class="step-links">
+                {% if page_obj.has_previous %}
+                <a href="?page=1">&laquo; First</a>
+                <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                {% endif %}
+    
+                <span class="current">
+                    Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+                </span>
+    
+                {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}">Next</a>
+                <a href="?page={{ page_obj.paginator.num_pages }}">Last &raquo;</a>
+                {% endif %}
+            </span>
+        </div>
+    </div>
+    
 
 
 </div>
 
 <div class="col" style="height:1200px"></div>
-
 
 
 

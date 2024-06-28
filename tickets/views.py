@@ -224,7 +224,7 @@ def chat(request, ticket_id):
     return render(request, 'tickets/edotco/tchat.html', {'ticket': ticket, 'messages': messages, 'form': form})
 
 
-############### Child ticket start #################################################################
+############### Child ticket start tt#################################################################
 
 @login_required
 def create_child_ticket(request, parent_ticket_id):
@@ -269,8 +269,15 @@ def view_child_tickets(request, parent_ticket_id):
     
     return render(request, 'tickets/edotco/view_child_tickets_single.html', {'parent_ticket': parent_ticket, 'child_tickets': child_tickets})
 
+@login_required
+def view_child_ticket_mobile(request, parent_ticket_id):
+    parent_ticket = get_object_or_404(eTicket, pk=parent_ticket_id)  
+    child_tickets = parent_ticket.child_tickets.all()
+    
+    return render(request, 'tickets/edotco/view_child_tickets_single_mobile.html', {'parent_ticket': parent_ticket, 'child_tickets': child_tickets})
 
-################## ajax view to update for PG stop################################
+
+################## ajax view to update for PG stop only ################################
 @method_decorator(csrf_exempt, name='dispatch')
 class UpdateChildTicketData(View):
     def post(self, request):
@@ -280,10 +287,7 @@ class UpdateChildTicketData(View):
             for change in changes:
                 child_ticket_id = change.get('id')
                 field = change.get('field')
-                value = change.get('value')
-
-                print(f'Received data: id={child_ticket_id}, field={field}, value={value}')  # Debugging
-
+                value = change.get('value')              
                 child_ticket = ChildTicket.objects.get(id=child_ticket_id)
 
                 if field in ['child_internal_generator_start_date', 'child_internal_generator_stop_date']:
@@ -300,8 +304,7 @@ class UpdateChildTicketData(View):
         except ValueError as ve:
             print(f'ValueError: {ve}')  # Debugging
             return JsonResponse({'error': 'Invalid date or time format'}, status=400)
-        except Exception as e:
-            print(f'Error: {e}')  # Debugging
+        except Exception as e:      
             return JsonResponse({'error': str(e)}, status=400)
 
 
@@ -434,6 +437,12 @@ def view_child_tickets_external(request, parent_ticket_id):
     
     return render(request, 'tickets/external_childticket/view_child_tickets_single.html', {'parent_ticket': parent_ticket, 'child_tickets': child_tickets})
 
+@login_required
+def view_child_tickets_external_mobile(request, parent_ticket_id):
+    parent_ticket = get_object_or_404(eTicket, pk=parent_ticket_id)  
+    child_tickets = parent_ticket.child_tickets.all()
+    
+    return render(request, 'tickets/external_childticket/view_child_tickets_single_mobile.html', {'parent_ticket': parent_ticket, 'child_tickets': child_tickets})
 
 # ajax for updating data for validation/checking
 @method_decorator(csrf_exempt, name='dispatch')
@@ -605,6 +614,267 @@ def view_tt_edotco(request):
         'total_connected_ticket': total_connected_ticket,
         'total_assigned_ticket': total_assigned_ticket
     })
+
+
+
+@login_required
+def view_tt_start_stop(request):
+    days = None
+    start_date = None
+    end_date = None
+    region = None
+    zone = None
+    mp = None
+    
+    form = SummaryReportChartForm(request.GET or {'days': 20})
+    tickets = eTicket.objects.all().order_by('-created_at')
+
+    user = request.user
+    user_name = None  # Initialize user_name with a default value
+    if user.employee:
+        user_name = user.employee.name
+        print(user_name)
+    else:
+        print("User does not have an associated employee.")
+    
+    if form.is_valid():
+        start_date = form.cleaned_data.get('start_date')
+        end_date = form.cleaned_data.get('end_date')
+        days = form.cleaned_data.get('days')
+        region = form.cleaned_data.get('region')
+        zone = form.cleaned_data.get('zone')
+        mp = form.cleaned_data.get('mp')
+        
+        if start_date and end_date:
+            tickets = tickets.filter(created_at__range=(start_date, end_date))
+            if region:
+                tickets = tickets.filter(region=region)
+        elif days:
+            end_date = datetime.today()
+            start_date = end_date - timedelta(days=days)
+            tickets = tickets.filter(created_at__range=(start_date, end_date))
+          
+        if region:
+            tickets = tickets.filter(region=region)
+        if zone:
+            tickets = tickets.filter(zone=zone)
+        if mp:
+            tickets = tickets.filter(mp=mp)
+    
+    # Pagination logic
+    ticket_data = []
+    tickets_per_page = 10
+    paginator = Paginator(tickets, tickets_per_page)
+    page_number = request.GET.get('page', 1)
+
+    try:
+        page_obj = paginator.page(page_number)
+    except PageNotAnInteger:
+        page_obj = paginator.page(1)
+    except EmptyPage:
+        page_obj = paginator.page(paginator.num_pages)
+
+    total_valid_ticket = sum(1 for ticket in page_obj if ticket.ticket_status == 'TT_Valid')
+    total_invalid_ticket = sum(1 for ticket in page_obj if ticket.ticket_status == 'TT_invalid')
+    total_missed_ticket = sum(1 for ticket in page_obj if ticket.ticket_status == 'TT_Miss')
+    total_open_ticket = sum(1 for ticket in page_obj if ticket.ticket_status == 'open')
+    total_running_ticket = sum(1 for ticket in page_obj if ticket.ticket_status == 'running')
+    total_ontheway_ticket = sum(1 for ticket in page_obj if ticket.ticket_status == 'onTheWay')
+    total_connected_ticket = sum(1 for ticket in page_obj if ticket.ticket_status == 'TT_connected')
+    total_assigned_ticket = sum(1 for ticket in page_obj if ticket.ticket_status == 'team_assign')
+    total_ticket = (
+        total_valid_ticket + total_invalid_ticket + total_missed_ticket + 
+        total_open_ticket + total_running_ticket + total_ontheway_ticket + 
+        total_connected_ticket + total_assigned_ticket
+    )
+
+    if 'download_csv' in request.GET:
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="view_ticket.csv"'
+        writer = csv.writer(response)
+        writer.writerow(['created_at', 'Region', 'Zone', 'MP', 'Ticket Number'])
+
+        for ticket in page_obj:
+            writer.writerow([
+                ticket.created_at,
+                ticket.region,
+                ticket.zone,
+                ticket.mp,
+                "'" + str(ticket.internal_ticket_number)
+            ])
+
+        return response
+
+    # Process ticket data
+    for ticket in page_obj:
+        ticket.fuel_difference = ticket.customer_calculated_fuel_litre - ticket.internal_calculated_fuel_litre
+        ticket_dict = {}
+        ticket_fields = eTicket._meta.get_fields()
+        
+        for field in ticket_fields:
+            field_name = field.name
+            try:
+                field_value = getattr(ticket, field_name)
+            except ObjectDoesNotExist:
+                field_value = None  # Handle missing related object
+            ticket_dict[field_name] = field_value
+        
+        ticket_data.append(ticket_dict)
+
+    cleared_form = SummaryReportChartForm()
+    return render(request, 'tickets/edotco/view_tt _start_stop.html', {
+        'ticket_data': ticket_data,
+        'page_obj': page_obj,
+        'form': form,
+        'days': days,
+        'start_date': start_date,
+        'end_date': end_date,
+        'region': region,
+        'zone': zone,
+        'mp': mp,
+        'form': cleared_form,
+        'total_ticket': total_ticket,
+        'total_valid_ticket': total_valid_ticket,
+        'total_invalid_ticket': total_invalid_ticket,
+        'total_missed_ticket': total_missed_ticket,
+        'total_open_ticket': total_open_ticket,
+        'total_running_ticket': total_running_ticket,
+        'total_ontheway_ticket': total_ontheway_ticket,
+        'total_connected_ticket': total_connected_ticket,
+        'total_assigned_ticket': total_assigned_ticket
+    })
+
+
+
+
+
+@login_required
+def view_tt_disaster(request):
+    days = None
+    start_date = None
+    end_date = None
+    region = None
+    zone = None
+    mp = None
+    
+    form = SummaryReportChartForm(request.GET or {'days': 20})
+    tickets = eTicket.objects.filter(ticket_type='disaster_support').order_by('-created_at')
+
+    user = request.user
+    user_name = None  # Initialize user_name with a default value
+    if user.employee:
+        user_name = user.employee.name
+        print(user_name)
+    else:
+        print("User does not have an associated employee.")
+    
+    if form.is_valid():
+        start_date = form.cleaned_data.get('start_date')
+        end_date = form.cleaned_data.get('end_date')
+        days = form.cleaned_data.get('days')
+        region = form.cleaned_data.get('region')
+        zone = form.cleaned_data.get('zone')
+        mp = form.cleaned_data.get('mp')
+        
+        if start_date and end_date:
+            tickets = tickets.filter(created_at__range=(start_date, end_date))
+            if region:
+                tickets = tickets.filter(region=region)
+        elif days:
+            end_date = datetime.today()
+            start_date = end_date - timedelta(days=days)
+            tickets = tickets.filter(created_at__range=(start_date, end_date))
+          
+        if region:
+            tickets = tickets.filter(region=region)
+        if zone:
+            tickets = tickets.filter(zone=zone)
+        if mp:
+            tickets = tickets.filter(mp=mp)
+    
+    # Pagination logic
+    ticket_data = []
+    tickets_per_page = 10
+    paginator = Paginator(tickets, tickets_per_page)
+    page_number = request.GET.get('page', 1)
+
+    try:
+        page_obj = paginator.page(page_number)
+    except PageNotAnInteger:
+        page_obj = paginator.page(1)
+    except EmptyPage:
+        page_obj = paginator.page(paginator.num_pages)
+
+    total_valid_ticket = sum(1 for ticket in page_obj if ticket.ticket_status == 'TT_Valid')
+    total_invalid_ticket = sum(1 for ticket in page_obj if ticket.ticket_status == 'TT_invalid')
+    total_missed_ticket = sum(1 for ticket in page_obj if ticket.ticket_status == 'TT_Miss')
+    total_open_ticket = sum(1 for ticket in page_obj if ticket.ticket_status == 'open')
+    total_running_ticket = sum(1 for ticket in page_obj if ticket.ticket_status == 'running')
+    total_ontheway_ticket = sum(1 for ticket in page_obj if ticket.ticket_status == 'onTheWay')
+    total_connected_ticket = sum(1 for ticket in page_obj if ticket.ticket_status == 'TT_connected')
+    total_assigned_ticket = sum(1 for ticket in page_obj if ticket.ticket_status == 'team_assign')
+    total_ticket = (
+        total_valid_ticket + total_invalid_ticket + total_missed_ticket + 
+        total_open_ticket + total_running_ticket + total_ontheway_ticket + 
+        total_connected_ticket + total_assigned_ticket
+    )
+
+    if 'download_csv' in request.GET:
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="view_ticket.csv"'
+        writer = csv.writer(response)
+        writer.writerow(['created_at', 'Region', 'Zone', 'MP', 'Ticket Number'])
+
+        for ticket in page_obj:
+            writer.writerow([
+                ticket.created_at,
+                ticket.region,
+                ticket.zone,
+                ticket.mp,
+                "'" + str(ticket.internal_ticket_number)
+            ])
+
+        return response
+
+    # Process ticket data
+    for ticket in page_obj:
+        ticket.fuel_difference = ticket.customer_calculated_fuel_litre - ticket.internal_calculated_fuel_litre
+        ticket_dict = {}
+        ticket_fields = eTicket._meta.get_fields()
+        
+        for field in ticket_fields:
+            field_name = field.name
+            try:
+                field_value = getattr(ticket, field_name)
+            except ObjectDoesNotExist:
+                field_value = None  # Handle missing related object
+            ticket_dict[field_name] = field_value
+        
+        ticket_data.append(ticket_dict)
+
+    cleared_form = SummaryReportChartForm()
+    return render(request, 'tickets/edotco/view_tt disaster.html', {
+        'ticket_data': ticket_data,
+        'page_obj': page_obj,
+        'form': form,
+        'days': days,
+        'start_date': start_date,
+        'end_date': end_date,
+        'region': region,
+        'zone': zone,
+        'mp': mp,
+        'form': cleared_form,
+        'total_ticket': total_ticket,
+        'total_valid_ticket': total_valid_ticket,
+        'total_invalid_ticket': total_invalid_ticket,
+        'total_missed_ticket': total_missed_ticket,
+        'total_open_ticket': total_open_ticket,
+        'total_running_ticket': total_running_ticket,
+        'total_ontheway_ticket': total_ontheway_ticket,
+        'total_connected_ticket': total_connected_ticket,
+        'total_assigned_ticket': total_assigned_ticket
+    })
+
 
 
 

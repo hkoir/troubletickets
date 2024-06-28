@@ -218,6 +218,12 @@ def view_pg_fuel(request):
     })
 
 
+
+
+from django.http import JsonResponse
+
+
+
 @login_required
 def pg_summary_report(request):
     form = vehicleSummaryReportForm(request.GET or {'days': 20})
@@ -265,6 +271,7 @@ def pg_summary_report(request):
             pg_fuel_refill = pg_fuel_refill.filter(mp=mp)
             pgfuel_advance_from_daily_expense = pgfuel_advance_from_daily_expense.filter(mp=mp)
 
+
         for data in tickets:
             region = data.region
             zone = data.zone
@@ -275,6 +282,8 @@ def pg_summary_report(request):
             else:
                 PG_deployment_type = 'None'
                 PG_deployed_site_code = 'None'
+
+
             try:
                 pgnumber = data.pgnumber
             except AddPGInfo.DoesNotExist:
@@ -291,8 +300,8 @@ def pg_summary_report(request):
                 pg_summary_reports[region][zone] = {}
             if pgnumber not in pg_summary_reports[region][zone]:
                 pg_summary_reports[region][zone][pgnumber] = {
-                    'PG_deploymeny_type':PG_deployment_type,
-                    'PG_deployed_site_code':PG_deployed_site_code,
+                    'PG_deploymeny_type': PG_deployment_type,
+                    'PG_deployed_site_code': PG_deployed_site_code,
                     'total_refill_amount': 0,
                     'total_fuel_local_purchase': 0,
                     'total_fuel_cash_advance_taken': 0,
@@ -302,13 +311,13 @@ def pg_summary_report(request):
                     'total_fuel_cost': 0,
                     'fuel_consumed_per_tt': 0,
                     'fuel_consumed_per_run_hour': 0,
-                    'total_fuel_consumed':0,
-                    'fuel_balance':0,
-                    'total_refill_from_pump':0
+                    'total_fuel_consumed': 0,
+                    'fuel_balance': 0,
+                    'total_refill_from_pump': 0
                 }
 
-            pgfuel_advance_from_daily_expense = pgfuel_advance_from_daily_expense.filter(pgnumber=pgnumber, purpose='pg_local_fuel_purchase')
-            total_fuel_cash_advance_taken = pgfuel_advance_from_daily_expense.aggregate(total_fuel_cash_advance_taken=Sum('requisition_amount'))['total_fuel_cash_advance_taken'] or 0
+            pgfuel_advance_from_daily_expense_filtered = pgfuel_advance_from_daily_expense.filter(pgnumber=pgnumber, purpose='pg_local_fuel_purchase')
+            total_fuel_cash_advance_taken = pgfuel_advance_from_daily_expense_filtered.aggregate(total_fuel_cash_advance_taken=Sum('requisition_amount'))['total_fuel_cash_advance_taken'] or 0
           
 
             related_refills = pg_fuel_refill.filter(pgnumber=data.pgnumber)
@@ -348,7 +357,15 @@ def pg_summary_report(request):
             pg_summary_reports[region][zone][pgnumber]['fuel_consumed_per_run_hour'] += fuel_consumed_per_run_hour
             pg_summary_reports[region][zone][pgnumber]['fuel_balance'] += fuel_balance
 
-    paginator = Paginator(list(pg_summary_reports.items()), 10)
+    # Flatten the nested dictionary into a list of tuples for pagination
+    flat_summary_reports = []
+    for region, zones in pg_summary_reports.items():
+        for zone, pgnumbers in zones.items():
+            for pgnumber, summary in pgnumbers.items():
+                flat_summary_reports.append((region, zone, pgnumber, summary))
+
+    paginator = Paginator(flat_summary_reports, 10)  # Assuming 10 items per page
+
     page_number = request.GET.get('page')
     try:
         page_obj = paginator.page(page_number)
@@ -357,9 +374,10 @@ def pg_summary_report(request):
     except EmptyPage:
         page_obj = paginator.page(paginator.num_pages)
 
+
     form = vehicleSummaryReportForm()
     return render(request, 'generator/pg_summary_report.html', {
-        'pg_summary_reports': page_obj,  # Pass the paginated object
+        'page_obj': page_obj,  # Pass the paginated object
         'form': form,
         'days': days,
         'start_date': start_date,

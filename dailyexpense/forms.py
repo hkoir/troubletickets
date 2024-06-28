@@ -62,7 +62,7 @@ class MoneySendingForm(forms.ModelForm):
         return cleaned_data
     
 
-
+##################### sum OPTIMA form ####################################
 class SummaryExpensesForm(forms.ModelForm):
     total_run_hour = forms.FloatField(label='Total Run Hour (hours with decimals)', required=False)
 

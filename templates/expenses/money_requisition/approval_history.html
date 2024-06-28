@@ -36,140 +36,90 @@
     position: absolute;
     width: 100%;
     left: 0;
+    top:0;
   
 }
 
 </style>
+   
 
-    
+         
+<div class="container-fluid main-content" style="margin-top: 20px;">
+    {% if messages %}
+    <div>
+        <ul class="messages">
+            {% for message in messages %}
+                <li style="font-size: 20px; background-color: orange;";{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endif %}
 
-        {% if messages %}
-            <div>
-                <ul class="messages">
-                    {% for message in messages %}
-                        <li style="font-size: 20px; background-color: orange;";{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-                    {% endfor %}
-                </ul>
-            </div>
-        {% endif %}
 
-
-
-        <h2 class="text-center" style="margin-top:10px">Financial Approval Status</h2>
-        <p class="text-center">select date range/ or no of days but not both</p>
-        
-        
-        
-        <form method="GET" action="{% url 'dailyexpense:all_approval_status' %}" style="margin-bottom:30px">
-        
+<h2 class="text-center" style="margin-top:10px">Financial Approval Status</h2>
+<p class="text-center">select date range/ or no of days but not both</p>
+     <div class="row">  
+        <div class="col-12">       
+            <form method="GET" action="{% url 'dailyexpense:all_approval_status' %}" style="margin-bottom:30px">        
             <div class="container-fluid">
-                <div class="row row-cols-1 row-cols-md-4">
-        
-                    <div class="col" style="padding:5px; margin:5px">  Start Date:  {{ form.start_date }} </div>
-                    <div class="col" style="padding:5px; margin:5px">  End Date:  {{ form.end_date }} </div>
-                    <div class="col" style="padding:5px; margin:5px"> no of days {{ form.days }} </div>
-                    <div class="col" style="padding:5px; margin:5px">  Region:{{ form.region }} </div>  
-                    <div class="col" style="padding:5px; margin:5px">  Zone:{{ form.zone }} </div>    
-                    <div class="col" style="padding:5px; margin:5px">  mp:{{ form.mp }} </div>    
-        
-                    <div class="col" style="padding:5px; margin:5px"> <button type="submit" class='btn btn-primary'>Generate Data</button></div>
+                <div class="row row-cols-2 row-cols-md-6">        
+                    <div class="col" style="padding:5px;">  Start Date:  {{ form.start_date }} </div>
+                    <div class="col" style="padding:5px;">  End Date:  {{ form.end_date }} </div>
+                    <div class="col" style="padding:5px;"> no of days {{ form.days }} </div>
+                    <div class="col" style="padding:5px;">  Region:{{ form.region }} </div>  
+                    <div class="col" style="padding:5px;">  Zone:{{ form.zone }} </div>    
+                    <div class="col" style="padding:5px;">  mp:{{ form.mp }} </div>  
+                    <div class="col" style="padding:5px;"> <button type="submit" class='btn btn-primary'>Generate Data</button></div>
                     
                 </div>
-            </div>
-                
+            </div>                
             </form>
-                
-        
-        
-            <div style="left:0px; margin-left:0px">
-                <h4 style="margin-top:40px; margin-left:0px">Data for
-                    {% if days %}
-                        the last {{ days }} days
-                    {% elif start_date and end_date %}
-                        from: {{ start_date }} to {{ end_date }}
-                    {% endif %}
-                </h4>
-                    
-            </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-            <div class="container-fluid">
-                <div class="row row-cols-1 row-cols-md-2 p-2">     
-                    <div class="col">
-                        <div class="card rounded-card" style="margin-top:10px;background-color: bisque;">
-                            <div class="card-body">           
-                                <!-- Region-wise summary -->
-                                <h4>Region-wise Sum for last {{ days }} days</h4>
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th class="text-center p-2">Region</th>
-                                            <th class="text-center p-2">Total Requisition Amount</th>
-                                            <th class="text-center p-2">Total Approved Amount</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for region in region_approvals %}
-                                        <tr>
-                                            <td class="text-center p-2">{{ region.region }}</td>
-                                            <td class="text-center p-2">{{ region.total_requisition|floatformat:"2" }}</td>
-                                            <td class="text-center p-2">{{ region.total_approved|floatformat:"2" }}</td>
-                                        </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-            
-                    <div class="col">
-                        <div class="card rounded-card" style="margin-top:10px;margin-bottom:50px;background-color: bisque;">
-                            <div class="card-body">   
-                                <!-- Zone-wise summary -->
-                                <h4>Zone-wise Sum for last {{ days }} days</h4>
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th class="text-center p-2">Zone</th>
-                                            <th class="text-center p-2">Total Requisition Amount</th>
-                                            <th class="text-center p-2">Total Approved Amount</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for zone in zone_approvals %}
-                                        <tr>
-                                            <td class="text-center p-2">{{ zone.zone }}</td>
-                                            <td class="text-center p-2">{{ zone.total_requisition|floatformat:"2" }}</td>
-                                            <td class="text-center p-2">{{ zone.total_approved|floatformat:"2" }}</td>
-                                        </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-
-
-<h4 style="margin-top:20px; margin-bottom:10px"> Details requisition and approval 
-    <a href="{% url 'dailyexpense:download_money_requisition_data' %}">Download</a></h4>
-    
-<div class="container-fluid main-content" >
-    <div class="row">
-        <div class="col-xl-12">
+        </div>  
+        <div class="col-12" style="margin-bottom:10px">                  
+            <!-- Region-wise summary -->                 
+            <table>
+                <thead>
+                    <tr>
+                        <th class="text-center p-2">Region</th>
+                        <th class="text-center p-2">Total Requisition Amount</th>
+                        <th class="text-center p-2">Total Approved Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for region in region_approvals %}
+                    <tr>
+                        <td class="text-center p-2">{{ region.region }}</td>
+                        <td class="text-center p-2">{{ region.total_requisition|floatformat:"2" }}</td>
+                        <td class="text-center p-2">{{ region.total_approved|floatformat:"2" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>        
+        </div>            
+        <div class="col-12">                        
+         <!-- Zone-wise summary -->               
+            <table>
+                <thead>
+                    <tr>
+                        <th class="text-center p-2">Zone</th>
+                        <th class="text-center p-2">Total Requisition Amount</th>
+                        <th class="text-center p-2">Total Approved Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for zone in zone_approvals %}
+                    <tr>
+                        <td class="text-center p-2">{{ zone.zone }}</td>
+                        <td class="text-center p-2">{{ zone.total_requisition|floatformat:"2" }}</td>
+                        <td class="text-center p-2">{{ zone.total_approved|floatformat:"2" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="col-12">            
+             <h4 style="margin-top:20px; margin-bottom:10px"> Details requisition and approval 
+            <a href="{% url 'dailyexpense:download_money_requisition_data' %}">Download</a></h4>    
             <table>  
                 <thead>
                     <tr>
@@ -357,7 +307,7 @@
     function approveLevel1(requisitionId) {      
      
         $.ajax({
-            url: '/expenses:requisition_approval/',
+            url: '/dailyexpense:requisition_approval/',
             method: 'POST',
             data: { 'requisition_id': requisitionId },
             success: function(data) {

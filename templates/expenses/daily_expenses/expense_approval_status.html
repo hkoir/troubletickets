@@ -46,258 +46,236 @@
 
 
 
-<form method="GET" action="{% url 'dailyexpense:expense_approval_status' %}" style="margin-bottom:30px">
-
-    <div class="container-fluid">
-        <div class="row row-cols-1 row-cols-md-4">
-
-            <div class="col" style="padding:5px; margin:5px">  Start Date:  {{ form.start_date }} </div>
-            <div class="col" style="padding:5px; margin:5px">  End Date:  {{ form.end_date }} </div>
-            <div class="col" style="padding:5px; margin:5px"> no of days {{ form.days }} </div>
-            <div class="col" style="padding:5px; margin:5px">  Region:{{ form.region }} </div>  
-            <div class="col" style="padding:5px; margin:5px">  Zone:{{ form.zone }} </div>    
-            <div class="col" style="padding:5px; margin:5px">  mp:{{ form.mp }} </div>    
-
-            <div class="col" style="padding:5px; margin:5px"> <button type="submit" class='btn btn-primary'>Generate Data</button></div>
-            
-        </div>
-    </div>
-        
-    </form>
-        
-
-
-    <div style="left:0px; margin-left:0px">
-        <h4 style="margin-top:40px; margin-left:0px">Data for
-            {% if days %}
-                the last {{ days }} days
-            {% elif start_date and end_date %}
-                from: {{ start_date }} to {{ end_date }}
-            {% endif %}
-        </h4>
-            
-    </div>
-
-
-
-
-
-
-
-    <div class="container-fluid">
-        <div class="row row-cols-1 row-cols-md-2 p-2">     
-            <div class="col">
-                <div class="card rounded-card" style="margin-top:10px;background-color: bisque;">
-                    <div class="card-body">           
-                        <!-- Region-wise summary -->
-                        <h4>Region-wise Summary for last {{ days }} days</h4>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th class="text-center p-2">Region</th>
-                                    <th class="text-center p-2">Total Requisition Amount</th>
-                                    <th class="text-center p-2">Total Approved Amount</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for region in region_approvals %}
-                                <tr>
-                                    <td class="text-center p-2">{{ region.region }}</td>
-                                    <td class="text-center p-2">{{ region.total_requisition|floatformat:"2" }}</td>
-                                    <td class="text-center p-2">{{ region.total_approved|floatformat:"2" }}</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+<div class="container-fluid main-content">
+    <div class="row">  
+        <div class="col-12">   
+            <form method="GET" action="{% url 'dailyexpense:expense_approval_status' %}" style="margin-bottom:30px">        
+                <div class="container-fluid">
+                    <div class="row row-cols-2 row-cols-md-6">
+                    
+                        <div class="col" style="padding:5px;">  Start Date:  {{ form.start_date }} </div>
+                        <div class="col" style="padding:5px;">  End Date:  {{ form.end_date }} </div>
+                        <div class="col" style="padding:5px;" > days {{ form.days }} </div>
+                        <div class="col" style="padding:5px;">  Region:{{ form.region }} </div>  
+                        <div class="col" style="padding:5px;">  select Zone:{{ form.zone }} </div>    
+                        <div class="col" style="padding:5px;">  select mp:{{ form.mp }} </div>   
+                        <div class="col" style="padding:5px;"> <button type="submit" class='btn btn-primary'>Generate Data</button></div>
+                    
                     </div>
                 </div>
+            <form>
+        </div>               
+        <div class="col"></div>
+            <div style="left:0px; margin-left:0px">
+                <h4 class="text-center">Data for
+                {% if days %}
+                    the last {{ days }} days
+                {% elif start_date and end_date %}
+                    from: {{ start_date }} to {{ end_date }}
+                {% endif %}
+                </h4>            
             </div>
-    
-            <div class="col">
-                <div class="card rounded-card" style="margin-top:10px;margin-bottom:50px;background-color: bisque;">
-                    <div class="card-body">   
-                        <!-- Zone-wise summary -->
-                        <h4>Zone-wise Summary for last {{ days }} days</h4>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th class="text-center p-2">Zone</th>
-                                    <th class="text-center p-2">Total Requisition Amount</th>
-                                    <th class="text-center p-2">Total Approved Amount</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for zone in zone_approvals %}
-                                <tr>
-                                    <td class="text-center p-2">{{ zone.zone }}</td>
-                                    <td class="text-center p-2">{{ zone.total_requisition|floatformat:"2" }}</td>
-                                    <td class="text-center p-2">{{ zone.total_approved|floatformat:"2" }}</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-
-
-
-<h4 style="margin-top:20px; margin-bottom:10px"> Details requisition and approval 
-    <a href="{% url 'dailyexpense:download_expense_requisition_data' %}">Download</a></h4>
-    
-<div class="container-fluid main-content" >
-    <div class="row">
-        <div class="col-xl-12">
-            <table>  
+        </div> 
+        <div class="col" style="margin-bottom:10px">                    
+            <!-- Region-wise summary -->                   
+            <table>
                 <thead>
                     <tr>
-
-                        <th class="text-center p-2">Requester</th>
-                        <th class="text-center p-2">Requisition Date</th>
-                        <th class="text-center p-2">Requisition ID</th>
                         <th class="text-center p-2">Region</th>
-                        <th class="text-center p-2">Zone</th>                     
-                        <th class="text-center p-2">Purpose</th>
-                        <th class="text-center p-2">Requisition Amount</th>
-                        <th class="text-center p-2">Approved amount</th>
-                        <th class="text-center p-2">Level 1 Approval</th>   
-                        <th class="text-center p-2">Level 1 Approval Date</th>          
-                        <th class="text-center p-2">Level 2 Approval</th>  
-                        <th class="text-center p-2">Level 2 Approval Date</th>        
-                        <th class="text-center p-2">Level 3 Approval</th>
-                        <th class="text-center p-2">Level 3 Approval Date</th>    
-                        <th class="text-center p-2">Receiving Status</th>    
-                        <th class="text-center p-2">Supporting Docs</th>    
-                                
+                        <th class="text-center p-2">Total Requisition Amount</th>
+                        <th class="text-center p-2">Total Approved Amount</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for requisition in expense_requisitions %}
+                    {% for region in region_approvals %}
                     <tr>
-                        <td class="text-center p-2">{{ requisition.expense_requester }}</td>
-                        <td class="text-center p-2" style="white-space:nowrap;">{{ requisition.created_at }}</td>
-                        <td class="text-center p-2">{{ requisition.expense_requisition_number }}</td>
-                        <td class="text-center p-2">{{ requisition.region }}</td>
-                        <td class="text-center p-2">{{ requisition.zone }}</td>
-                        <td class="text-center p-2" style="white-space: nowrap;">{{ requisition.purpose }}</td>
-                        <td class="text-center p-2">{{ requisition.requisition_amount }}</td>
-                        <td class="text-center p-2">{{ requisition.approved_amount }}</td>
-                
-                        <!-- Level 1 Approval -->
-                        <td class="text-center p-2">
-                            {% if requisition.level1_approval_status == 'Approved' %}
-                                <span style="background-color: rgb(239, 235, 14); font-size: 20px;">Approved</span>
-                            {% elif requisition.level1_approval_status == 'Rejected' %}
-                                <span style="background: red; font-size: 20px;">Rejected</span>
-                            {% elif request.user.manager_level == 'first_level' %}
-                            <a href="{% url 'dailyexpense:expense_requisition_approval' expense_requisition_id=requisition.id %}"  style="font-size: 20px; text-decoration: none;">Pending</a>
-                                
-                            {% else %}
-                                <span style="background: goldenrod; font-size: 20px;">Pending</span>
-                            {% endif %}
-                        </td>
-                        <td class="text-center p-2" style="white-space: nowrap;">{{ requisition.level1_approval_date }}</td>
-                
-                        <!-- Level 2 Approval -->
-                        <td class="text-center p-2">
-                            {% if requisition.level2_approval_status == 'Approved' %}
-                                <span style="background: green; font-size: 20px;">Approved</span>
-                            {% elif requisition.level2_approval_status == 'Rejected' %}
-                                <span style="background: red; font-size: 20px;">Rejected</span>
-                            {% elif request.user.manager_level == 'second_level' %}
-                            <a href="{% url 'dailyexpense:expense_requisition_approval' expense_requisition_id=requisition.id %}"  style="font-size: 20px; text-decoration: none;">Pending</a>
-                            {% else %}
-                                <span style="background: goldenrod; font-size: 20px;">Pending</span>
-                            {% endif %}
-                        </td>
-
-                        <td class="text-center p-2" style="white-space: nowrap;">{{ requisition.level2_approval_date }}</td>
-                
-                        <!-- Level 3 Approval -->
-                        <td class="text-center p-2">
-                            {% if requisition.level3_approval_status == 'Approved' %}
-                                <span style="background: green; font-size: 20px;">Approved</span>
-                            {% elif requisition.level3_approval_status == 'Rejected' %}
-                                <span style="background: red; font-size: 20px;">Rejected</span>
-                            {% elif request.user.manager_level == 'third_level' %}
-                            <a href="{% url 'dailyexpense:expense_requisition_approval' expense_requisition_id=requisition.id %}"  style="font-size: 20px; text-decoration: none;">Pending</a>
-                            {% else %}
-                                <span style="background: goldenrod; font-size: 20px;">Pending</span>
-                            {% endif %}
-                        </td>
-                        <td class="text-center p-2" style="white-space: nowrap;">{{ requisition.level3_approval_date }}</td>
-                       
-                       
-                        <td class="text-center p-2">
-                            {% if requisition.receiving_status == 'Received' %}
-                                Received
-                            {% elif requisition.expense_requester == request.user %}
-                                <form method="post" action="{% url 'dailyexpense:mark_received' requisition_id=requisition.id %}">
-                                    {% csrf_token %}
-                                    <button type="submit" class="btn btn-success">Pending</button>
-                                </form>
-                            {% else %}
-                               login require
-                            {% endif %}
-                        </td>
-
-
-                        <td class="text-center p-2" style="white-space:nowrap;">
-                            {% if requisition.supporting_documents %}
-                                {% if requisition.supporting_documents.url|slice:'-3:' == 'pdf' %}
-                                    <a href="{{ requisition.supporting_documents.url }}" target="_blank">
-                                        View PDF
-                                    </a>
-                                {% else %}
-                                    <a href="{{ requisition.supporting_documents.url }}" target="_blank">
-                                        <img 
-                                            src="{{ requisition.supporting_documents.url }}" 
-                                            alt="Supporting Docs" 
-                                            style="cursor: pointer; width:50px;height:50px"
-                                        >
-                                    </a>
-                                {% endif %}
-                            {% else %}
-                                No Docs available
-                            {% endif %}
-                        </td>
-                                             
-                        
-
+                        <td class="text-center p-2">{{ region.region }}</td>
+                        <td class="text-center p-2">{{ region.total_requisition|floatformat:"2" }}</td>
+                        <td class="text-center p-2">{{ region.total_approved|floatformat:"2" }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
-                 
-                
             </table>
-        </div>   
-        
-        
+        </div>
+        <div class="col">                
+            <!-- Zone-wise summary -->           
+            <table>
+                <thead>
+                    <tr>
+                        <th class="text-center p-2">Zone</th>
+                        <th class="text-center p-2">Total Requisition Amount</th>
+                        <th class="text-center p-2">Total Approved Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for zone in zone_approvals %}
+                    <tr>
+                        <td class="text-center p-2">{{ zone.zone }}</td>
+                        <td class="text-center p-2">{{ zone.total_requisition|floatformat:"2" }}</td>
+                        <td class="text-center p-2">{{ zone.total_approved|floatformat:"2" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>                
+        </div>  
+        <div class="col">            
+            <div class="container-fluid" >
+                <h4 style="margin-top:20px; margin-bottom:10px"> Details requisition and approval 
+                <a href="{% url 'dailyexpense:download_expense_requisition_data' %}">Download</a></h4>
+    
+                <div class="row">
+                    <div class="col-xl-12">
+                        <table>  
+                            <thead>
+                                <tr>
 
-<div class="pagination" style="padding:10px">
-    {% if page_obj.has_previous %}
-        <a style="margin:10px; font-size: 14px;" href="?page={{ page_obj.previous_page_number }}">Previous</a>
-    {% endif %}
-    
-    {% for num in page_obj.paginator.page_range %}
-        {% if page_obj.number == num %}
-            <span style="margin:10px; font-size:14px">{{ num }}</span>
-        {% else %}
-            <a style="margin:10px; font-size:14px" href="?page={{ num }}">{{ num }}</a>
-        {% endif %}
-    {% endfor %}
-    
-    {% if page_obj.has_next %}
-        <a style="margin:10px; font-size:14px" href="?page={{ page_obj.next_page_number }}">Next</a>
-    {% endif %}
-</div>
+                                    <th class="text-center p-2">Requester</th>
+                                    <th class="text-center p-2">Requisition Date</th>
+                                    <th class="text-center p-2">Requisition ID</th>
+                                    <th class="text-center p-2">Region</th>
+                                    <th class="text-center p-2">Zone</th>                     
+                                    <th class="text-center p-2">Purpose</th>
+                                    <th class="text-center p-2">Requisition Amount</th>
+                                    <th class="text-center p-2">Approved amount</th>
+                                    <th class="text-center p-2">Level 1 Approval</th>   
+                                    <th class="text-center p-2">Level 1 Approval Date</th>          
+                                    <th class="text-center p-2">Level 2 Approval</th>  
+                                    <th class="text-center p-2">Level 2 Approval Date</th>        
+                                    <th class="text-center p-2">Level 3 Approval</th>
+                                    <th class="text-center p-2">Level 3 Approval Date</th>    
+                                    <th class="text-center p-2">Receiving Status</th>    
+                                    <th class="text-center p-2">Supporting Docs</th>    
+                                            
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for requisition in expense_requisitions %}
+                                <tr>
+                                    <td class="text-center p-2">{{ requisition.expense_requester }}</td>
+                                    <td class="text-center p-2" style="white-space:nowrap;">{{ requisition.created_at }}</td>
+                                    <td class="text-center p-2">{{ requisition.expense_requisition_number }}</td>
+                                    <td class="text-center p-2">{{ requisition.region }}</td>
+                                    <td class="text-center p-2">{{ requisition.zone }}</td>
+                                    <td class="text-center p-2" style="white-space: nowrap;">{{ requisition.purpose }}</td>
+                                    <td class="text-center p-2">{{ requisition.requisition_amount }}</td>
+                                    <td class="text-center p-2">{{ requisition.approved_amount }}</td>
+                            
+                                    <!-- Level 1 Approval -->
+                                    <td class="text-center p-2">
+                                        {% if requisition.level1_approval_status == 'Approved' %}
+                                            <span style="background-color: rgb(239, 235, 14); font-size: 20px;">Approved</span>
+                                        {% elif requisition.level1_approval_status == 'Rejected' %}
+                                            <span style="background: red; font-size: 20px;">Rejected</span>
+                                        {% elif request.user.manager_level == 'first_level' %}
+                                        <a href="{% url 'dailyexpense:expense_requisition_approval' expense_requisition_id=requisition.id %}"  style="font-size: 20px; text-decoration: none;">Pending</a>
+                                            
+                                        {% else %}
+                                            <span style="background: goldenrod; font-size: 20px;">Pending</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center p-2" style="white-space: nowrap;">{{ requisition.level1_approval_date }}</td>
+                            
+                                    <!-- Level 2 Approval -->
+                                    <td class="text-center p-2">
+                                        {% if requisition.level2_approval_status == 'Approved' %}
+                                            <span style="background: green; font-size: 20px;">Approved</span>
+                                        {% elif requisition.level2_approval_status == 'Rejected' %}
+                                            <span style="background: red; font-size: 20px;">Rejected</span>
+                                        {% elif request.user.manager_level == 'second_level' %}
+                                        <a href="{% url 'dailyexpense:expense_requisition_approval' expense_requisition_id=requisition.id %}"  style="font-size: 20px; text-decoration: none;">Pending</a>
+                                        {% else %}
+                                            <span style="background: goldenrod; font-size: 20px;">Pending</span>
+                                        {% endif %}
+                                    </td>
+
+                                    <td class="text-center p-2" style="white-space: nowrap;">{{ requisition.level2_approval_date }}</td>
+                            
+                                    <!-- Level 3 Approval -->
+                                    <td class="text-center p-2">
+                                        {% if requisition.level3_approval_status == 'Approved' %}
+                                            <span style="background: green; font-size: 20px;">Approved</span>
+                                        {% elif requisition.level3_approval_status == 'Rejected' %}
+                                            <span style="background: red; font-size: 20px;">Rejected</span>
+                                        {% elif request.user.manager_level == 'third_level' %}
+                                        <a href="{% url 'dailyexpense:expense_requisition_approval' expense_requisition_id=requisition.id %}"  style="font-size: 20px; text-decoration: none;">Pending</a>
+                                        {% else %}
+                                            <span style="background: goldenrod; font-size: 20px;">Pending</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center p-2" style="white-space: nowrap;">{{ requisition.level3_approval_date }}</td>
+                                
+                                
+                                    <td class="text-center p-2">
+                                        {% if requisition.receiving_status == 'Received' %}
+                                            Received
+                                        {% elif requisition.expense_requester == request.user %}
+                                            <form method="post" action="{% url 'dailyexpense:mark_received' requisition_id=requisition.id %}">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-success">Pending</button>
+                                            </form>
+                                        {% else %}
+                                        login require
+                                        {% endif %}
+                                    </td>
+
+
+                                    <td class="text-center p-2" style="white-space:nowrap;">
+                                        {% if requisition.supporting_documents %}
+                                            {% if requisition.supporting_documents.url|slice:'-3:' == 'pdf' %}
+                                                <a href="{{ requisition.supporting_documents.url }}" target="_blank">
+                                                    View PDF
+                                                </a>
+                                            {% else %}
+                                                <a href="{{ requisition.supporting_documents.url }}" target="_blank">
+                                                    <img 
+                                                        src="{{ requisition.supporting_documents.url }}" 
+                                                        alt="Supporting Docs" 
+                                                        style="cursor: pointer; width:50px;height:50px"
+                                                    >
+                                                </a>
+                                            {% endif %}
+                                        {% else %}
+                                            No Docs available
+                                        {% endif %}
+                                    </td>
+                                                        
+                                    
+
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            
+                            
+                        </table>     
+                    
+                        <div class="pagination" style="padding:10px">
+                            {% if page_obj.has_previous %}
+                                <a style="margin:10px; font-size: 14px;" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                            {% endif %}
+                            
+                            {% for num in page_obj.paginator.page_range %}
+                                {% if page_obj.number == num %}
+                                    <span style="margin:10px; font-size:14px">{{ num }}</span>
+                                {% else %}
+                                    <a style="margin:10px; font-size:14px" href="?page={{ num }}">{{ num }}</a>
+                                {% endif %}
+                            {% endfor %}
+                            
+                            {% if page_obj.has_next %}
+                                <a style="margin:10px; font-size:14px" href="?page={{ page_obj.next_page_number }}">Next</a>
+                            {% endif %}
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
 
 
     </div>
 </div>
+
 
 
 <div class="col" style="height:1200px"></div>

@@ -82,14 +82,14 @@
         <div class="col-xl-12">                
             <form method="GET" action="{% url 'tickets:view_tt_edotco' %}">
                 <div class="container-fluid main-content2">
-                    <div class="row row-cols-1 row-cols-md-4">
-                        <div class="col" style="padding:5px; margin:5px">  Start Date:  {{ form.start_date }} </div>
-                        <div class="col" style="padding:5px; margin:5px">  End Date:  {{ form.end_date }} </div>
-                        <div class="col" style="padding:5px; margin:5px"> No of days {{ form.days }} </div>
-                        <div class="col" style="padding:5px; margin:5px">  Region:{{ form.region }} </div>  
-                        <div class="col" style="padding:5px; margin:5px">  Zone:{{ form.zone }} </div>    
-                        <div class="col" style="padding:5px; margin:5px">  MP:{{ form.mp }} </div>  
-                        <div class="col" style="padding:5px; margin:5px"> 
+                    <div class="row row-cols-2 row-cols-md-6">
+                        <div class="col" style="padding:5px; ">  Start Date:  {{ form.start_date }} </div>
+                        <div class="col" style="padding:5px; ">  End Date:  {{ form.end_date }} </div>
+                        <div class="col" style="padding:5px; "> No of days {{ form.days }} </div>
+                        <div class="col" style="padding:5px; ">  Region:{{ form.region }} </div>  
+                        <div class="col" style="padding:5px; ">  Zone:{{ form.zone }} </div>    
+                        <div class="col" style="padding:5px; ">  MP:{{ form.mp }} </div>  
+                        <div class="col" style="padding:5px; "> 
                             <button type="submit" class='btn btn-primary'>Generate Data</button>
                         </div>
                     </div>
@@ -175,6 +175,8 @@
                             <th class="text-center p-2">Site ID</th>
                             <th class="text-center p-2">Ticket origin date</th>
                             <th class="text-center p-2">Customer name</th>
+
+                            <th class="text-center p-2">Ticket Type</th>
                             <th class="text-center p-2">Ticket Status</th>
 
                             <th class="text-center p-2">Team Leader</th>                     
@@ -201,30 +203,28 @@
                         </tr>
                     </thead>
                     <tbody>
-                            {% for ticket in ticket_data %}
+                        {% for ticket in ticket_data %}
 
-                            {% if ticket.fuel_difference < 0 %}
-                                <tr style="background-color: rgb(237, 144, 14); color:white">
-                            {% elif ticket.ticket_status == 'open' %}
-                                <tr style="background-color: white;">   
-                            {% elif ticket.ticket_status == 'onTheWay' or ticket.ticket_status == 'ttconnected' or ticket.ticket_status == 'running' or ticket.ticket_status == 'teamassign' %}
-                                    <tr style="background-color: rgb(174, 245, 193);">                       
-                                                                                            
-                            {% else %}
-                            <tr style="background-color: rgb(9, 235, 92);">
-                        
-                            {% endif %}
-                     
-                                <td style="white-space: nowrap;"><a  href="{% url 'tickets:update_ticket_edotco' ticket.id %}" style="text-decoration:none;">Assign team</a></td>
-                                <td style="white-space: nowrap;"><a  href="{% url 'tickets:parent_ticket_status_update' ticket.id %}" style="text-decoration:none;">Update TT</a></td>
-                                <td style="white-space: nowrap; "><a  href="{% url 'tickets:delete_ticket_edotco' ticket.id %}" style="text-decoration:none;">Delete</a></td>
-                                <td style="white-space: nowrap; "><a  href="{% url 'tickets:chat' ticket.id %}"style="text-decoration:none;">Message</a></td>
-                                <td style="white-space: nowrap; "><a  href="{% url 'tickets:create_child_ticket' ticket.id %}"  style="text-decoration:none;">PG start</a></td>
-                                <td style="white-space: nowrap; "><a  href="{% url 'tickets:view_child_tickets' ticket.id %}" style="text-decoration: none;">PG stop </a></td>  
-                                <td style="white-space: nowrap; "><a  href="{% url 'tickets:view_child_tickets_external' ticket.id %}" style="text-decoration:none;">Validation</a></td>                          
-                               
-                               
-                               
+                        {% if ticket.fuel_difference < 0 %}
+                            <tr style="background-color: rgb(237, 144, 14); color:white">
+                        {% elif ticket.ticket_status == 'open' %}
+                            <tr style="background-color: white;">   
+                        {% elif ticket.ticket_status == 'onTheWay' or ticket.ticket_status == 'ttconnected' or ticket.ticket_status == 'running' or ticket.ticket_status == 'teamassign' %}
+                                <tr style="background-color: rgb(174, 245, 193);">                       
+                                                                                        
+                        {% else %}
+                        <tr style="background-color: rgb(9, 235, 92);">
+                    
+                        {% endif %}
+                    
+                            <td style="white-space: nowrap;"><a  href="{% url 'tickets:update_ticket_edotco' ticket.id %}" style="text-decoration:none;">Assign team</a></td>
+                            <td style="white-space: nowrap;"><a  href="{% url 'tickets:parent_ticket_status_update' ticket.id %}" style="text-decoration:none;">Update TT</a></td>
+                            <td style="white-space: nowrap; "><a  href="{% url 'tickets:delete_ticket_edotco' ticket.id %}" style="text-decoration:none;">Delete</a></td>
+                            <td style="white-space: nowrap; "><a  href="{% url 'tickets:chat' ticket.id %}"style="text-decoration:none;">Message</a></td>
+                            <td style="white-space: nowrap; "><a  href="{% url 'tickets:create_child_ticket' ticket.id %}"  style="text-decoration:none;">PG start</a></td>
+                            <td style="white-space: nowrap; "><a  href="{% url 'tickets:view_child_tickets' ticket.id %}" style="text-decoration: none;">PG stop </a></td>  
+                            <td style="white-space: nowrap; "><a  href="{% url 'tickets:view_child_tickets_external' ticket.id %}" style="text-decoration:none;">Validation</a></td>                        
+                                                                                        
 
                             <td class="text-center" style="font-size: 14px; white-space: nowrap; color:black">{{ ticket.created_at }}</td>                       
                             <td class="text-center" style="font-size: 14px; white-space: nowrap;color:black">{{ ticket.region }}</td>
@@ -236,6 +236,7 @@
                             <td class="text-center" style="font-size: 14px; white-space: nowrap;color:black">{{ ticket.site_id }}</td>
                             <td class="text-center" style="font-size: 14px; white-space: nowrap;color:black">{{ ticket.ticket_origin_date }}</td>
                             <td class="text-center" style="font-size: 14px; white-space: nowrap;color:black">{{ ticket.customer_name }}</td>
+                            <td class="text-center" style="font-size: 14px; white-space: nowrap;color:black">{{ ticket.ticket_type }}</td>
 
                            
                             <td class="text-center" style="font-size: 14px; white-space: nowrap;color:black">{{ ticket.ticket_status }}</td>

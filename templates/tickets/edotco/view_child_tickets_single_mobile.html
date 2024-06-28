@@ -1,0 +1,187 @@
+{% extends "base.html" %}
+{% load static %}
+
+
+
+{% block content %}
+
+<title>View Ticket</title>
+
+
+    <style>
+
+
+table {
+            border-collapse: collapse;
+            width: 100%;
+        
+        }
+        
+        th, td {
+            border: 1px solid black; /* Set border color for individual cells */
+            vertical-align: middle;
+            padding: 0px;
+        }
+        
+        th {
+          background-color: rgb(131, 231, 151);
+           
+        }
+        
+        
+        
+ .main-content {   
+    overflow-y: auto;
+    margin-left:0px;
+    position: absolute;
+    width: 100%;
+    left: 0;
+  
+}
+.editable-input {
+            border: none;
+            background: transparent;
+            width: 100%;
+            text-align: center;
+        }
+
+</style>
+
+
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+
+
+<div class="container">
+    <div class="row">
+<div class="col text-center">
+<button class=" btn btn-primary" id="updateButton" class="btn btn-primary">Update</button>
+</div>
+</div>
+</div>
+
+
+<div class="container-fluid main-content">
+    <div class="row">
+        <div class="col">
+
+            
+    <h2>Update Ticket's stop time:</h2>
+    <table>
+        <thead>
+            <tr>
+                <th class="text-center p-2" style="white-space:normal">Parent Ticket</th>
+                <th class="text-center p-2"style="white-space:normal">Site code</th>
+                <th class="text-center p-2"style="white-space:normal"> Start Date</th>
+                <th class="text-center p-2"style="white-space:nowrap">Start Time</th>
+                <th class="text-center p-2"style="white-space:normal">Stop Date</th>
+                <th class="text-center p-2"style="white-space:nowrap">Stop Time</th>
+
+           
+            </tr>
+        </thead>
+        <tbody>
+            {% for child_ticket in child_tickets %}
+                <tr>
+                    <td class="text-center p-2" style="white-space:normal">{{ parent_ticket.internal_ticket_number }}</td>
+                    <td class="text-center p-2" style="white-space:normal">{{ parent_ticket.site_id }}</td>
+                    <td class="text-center p-2" style="white-space:normal"><input type="text" readonly class="date-picker text-center" data-field="child_internal_generator_start_date" data-id="{{ child_ticket.id }}" value="{{ child_ticket.child_internal_generator_start_date }}"></td>
+                    <td class="text-center p-2" style="white-space:normal"><input type="text" class="time-picker text-center" data-field="child_internal_generator_start_time" data-id="{{ child_ticket.id }}" value="{{ child_ticket.child_internal_generator_start_time }}"></td>
+                    <td class="text-center p-2" style="white-space:normal"><input type="text" readonly class="date-picker text-center" data-field="child_internal_generator_stop_date" data-id="{{ child_ticket.id }}" value="{{ child_ticket.child_internal_generator_stop_date }}"></td>
+                    <td class="text-center p-2" style="white-space:normal"><input type="text" class="time-picker text-center" data-field="child_internal_generator_stop_time" data-id="{{ child_ticket.id }}" value="{{ child_ticket.child_internal_generator_stop_time }}"></td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+  
+
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        // Initialize time pickers
+        $('.time-picker').timepicker({
+            timeFormat: 'H:i:s',
+            interval: 5,
+            dynamic: false,
+            dropdown: true,
+            scrollbar: true,
+            change: function(time) {
+                $(this).addClass('edited');
+            }
+        });
+    
+        // Event delegation to initialize date picker on focus
+        $(document).on('focus', '.date-picker', function() {
+            $(this).datepicker({
+                dateFormat: 'yy-mm-dd', // Ensure date format matches Django's expectation
+                onSelect: function(dateText, inst) {
+                    $(this).addClass('edited');
+                }
+            });
+        });
+    
+        $('#updateButton').on('click', function() {
+            var editedFields = [];
+    
+            $('input.edited').each(function() {
+                var field = $(this).data('field');
+                var id = $(this).data('id');
+                var value = $(this).val();
+    
+                if (value === 'None') {
+                    alert('Value cannot be None');
+                    return;
+                }
+    
+                var data = {
+                    'id': id,
+                    'field': field,
+                    'value': value
+                };
+    
+                editedFields.push(data);
+            });
+    
+            if (editedFields.length > 0) {
+                $.ajax({
+                    type: 'POST',
+                    url: '{% url "tickets:update_child_ticket_data" %}',
+                    data: JSON.stringify(editedFields),
+                    contentType: 'application/json',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    success: function(response) {
+                        alert('Successfully updated');
+                    },
+                    error: function(xhr, status, error) {
+                        var errorMessage = xhr.responseJSON ? xhr.responseJSON.error : 'Unknown error';
+                        alert('Error: ' + errorMessage);
+                    }
+                });
+            } else {
+                alert('No changes to update.');
+            }
+        });
+    });
+    </script>
+    
+    
+    
+ 
+        
+
+
+
+
+
+{% endblock %}

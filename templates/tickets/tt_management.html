@@ -59,6 +59,12 @@
         </div>
 
         <div class="card" style="background-color: white;">
+            <a class="text-center" style="text-decoration: none;" href="{% url 'tickets:view_tt_start_stop' %}">
+                <img class="rounded-pill" src="{% static 'images/view.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
+                <br>PG start Stop</a>
+        </div>
+
+        <div class="card" style="background-color: white;">
             <a class="text-center" style="text-decoration: none;" href="{% url 'tickets:view_all_parent_tickets_with_children' %}">
                 <img class="rounded-pill" src="{% static 'images/view.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
                 <br>View Tickets with children</a>

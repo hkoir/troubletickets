@@ -38,8 +38,9 @@ class PGRForm(forms.ModelForm):
     class Meta:
         model = PGRdatabase
         fields = [
-            'region', 'zone', 'mp', 'name','PGR_category','phone', 'email',
-            'address','joining_date','pgtl','reference_person_name','reference_person_phone', 'PGR_birth_certificate'
+            'region', 'zone', 'mp', 'name', 'PGR_category', 'phone', 'email',
+            'address', 'joining_date', 'pgtl', 'reference_person_name',
+            'reference_person_phone', 'PGR_birth_certificate'
         ]
 
     def clean(self):

@@ -34,6 +34,12 @@ class eTicket(models.Model):
     mp = models.CharField(max_length=100,choices=MP_CHOICES,null=True,blank=True)
     internal_ticket_number = models.CharField(max_length=50)
 
+    ticket_type_choices=[
+        ('normal','normal'),
+        ('disaster_support','disaster_support')
+    ]
+    ticket_type = models.CharField(max_length=100,choices=ticket_type_choices,null=True,blank=True)
+
     customer_name_choices = [
         ('Edotco', 'Edotco'),
         ('GP', 'GP'),
@@ -220,6 +226,13 @@ class ChildTicketExternal(models.Model):
         total_calculated_fuel = parent_ticket.child_tickets_external.aggregate(total_fuel=Sum('child_external_calculated_fuel_litre'))['total_fuel']
         parent_ticket.customer_calculated_fuel_litre = total_calculated_fuel
         parent_ticket.save(update_fields=['customer_calculated_fuel_litre'])
+
+
+
+
+
+
+
 
 
 

@@ -22,13 +22,13 @@ class ChatForm(forms.ModelForm):
 class CreateTicketFormEdotco(forms.ModelForm):
     class Meta:
         model =  eTicket
-        fields = ['region', 'zone', 'mp', 'site_id','customer_ticket_ref','customer_name']
+        fields = ['region', 'zone', 'mp', 'site_id','customer_ticket_ref','customer_name','ticket_type']
    
  
 class CreateTicketFormEdotco2(forms.ModelForm):
     class Meta:
         model = eTicket
-        fields = ['region', 'zone', 'mp', 'site_id', 'customer_ticket_ref', 'customer_name']
+        fields = ['region', 'zone', 'mp', 'site_id', 'customer_ticket_ref', 'customer_name','ticket_type']
        
 
 
@@ -64,6 +64,10 @@ class UpdateTicketFormEdotco(forms.ModelForm):
         if user_role == 'external':
             self.fields['internal_generator_start_time'].widget = forms.HiddenInput()
             self.fields['internal_generator_stop_time'].widget = forms.HiddenInput()
+
+
+
+
 
      
 

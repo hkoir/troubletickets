@@ -49,12 +49,12 @@
 
 <form method="GET" action="{% url 'vehicle:view_vehicle_info' %}">
     <div class="container-fluid">
-        <div class="row row-cols-1 row-cols-md-4">      
-         <div class="col" style="padding:5px; margin:5px">  Region:{{ form.region }} </div>  
-         <div class="col" style="padding:5px; margin:5px">  Zone:{{ form.zone }} </div>    
-         <div class="col" style="padding:5px; margin:5px">  mp:{{ form.mp }} </div>    
-         <div class="col" style="padding:5px; margin:5px">  Vehicle Reg Number:{{ form.vehicle_reg_number }} </div> 
-         <div class="col" style="padding:5px; margin:5px"> <button type="submit" class='btn btn-primary'>Generate Data</button></div>
+        <div class="row row-cols-2 row-cols-md-4">      
+         <div class="col" style="padding:5px;">  Region:{{ form.region }} </div>  
+         <div class="col" style="padding:5px;">  Zone:{{ form.zone }} </div>    
+         <div class="col" style="padding:5px;">  mp:{{ form.mp }} </div>    
+         <div class="col" style="padding:5px;">  Vehicle Reg Number:{{ form.vehicle_reg_number }} </div> 
+         <div class="col" style="padding:5px;"> <button type="submit" class='btn btn-primary'>Generate Data</button></div>
            
         </div>
     </div>

@@ -16,7 +16,6 @@ urlpatterns = [
 
     path('create_expense_requisition/', views.create_expense_requisition, name='create_expense_requisition'),   
     path('expense_requisition_approval/<int:expense_requisition_id>/', views.expense_requisition_approval, name='expense_requisition_approval'),
-   
     path('expense_approval_status/', views.expense_approval_status, name='expense_approval_status'),
     path('expense_received_mark/<int:requisition_id>/', views.expense_received_mark, name='expense_received_mark'),
     path('download_expense_requisition_data/', views.download_expense_requisition_data, name='download_expense_requisition_data'),

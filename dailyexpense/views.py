@@ -14,6 +14,7 @@ from django.db.models import Value,ExpressionWrapper
 from .forms import ExpenseRequisitionForm,SummaryExpensesForm,ExpenseRequisitionStatusForm,MoneyRequisitionForm
 from .models import MoneyRequisition,SummaryExpenses,DailyExpenseRequisition,AdhocRequisition
 from .forms import ZoneWiseExpensesForm,AdhocRequisitionStatusForm,AdhocRequisitionForm,dailyExpenseSummaryForm
+from.forms import MoneySendingForm
 
 from common.models import FuelPumpDatabase,PGTLdatabase
 from tickets.forms import SummaryReportChartForm
@@ -325,7 +326,7 @@ def download_money_requisition_data(request):
 
 
 
-from.forms import MoneySendingForm
+
 @login_required
 def update_money_requisition(request,requisition_id):
     requisition = get_object_or_404(MoneyRequisition, id=requisition_id)

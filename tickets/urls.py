@@ -15,13 +15,17 @@ urlpatterns = [
     
      path('view_all_parent_tickets_with_children/', views.view_all_parent_tickets_with_children, name='view_all_parent_tickets_with_children'),
      path('view_child_tickets/<int:parent_ticket_id>/', views.view_child_tickets, name='view_child_tickets'),
+     path('view_child_ticket_mobile/<int:parent_ticket_id>/', views.view_child_ticket_mobile, name='view_child_ticket_mobile'),
      path('update_child_ticket_data/', views.UpdateChildTicketData.as_view(), name='update_child_ticket_data'),
        
      path('view_all_parent_tickets_with_children_external/', views.view_all_parent_tickets_with_children_external, name='view_all_parent_tickets_with_children_external'),
      path('view_child_tickets_external/<int:parent_ticket_id>/', views.view_child_tickets_external, name='view_child_tickets_external'),
+     path('view_child_tickets_external_mobile/<int:parent_ticket_id>/', views.view_child_tickets_external_mobile, name='view_child_tickets_external_mobile'),
      path('update_child_ticket_data_external/', views.UpdateChildTicketDataExternal.as_view(), name='update_child_ticket_data_external'),
     
      path('view_tt_edotco/', views.view_tt_edotco, name='view_tt_edotco'),  
+     path('view_tt_start_stop/', views.view_tt_start_stop, name='view_tt_start_stop'), 
+     path('view_tt_disaster/', views.view_tt_disaster, name='view_tt_disaster'),  
      path('update_ticket_edotco/<int:ticket_id>/', views.update_ticket_edotco, name='update_ticket_edotco'),
      path('delete_tt_edotco/<int:ticket_id>/', views.delete_ticket_edotco, name='delete_ticket_edotco'), 
     

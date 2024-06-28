@@ -50,25 +50,19 @@
 
 
 <div class="container-fluid main-content">
-    <h1>PG fault status</h1>
-    
-    <form method="GET" action="{% url 'generator:view_pg_fuel' %}">        
-        <button type="submit" name="download_csv" class="btn btn-primary">Export CSV</button>
-    </form>
-    
-
-
+    <h1>PG fault status</h1>  
+   
     <form method="GET" action="{% url 'generator:view_pg_fault' %}">
         <div class="container-fluid main-content2">
-            <div class="row row-cols-1 row-cols-md-4">
+            <div class="row row-cols-2 row-cols-md-6">
     
-            <div class="col" style="padding:5px; margin:5px">  Start Date:  {{ form.start_date }} </div>
-            <div class="col" style="padding:5px; margin:5px">  End Date:  {{ form.end_date }} </div>
-            <div class="col" style="padding:5px; margin:5px"> No of days {{ form.days }} </div>
-            <div class="col" style="padding:5px; margin:5px">  Region:{{ form.region }} </div>  
-            <div class="col" style="padding:5px; margin:5px">  Zone:{{ form.zone }} </div>    
-            <div class="col" style="padding:5px; margin:5px">  mp:{{ form.mp }} </div>  
-            <div class="col" style="padding:5px; margin:5px"> <button type="submit" class='btn btn-primary'>Generate Data</button></div>
+            <div class="col" style="padding:5px;">  Start Date:  {{ form.start_date }} </div>
+            <div class="col" style="padding:5px;">  End Date:  {{ form.end_date }} </div>
+            <div class="col" style="padding:5px;"> No of days {{ form.days }} </div>
+            <div class="col" style="padding:5px;">  Region:{{ form.region }} </div>  
+            <div class="col" style="padding:5px;">  Zone:{{ form.zone }} </div>    
+            <div class="col" style="padding:5px;">  mp:{{ form.mp }} </div>  
+            <div class="col" style="padding:5px;"> <button type="submit" class='btn btn-primary'>Generate Data</button></div>
             
             </div>
         </div>                    
@@ -85,6 +79,10 @@
 
 
 <h4> <a href="{% url 'generator:view_pg_details_fault'%}">View fault details</a></h4>
+<form method="GET" action="{% url 'generator:view_pg_fuel' %}">        
+    <button type="submit" name="download_csv" class="btn btn-primary">Export CSV</button>
+</form>
+
 
 
 
