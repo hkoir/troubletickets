@@ -14,6 +14,14 @@ def total_run_hour_in_hours(td):
 
 
 @register.filter
+def divide_by(value, divisor):
+    try:
+        return value / divisor
+    except (TypeError, ZeroDivisionError):
+        return value
+
+
+@register.filter
 def format_currency(value):
     if value is not None:
         # Convert the value to a float and format it as a string with thousand separators
@@ -49,7 +57,12 @@ def calculate_faulty_percentage(faulty_count, total_count):
 def subtract_with_multiplier(value, arg):
     return (value*2.4) - (arg * 2.4)
 
-
+@register.filter
+def add(value, arg):
+    try:
+        return value + arg
+    except TypeError:
+        return ''
 
 
 @register.filter

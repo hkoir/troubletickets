@@ -77,112 +77,130 @@
 
 
 
-
-<div class="container-fluid"id='main-content'>
-    <div class="row">
-        <div class="col overflow-auto">
-            <table border="1">
-                <thead>
-                    <tr>
-                        <th class="text-center p-2">View details</th>    
-                        <th class="text-center p-2">Date</th>           
-                        <th class="text-center p-2">Region</th>
-                        <th class="text-center p-2">Zone</th>
-                        <th class="text-center p-2">MP</th>
-                        <th class="text-center p-2">TT Number</th>
-                        <th class="text-center p-2">Edotco TT Ref</th>
-                        <th class="text-center p-2">Edotco Site ID</th>
-
-                        <th class="text-center p-2">PGR Type</th>
-                        <th class="text-center p-2">PGR Category</th>
-                        <th class="text-center p-2">PGR Name</th>
-                        <th class="text-center p-2">Team leader Name</th>
-                        <th class="text-center p-2">PGR Phone</th>
-                        <th class="text-center p-2">Team leader phone</th>
-                        <th class="text-center p-2">Ticket Status</th>
-
-                        <th class="text-center p-2">Internal GRH</th>
-                        <th class="text-center p-2">Customer GRH</th>                        
-                        <th class="text-center p-2">Fuel difference</th>
-                   
-
-                    
-                        <th class="text-center p-2">Vehicle type</th>
-                      
-                        <th class="text-center p-2">PG Number</th>
-                        <th class="text-center p-2">Vehicle Number</th>
-                      
-                       
-                        <!-- Add other fields as necessary -->
-                    </tr>
-                </thead> 
-                <tbody>
-                    {% if etickets %}
-                        {% for ticket in etickets %}
-                        <tr>
-                            <td style="white-space: nowrap; "><a  href="{% url 'tickets:view_child_tickets_external' ticket.id %}" style="text-decoration:none;">view childs</a></td>  
-                            <td class="text-center p-2" style="white-space: nowrap;">{{ ticket.created_at }}</td>               
-                            <td class="text-center p-2">{{ ticket.region }}</td>
-                            <td class="text-center p-2">{{ ticket.zone }}</td>
-                            <td class="text-center p-2">{{ ticket.mp }}</td>
-                            <td class="text-center p-2">{{ ticket.internal_ticket_number }}</td>
-                            <td class="text-center p-2">{{ ticket.customer_ticket_ref }}</td>
-                            <td class="text-center p-2">{{ ticket.site_id }}</td>
-
-                            <td class="text-center p-2">{{ ticket.assigned_to.PGR_type }}</td>
-                            {% if ticket.assigned_to.PGR_category == 'adhoc' %}
-                            <td class="text-center p-2" style="background-color: red;">{{ ticket.assigned_to.PGR_category }}</td>
-                            {% else %}
-                            <td class="text-center p-2">{{ ticket.assigned_to.PGR_category }}</td>
-                            {% endif %}
-                            <td class="text-center p-2">{{ ticket.assigned_to.name }}</td>
-                            <td class="text-center p-2">{{ ticket.team_leader_name.name }}</td>
-                            <td class="text-center p-2">{{ ticket.assigned_to.phone }}</td>
-                            <td class="text-center p-2">{{ ticket.team_leader_name.phone}}</td>
-                          
-                            <td class="text-center p-2">{{ ticket.ticket_status }}</td>
-
-                            <td class="text-center p-2">{{ ticket.internal_generator_running_hours }}</td>
-                            <td class="text-center p-2">{{ ticket.customer_generator_running_hours }}</td>
+    <div class="container-fluid"id='main-content'>
+        <div class="row">
+            <div class="col-xl-12">      
                             
-                            {% if ticket.fuel_difference > 0 %}
-                            <td class="text-center p-2" style="background-color: red;">{{ ticket.fuel_difference|floatformat:'2'}}</td>
-                                {% else %}
-                            <td class="text-center p-2" style="background-color: greenyellow;">{{ ticket.fuel_difference|floatformat:'2' }}</td>
-                            {% endif %}
-                                                       
-                            {% if ticket.vehicle.vehicle_rental_type == "adhoc" %}
-                            <td class="text-center p-2" style="background-color: red;color:white">{{ ticket.vehicle.vehicle_rental_type}}</td>
-                            {% else %}
-                            <td class="text-center p-2" style="background-color: greenyellow;">{{ ticket.vehicle.vehicle_rental_type}}</td>
-                            {% endif %}
+                <table border="1">
+                    <thead>
+                        <tr>
+                            <th class="text-center p-2">View details</th> 
+                            <th class="text-center p-2">Date</th>           
+                            <th class="text-center p-2">Region</th>
+                            <th class="text-center p-2">Zone</th>
+                            <th class="text-center p-2">MP</th>
+                            <th class="text-center p-2">TT Number</th>
+                            <th class="text-center p-2">Customer TT Ref</th>
+                            <th class="text-center p-2">Customer Site ID</th>
+    
+    
+                            <th class="text-center p-2">Internal GRH</th>
+                            <th class="text-center p-2">Customer GRH</th>
+                            <th class="text-center p-2">PGR Type</th>
+                            <th class="text-center p-2">PGR Category</th>
+                            <th class="text-center p-2">PGR Name</th>
+                            <th class="text-center p-2">Team leader Name</th>     
+                            <th class="text-center p-2">PGR Phone</th> 
+                            <th class="text-center p-2">Team Leader Phone</th>          
+                            <th class="text-center p-2">Ticket Status</th>
+                            <th class="text-center p-2">Fuel difference</th>
+                         
+    
+                           
+                            <th class="text-center p-2">Vehicle type</th>
                           
-                            <td class="text-center p-2">{{ ticket.pgnumber.PGNumber }}</td>
-                            <td class="text-center p-2" style="white-space: nowrap;">{{ ticket.vehicle.vehicle_reg_number }}</td>
-
-
+                            <th class="text-center p-2">PG Number</th>
+                            <th class="text-center p-2">Vehicle Number</th>
                         
-                                                   
-                                             
-                                                    
                             <!-- Add other fields as necessary -->
                         </tr>
-                        {% endfor %}
-                    {% else %}
-                        <tr>
-                            <td colspan="12" class="text-center p-2">
-                                <h4>Currently no data found for this selection.</h4>
-                            </td>
-                        </tr>
-                    {% endif %}
-                </tbody>
-            </table>
-            
-            
-
+                    </thead> 
+                    <tbody>
+                        {% if page_obj %}
+                              {% for ticket in page_obj %}
+                            <tr>
+                                <td style="white-space: nowrap; "><a  href="{% url 'tickets:view_child_tickets_external' ticket.id %}" style="text-decoration:none;">view childs</a></td>  
+                                <td class="text-center p-2" style="white-space: nowrap;">{{ ticket.created_at }}</td>               
+                                <td class="text-center p-2">{{ ticket.region }}</td>
+                                <td class="text-center p-2">{{ ticket.zone }}</td>
+                                <td class="text-center p-2">{{ ticket.mp }}</td>
+                                <td class="text-center p-2">{{ ticket.internal_ticket_number }}</td>
+                                <td class="text-center p-2">{{ ticket.customer_ticket_ref }}</td>
+                                <td class="text-center p-2">{{ ticket.site_id }}</td>
+    
+                                <td class="text-center p-2">{{ ticket.internal_generator_running_hours }}</td>
+                                <td class="text-center p-2">{{ ticket.customer_generator_running_hours }}</td>
+    
+                                <td class="text-center p-2">{{ ticket.assigned_to.PGR_type }}</td>
+                                {% if ticket.assigned_to.PGR_category == "adhoc" %}
+                                <td class="text-center p-2" style="background-color: red;">{{ ticket.assigned_to.PGR_category }}</td>
+                                {% else %}
+                                <td class="text-center p-2">{{ ticket.assigned_to.PGR_category }}</td>
+                                {% endif %} 
+                                <td class="text-center p-2">{{ ticket.assigned_to.name }}</td>
+                                <td class="text-center p-2">{{ ticket.team_leader_name.name }}</td>
+                                <td class="text-center p-2">{{ ticket.assigned_to.phone }}</td>
+                                <td class="text-center p-2">{{ ticket.team_leader_name.phone }}</td>
+                               
+                                <td class="text-center p-2">{{ ticket.ticket_status }}</td>
+                                
+                
+                                {% if ticket.fuel_difference > 0 %}
+                                <td class="text-center p-2" style="background-color: red;">{{ ticket.fuel_difference|floatformat:'2' }}</td>
+                                {% else %}
+                                <td class="text-center p-2" style="background-color: greenyellow">{{ ticket.fuel_difference|floatformat:'2' }}</td>
+                                {% endif %}
+                                
+    
+                               
+                                {% if ticket.vehicle.vehicle_rental_type == "adhoc" %}
+                                <td class="text-center p-2" style="background-color: red;color:white">{{ ticket.vehicle.vehicle_rental_type}}</td>
+                                {% else %}
+                                <td class="text-center p-2">{{ ticket.vehicle.vehicle_rental_type}}</td>
+                                {% endif %}
+                              
+                                <td class="text-center p-2">{{ ticket.pgnumber.PGNumber }}</td>
+                                <td class="text-center p-2" style="white-space: nowrap;">{{ ticket.vehicle.vehicle_reg_number }}</td>
+                            
+                                <!-- Add other fields as necessary -->
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="12" class="text-center p-2">
+                                    <h4>Currently no data found for this selection.</h4>
+                                </td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+    
+    
+            </div>
         </div>
+    
+    
+    
+        <div class="pagination" style="padding:10px">
+            {% if page_obj.has_previous %}
+                <a style="margin:10px; font-size: 14px;" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+            {% endif %}
+            
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                    <span style="margin:10px; font-size:14px">{{ num }}</span>
+                {% else %}
+                    <a style="margin:10px; font-size:14px"href="?page={{ num }}">{{ num }}</a>
+                {% endif %}
+            {% endfor %}
+            
+            {% if page_obj.has_next %}
+                <a style="margin:10px; font-size:14px"href="?page={{ page_obj.next_page_number }}">Next</a>
+            {% endif %}
+        </div>
+    
+        
     </div>
-</div>
 
 <div class="col" style="height:1200px"></div>
 

@@ -141,7 +141,7 @@
                     </tr>
                 </thead> 
                 <tbody>
-                    {% if page_obj %}
+                
                           {% for ticket in page_obj %}
                         <tr>
                             <td style="white-space: nowrap; "><a  href="{% url 'tickets:view_child_tickets_external' ticket.id %}" style="text-decoration:none;">view childs</a></td>  
@@ -190,13 +190,9 @@
                             <!-- Add other fields as necessary -->
                         </tr>
                         {% endfor %}
-                    {% else %}
-                        <tr>
-                            <td colspan="12" class="text-center p-2">
-                                <h4>Currently no data found for this selection.</h4>
-                            </td>
-                        </tr>
-                    {% endif %}
+              
+                      
+           
                 </tbody>
             </table>
 

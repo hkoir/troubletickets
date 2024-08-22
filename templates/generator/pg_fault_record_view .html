@@ -50,6 +50,8 @@
 
 
 <div class="container-fluid main-content">
+    <div class="row">
+        <div class="col-xl-12">
     <h1>PG fault status</h1>  
    
     <form method="GET" action="{% url 'generator:view_pg_fault' %}">
@@ -76,16 +78,18 @@
             {% endif %}
         </h4>       
 
+    </div>
+    <div class="col-12">
+        <h4> <a href="{% url 'generator:view_pg_details_fault'%}">View fault details</a></h4>
+        <form method="GET" action="{% url 'generator:view_pg_fuel' %}">        
+            <button type="submit" name="download_csv" class="btn btn-primary">Export CSV</button>
+        </form>
+
+    </div>
 
 
-<h4> <a href="{% url 'generator:view_pg_details_fault'%}">View fault details</a></h4>
-<form method="GET" action="{% url 'generator:view_pg_fuel' %}">        
-    <button type="submit" name="download_csv" class="btn btn-primary">Export CSV</button>
-</form>
 
-
-
-
+<div class="col-xl-12">
     <table>
         <thead>
             <tr>
@@ -97,6 +101,7 @@
                 <th class="text-center p-2">Zone</th>
                 <th class="text-center p-2">MP</th>
                 <th class="text-center p-2">PG Number</th>
+                <th class="text-center p-2">PG vendor</th>
                 <th class="text-center p-2">Fault Date</th>
                 <th class="text-center p-2">Repair date</th>
                 <th class="text-center p-2" style="white-space:normal;">Fault Description</th>
@@ -105,6 +110,7 @@
 
                 <th class="text-center p-2">Repair by</th>
                 <th class="text-center p-2">Repair cost</th>
+             
               
             </tr>
         </thead>
@@ -124,6 +130,7 @@
                 <td class="text-center p-2"style="white-space: nowrap;">{{ fuel.zone }}</td>
                 <td class="text-center p-2"style="white-space: nowrap;">{{ fuel.mp }}</td>
                 <td class="text-center p-2" style="white-space: nowrap;">{{ fuel.pgnumber.PGNumber }}</td>
+                <td class="text-center p-2" style="white-space: nowrap;">{{ fuel.pgnumber.PG_supplier }}</td>
                 <td class="text-center p-2" style="white-space: nowrap;">{{ fuel.fault_date }}</td>
                 <td class="text-center p-2" style="white-space: nowrap;">{{ fuel.repair_date }}</td>
                 <td class="text-center p-2" style="white-space: nowrap;">{{ fuel.fault_description }}</td>
@@ -131,12 +138,13 @@
                 <td class="text-center p-2" style="white-space: nowrap;">{{ fuel.fault_duration }}</td>
                 <td class="text-center p-2" style="white-space: nowrap;">{{ fuel.repair_by }}</td>
                 <td class="text-center p-2" style="white-space: nowrap;">{{ fuel.repair_cost }}</td>
+               
                 
             </tr> 
             {% endfor %} 
         </tbody>
     </table>
-
+</div>
 
 <!-- Pagination -->
 <div class="pagination" style="padding: 10px;">

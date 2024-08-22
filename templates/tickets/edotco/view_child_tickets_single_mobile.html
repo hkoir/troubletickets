@@ -7,6 +7,7 @@
 
 <title>View Ticket</title>
 
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <style>
 
@@ -28,7 +29,9 @@ table {
            
         }
         
-        
+        table thead th {
+        white-space: normal;
+        }
         
  .main-content {   
     overflow-y: auto;
@@ -38,12 +41,7 @@ table {
     left: 0;
   
 }
-.editable-input {
-            border: none;
-            background: transparent;
-            width: 100%;
-            text-align: center;
-        }
+
 
 </style>
 
@@ -55,100 +53,87 @@ table {
     {% endfor %}
 </ul>
 {% endif %}
-
-
-<div class="container">
-    <div class="row">
-<div class="col text-center">
-<button class=" btn btn-primary" id="updateButton" class="btn btn-primary">Update</button>
-</div>
-</div>
-</div>
-
-
 <div class="container-fluid main-content">
-    <div class="row">
+    <div class="row">   
         <div class="col">
+                 
+             <h2 class="text-center">Update Stop time<button id="updateButton" class="btn btn-primary text-center">Update</button>   </h2>
+        
+                <table>
+                    <thead>
+                        <tr>     
+                            <th class="text-center p-2"style="white-space:normal">Internal Start Date</th>
+                            <th class="text-center p-2"style="white-space:normal">Internal Start Time</th>
+                            <th class="text-center p-2"style="white-space:normal">Internal Stop Date</th>
+                            <th class="text-center p-2"style="white-space:normal">Internal Stop Time</th>
+                            <th class="text-center p-2"style="white-space:normal">Input Status</th>
+                                                   
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for child_ticket in child_tickets %}
+                            <tr>                                           
+                                <td class="text-center p-2" contenteditable="true" data-field="child_internal_generator_start_date" data-id="{{ child_ticket.id }}" style="white-space: nowrap;">{{ child_ticket.child_internal_generator_start_date }}</td>
+                                <td class="text-center p-2" contenteditable="true" data-field="child_internal_generator_start_time" data-id="{{ child_ticket.id }}">{{ child_ticket.child_internal_generator_start_time }}</td>
+                                <td class="text-center p-2" contenteditable="true" data-field="child_internal_generator_stop_date" data-id="{{ child_ticket.id }}" style="white-space: nowrap;">{{ child_ticket.child_internal_generator_stop_date }}</td>
+                                <td class="text-center p-2" contenteditable="true" data-field="child_internal_generator_stop_time" data-id="{{ child_ticket.id }}">{{ child_ticket.child_internal_generator_stop_time }}</td>
+                            
+                                {% if child_ticket.child_internal_generator_stop_time is not None %}
+                                <td class="text-center p-2"><i class="fas fa-check" style="color:green">done</i></td>
+                                {% else %}
+                                <td class="text-center p-2" style="color:red">Pending</td>
+                                {% endif %}
+                        {% endfor %}
+                    </tbody>
+                </table>
 
-            
-    <h2>Update Ticket's stop time:</h2>
-    <table>
-        <thead>
-            <tr>
-                <th class="text-center p-2" style="white-space:normal">Parent Ticket</th>
-                <th class="text-center p-2"style="white-space:normal">Site code</th>
-                <th class="text-center p-2"style="white-space:normal"> Start Date</th>
-                <th class="text-center p-2"style="white-space:nowrap">Start Time</th>
-                <th class="text-center p-2"style="white-space:normal">Stop Date</th>
-                <th class="text-center p-2"style="white-space:nowrap">Stop Time</th>
 
-           
-            </tr>
-        </thead>
-        <tbody>
-            {% for child_ticket in child_tickets %}
-                <tr>
-                    <td class="text-center p-2" style="white-space:normal">{{ parent_ticket.internal_ticket_number }}</td>
-                    <td class="text-center p-2" style="white-space:normal">{{ parent_ticket.site_id }}</td>
-                    <td class="text-center p-2" style="white-space:normal"><input type="text" readonly class="date-picker text-center" data-field="child_internal_generator_start_date" data-id="{{ child_ticket.id }}" value="{{ child_ticket.child_internal_generator_start_date }}"></td>
-                    <td class="text-center p-2" style="white-space:normal"><input type="text" class="time-picker text-center" data-field="child_internal_generator_start_time" data-id="{{ child_ticket.id }}" value="{{ child_ticket.child_internal_generator_start_time }}"></td>
-                    <td class="text-center p-2" style="white-space:normal"><input type="text" readonly class="date-picker text-center" data-field="child_internal_generator_stop_date" data-id="{{ child_ticket.id }}" value="{{ child_ticket.child_internal_generator_stop_date }}"></td>
-                    <td class="text-center p-2" style="white-space:normal"><input type="text" class="time-picker text-center" data-field="child_internal_generator_stop_time" data-id="{{ child_ticket.id }}" value="{{ child_ticket.child_internal_generator_stop_time }}"></td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-
-  
 
         </div>
     </div>
 </div>
 
-<script>
+    
+
+
+
+ 
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
     $(document).ready(function() {
-        // Initialize time pickers
-        $('.time-picker').timepicker({
-            timeFormat: 'H:i:s',
-            interval: 5,
-            dynamic: false,
-            dropdown: true,
-            scrollbar: true,
-            change: function(time) {
-                $(this).addClass('edited');
-            }
-        });
-    
-        // Event delegation to initialize date picker on focus
-        $(document).on('focus', '.date-picker', function() {
-            $(this).datepicker({
-                dateFormat: 'yy-mm-dd', // Ensure date format matches Django's expectation
-                onSelect: function(dateText, inst) {
-                    $(this).addClass('edited');
-                }
-            });
-        });
-    
         $('#updateButton').on('click', function() {
             var editedFields = [];
     
-            $('input.edited').each(function() {
+            $('[contenteditable="true"]').each(function() {
                 var field = $(this).data('field');
                 var id = $(this).data('id');
-                var value = $(this).val();
+                var value = $(this).text();
     
                 if (value === 'None') {
                     alert('Value cannot be None');
-                    return;
+                    return; 
                 }
     
-                var data = {
-                    'id': id,
-                    'field': field,
-                    'value': value
-                };
+                if ($(this).hasClass('edited')) {
+                    if (field.includes('date')) {
+                        var date = new Date(value);
+                        value = date.toISOString().split('T')[0];
+                    } else if (field.includes('time')) {
+                        var timeParts = value.split(':');
+                        if (timeParts.length === 2) {
+                            value = value + ':00';  // Add seconds part if missing
+                        }
+                    }
     
-                editedFields.push(data);
+                    var data = {
+                        'id': id,
+                        'field': field,
+                        'value': value
+                    };
+    
+                    editedFields.push(data);
+                }
             });
     
             if (editedFields.length > 0) {
@@ -172,10 +157,14 @@ table {
                 alert('No changes to update.');
             }
         });
+    
+        $('[contenteditable="true"]').on('blur', function() {
+            $(this).addClass('edited');
+        });
     });
     </script>
     
-    
+
     
  
         

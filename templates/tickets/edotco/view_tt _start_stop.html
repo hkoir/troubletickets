@@ -80,16 +80,17 @@
 <div class="container-fluid" id="main-content">
     <div class="row">
         <div class="col-xl-12">                
-            <form method="GET" action="{% url 'tickets:view_tt_edotco' %}">
+            <form method="GET" action="{% url 'tickets:view_tt_start_stop' %}">
                 <div class="container-fluid main-content2">
                     <div class="row row-cols-2 row-cols-md-6">
                         <div class="col" style="padding:5px; ">  Start Date:  {{ form.start_date }} </div>
                         <div class="col" style="padding:5px; ">  End Date:  {{ form.end_date }} </div>
-                        <div class="col" style="padding:5px; "> No of days {{ form.days }} </div>
+                        <div class="col" style="padding:5px; ">  No of days {{ form.days }} </div>
                         <div class="col" style="padding:5px; ">  Region:{{ form.region }} </div>  
                         <div class="col" style="padding:5px; ">  Zone:{{ form.zone }} </div>    
                         <div class="col" style="padding:5px; ">  MP:{{ form.mp }} </div>  
-                        <div class="col" style="padding:5px; "> 
+                        <div class="col" style="padding:5px;">  Ticket Number:{{ form.ticket_number }} </div>  
+                        <div class="col" style="padding:5px;margin-left:20px;margin-top:20px"> 
                             <button type="submit" class='btn btn-primary'>Generate Data</button>
                         </div>
                     </div>
@@ -115,9 +116,11 @@
                
                     <thead style="background-color: rgb(6, 238, 226);">
                         <tr>                         
-                          
-                            <th class="text-center p-2">Chat</th>
+                      
+                            <th class="text-center p-2">Chat</th>                                 
+                            <th class="text-center p-2">MP</th>
                             <th class="text-center p-2">Ticket Number</th>
+                            <th class="text-center p-2">Ticket Origin date</th>
                             <th class="text-center p-2">Site code</th>
                             <th class="text-center p-2">PG Start</th>
                             <th class="text-center p-2">PG Stop</th>
@@ -130,12 +133,15 @@
                     </thead>
                     <tbody>
                         {% for ticket in ticket_data %}
-                                         
+                         
+                           
 
                             <td style="white-space: nowrap; "><a  href="{% url 'tickets:chat' ticket.id %}"style="text-decoration:none;">Message</a></td>
-                            <td class="text-center" style="font-size: 14px; white-space: nowrap;color:black">{{ ticket.customer_ticket_ref }}</td>
+                            <td class="text-center" style="font-size: 14px; white-space: nowrap;color:black">{{ ticket.mp}}</td>
+                            <td class="text-center" style="font-size: 14px; white-space: nowrap;color:black">{{ ticket.internal_ticket_number}}</td>
+                            <td class="text-center" style="font-size: 14px; white-space: nowrap;color:black">{{ ticket.ticket_origin_date}}</td>
                             <td class="text-center" style="font-size: 14px; white-space: nowrap;color:black">{{ ticket.site_id }}</td>                       
-                            <td style="white-space: nowrap; "><a  href="{% url 'tickets:create_child_ticket' ticket.id %}"  style="text-decoration:none;">PG start</a></td>
+                            <td style="white-space: nowrap; "><a  href="{% url 'tickets:create_child_ticke_mobile' ticket.id %}"  style="text-decoration:none;">PG start</a></td>
                             <td style="white-space: nowrap; "><a  href="{% url 'tickets:view_child_ticket_mobile' ticket.id %}" style="text-decoration: none;">PG stop </a></td>  
                             <td style="white-space: nowrap; "><a  href="{% url 'tickets:view_child_tickets_external_mobile' ticket.id %}" style="text-decoration:none;">Validation</a></td> 
                            

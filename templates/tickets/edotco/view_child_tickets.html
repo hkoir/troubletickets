@@ -102,9 +102,12 @@ table {
             <th class="text-center p-2">Ticket Status</th>
 
             <th class="text-center p-2">Assigned PGR Name</th>
-            <th class="text-center p-2">Assigned PGR type</th>
-            <th class="text-center p-2">PGR Category</th>
-            <th class="text-center p-2">Team leader</th>
+            <th class="text-center p-2">Assigned PGR Photo</th>
+            <th class="text-center p-2">Assigned PGR Category</th>
+            <th class="text-center p-2">PGR Phone</th>
+            <th class="text-center p-2">Team leader Name</th>
+            <th class="text-center p-2">Team leader Photo</th>
+            <th class="text-center p-2">Team leader Phone</th>
 
             <th class="text-center p-2">Assigned Vehicle Type</th>
        
@@ -149,9 +152,39 @@ table {
                 <td class="text-center p-2" style="font-size: 14px; white-space: nowrap;color:black">{{ parent_ticket.ticket_status }}</td>
 
                 <td class="text-center p-2" style="font-size: 14px; white-space: nowrap;color:black">{{ parent_ticket.assigned_to }}</td>
-                <td class="text-center p-2" style="font-size: 14px; white-space: nowrap;color:black">{{ parent_ticket.assigned_to.PGR_type }}</td>
+               
+               <td class="text-center p-2" style="font-size: 14px; white-space: nowrap;color:black"> 
+                {% if parent_ticket.assigned_to.PGR_photo %}
+                <a href="{{ parent_ticket.assigned_to.PGR_photo.url }}" target="_blank">
+                    <img 
+                        src="{{ parent_ticket.assigned_to.PGR_photo.url }}" 
+                        alt="PGR photo"
+                        style="cursor: pointer; width:50px;height:50px">
+                </a>
+                {% else %}
+                No file available
+                {% endif %}
+                </td>
+                
+
                 <td class="text-center p-2" style="font-size: 14px; white-space: nowrap;color:black">{{ parent_ticket.assigned_to.PGR_category }}</td>
-                <td class="text-center p-2" style="font-size: 14px; white-space: nowrap;color:black">{{ parent_ticket.team_leader_name.name }}</td>
+                <td class="text-center p-2" style="font-size: 14px; white-space: nowrap;color:black">{{ parent_ticket.assigned_to.phone }}</td>
+
+                <td class="text-center p-2" style="font-size: 14px; white-space: nowrap;color:black">{{ parent_ticket.assigned_to.pgtl.name }}</td>
+
+                <td class="text-center p-2" style="font-size: 14px; white-space: nowrap;color:black">
+                {% if parent_ticket.assigned_to.pgtl.PGTL_photo %}
+                <a href="{{ parent_ticket.assigned_to.pgtl.PGTL_photo.url }}" target="_blank">
+                    <img 
+                        src="{{ parent_ticket.assigned_to.pgtl.PGTL_photo.url }}" 
+                        alt="PGTL photo"
+                        style="cursor: pointer; width:50px;height:50px">
+                </a>
+                {% else %}
+                No file available
+                {% endif %}
+              </td>
+                <td class="text-center p-2" style="font-size: 14px; white-space: nowrap;color:black">{{ parent_ticket.assigned_to.pgtl.phone }}</td>
 
                 <td class="text-center p-2" style="font-size: 14px; white-space: nowrap;color:black">{{ parent_ticket.vehicle.vehicle_rental_type }}</td>
 

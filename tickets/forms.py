@@ -8,7 +8,8 @@ from common.models import PGTLdatabase
 from generator.models import AddPGInfo
 
 
-
+class TicketNumber(forms.Form):
+    TicketNumber = forms.CharField(required=True)
 
 class ChatForm(forms.ModelForm):
     class Meta:
@@ -79,10 +80,7 @@ class CreateChildTicketForm(forms.ModelForm):
     class Meta:
         model =  ChildTicket
         fields = ['parent_ticket_number','child_internal_generator_start_time']      
-        widgets = {
-                'child_internal_generator_start_time': forms.TimeInput(attrs={'type': 'time'})          
-            
-                     }
+        widgets = {'child_internal_generator_start_time': forms.TimeInput(attrs={'type': 'time'})}
         
     def clean(self):
         cleaned_data = super().clean()
@@ -182,3 +180,4 @@ class SummaryReportChartForm(forms.Form):
     region = forms.ChoiceField(choices=REGION_CHOICES, required=False)
     zone = forms.ChoiceField(choices=ZONE_CHOICES, required=False)
     mp = forms.ChoiceField(choices=MP_CHOICES, required=False)
+    ticket_number = forms.CharField(required=False)

@@ -81,7 +81,7 @@ table {
             {% for child_ticket in child_tickets %}
                 <tr>
                    
-                    <td class="text-center p-2">{{ parent_ticket.internal_ticket_number }}</td>
+                    <td class="text-center p-2"><a href="{% url 'tickets:parent_ticket_status_update' parent_ticket.id %}">{{ parent_ticket.internal_ticket_number }}</a></td>
                     <td class="text-center p-2">{{ parent_ticket.site_id }}</td>
                     <td class="text-center p-2"style='white-space:nowrap'>{{ child_ticket.child_internal_generator_start_time }}</td>
                     <td class="text-center p-2" style="white-space:nowrap;">{{ child_ticket.child_internal_generator_stop_time }}</td>

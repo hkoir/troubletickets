@@ -31,11 +31,10 @@ class MoneyRequisition(models.Model):
     zone = models.CharField(max_length=100,choices=ZONE_CHOICES,null=True, blank=True)
 
     purpose_choices=[
-        ('CM_work','CM_work'),
-        ('PM_work','PM_work'),
-        ('General','General'),
-        ('spare_purchase','spare_purchase'),
-        ('others','others')
+        ('Operations','Operations'),
+        ('Adhoc_man','Adhoc_man'),
+        ('Adhoc_vehicle','Adhoc_vehicle'),
+      
     ]
     purpose = models.CharField(max_length=100,choices=purpose_choices, default="None",null=True, blank=True)
     

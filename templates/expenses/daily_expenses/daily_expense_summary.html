@@ -61,12 +61,15 @@
 
 <div style="left:0px; margin-left:0px">
     <h4 style="margin-top:40px; margin-bottom:30px; margin-left:0px">
+        Summary at a galance:   
         Data for
         {% if days %}
             the last {{ days }} days
         {% elif form.cleaned_data.start_date and form.cleaned_data.end_date %}
             from: {{ form.cleaned_data.start_date }} to {{ form.cleaned_data.end_date }}
         {% endif %}
+        :<a href="{% url 'dailyexpense:create_expense_requisition' %}">Add expenses</a>:
+        <a href="{% url 'dailyexpense:expense_approval_status' %}">Expense approval status</a>
     </h4>
 </div>
 
@@ -74,9 +77,7 @@
 
 <div class="container">
     <div class="row">
-        <div class="col-xl-12">
-
-            <h4> Summary at a galance</h4>          
+        <div class="col-xl-12">          
 
             <table>
                 <thead>
@@ -105,7 +106,7 @@
                     <td class="text-center p-2">{{ vehicle_local_fuel_purchase }}</td>
 
                     <td class="text-center p-2">{{ local_conveyance_amount }}</td>
-                    <td class="text-center p-2">{{pg_carrying_cost_amount }}</td>
+                    <td class="text-center p-2">{{ pg_carrying_cost_amount }}</td>
                     <td class="text-center p-2">{{ food_amount}}</td>
                     <td class="text-center p-2">{{ toll_amount }}</td>
                     <td class="text-center p-2">{{ night_bill_amount }}</td>

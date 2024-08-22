@@ -95,16 +95,24 @@ table {
 
                         <th class="text-center p-2">Date</th>
                         <th class="text-center p-2">Adhoc name</th>
+                        <th class="text-center p-2">Adhoc Photo ID</th>
+                        <th class="text-center p-2">Adhoc phone</th>
+                        <th class="text-center p-2">Team Leader</th>                        
+                        <th class="text-center p-2">Team Leader Photo ID</th>
+                        <th class="text-center p-2">Team leader phone</th>  
+                        <th class="text-center p-2">Adhoc Region</th>
+                        <th class="text-center p-2">Adhoc Zone</th>
+                        <th class="text-center p-2">Adhoc MP</th>
                         <th class="text-center p-2">Start date</th>
                         <th class="text-center p-2">End date</th>
                         <th class="text-center p-2" style="white-space: nowrap;">Days</th>
                         <th class="text-center p-2">Purpose</th>   
-                        <th class="text-center p-2">Team Leader</th> 
-                        <th class="text-center p-2">Status</th> 
-                        <th class="text-center p-2">Adhoc phone</th>      
-                        <th class="text-center p-2">Team leader phone</th>  
-                        <th class="text-center p-2">Team leader zone</th>
-                        <th class="text-center p-2">Adhoc zone</th>                  
+                       
+                        <th class="text-center p-2">Approval Status</th> 
+                          
+                    
+                        <th class="text-center p-2">Current Status</th>
+                                   
                                 
                     </tr>
                 </thead>
@@ -113,28 +121,81 @@ table {
                     <tr>
                         <td class="text-center p-2" style="white-space: nowrap;">{{ requisition.requisition_date}}</td>
                         <td class="text-center p-2" style="white-space:nowrap;">{{ requisition.pgr.name}}</td>
+                      
+                        <td class="text-center p-2" style="white-space:nowrap;">
+
+                            {% if requisition.pgr.PGR_photo %}
+                            <a href="requisition.pgr.PGR_photo.url" target="blank">
+                            <img src="{{ requisition.pgr.PGR_photo.url }}"
+                            alt="Pump payment documents" 
+                            style="cursor: pointer; width:50px;height:50px">
+                        </a>
+                        {% endif %}
+                        </td>
+
+                        <td class="text-center p-2" style="white-space:nowrap;">{{ requisition.pgr.phone}}</td>
+
+
+                        <td class="text-center p-2" style="white-space:nowrap;">{{ requisition.pgr.pgtl.name}}</td>
+
+                        <td class="text-center p-2" style="white-space:nowrap;">
+
+                            {% if requisition.pgr.pgtl.PGTL_photo %}
+                            <a href="requisition.pgr.pgtl.PGTL_photo.url" target="blank">
+                            <img src="{{ requisition.pgr.pgtl.PGTL_photo.url }}"
+                            alt="pgtl photo ID" 
+                            style="cursor: pointer; width:50px;height:50px">
+                        </a>
+                        {% endif %}
+                        </td>
+                        <td class="text-center p-2">{{ requisition.pgr.pgtl.phone}}</td>
+
+                        <td class="text-center p-2" style="white-space:nowrap;">{{ requisition.pgr.region}}</td>
+                        <td class="text-center p-2" style="white-space:nowrap;">{{ requisition.pgr.zone}}</td>
+                        <td class="text-center p-2" style="white-space:nowrap;">{{ requisition.pgr.mp}}</td>
                         <td class="text-center p-2" style="white-space:nowrap;">{{ requisition.start_date}}</td>
                         <td class="text-center p-2" style="white-space:nowrap;">{{ requisition.end_date}}</td>
                         <td class="text-center p-2">{{ requisition.num_of_days_applied }}</td>
                          <td class="text-center p-2">{{ requisition.purpose}}</td>
-                         <td class="text-center p-2">{{ requisition.pgr.pgtl.name}}</td>
+                       
 
-                         {% if requisition.active_status %}      
+                         {% if requisition.level1_approval_status == "Approved" %}      
                         <td class="text-center p-2" style="white-space: nowrap; background-color: greenyellow;">Approved</td>
                         {% else %}
                         <td class="text-center p-2" style="white-space: nowrap; background-color: red;">Pending Approval</td>
-                        {% endif %}
-
-                        <td class="text-center p-2">{{ requisition.pgr.phone}}</td>
-                        <td class="text-center p-2">{{ requisition.pgr.pgtl.phone}}</td>
-                        <td class="text-center p-2">{{ requisition.pgr.pgtl.zone}}</td>
-                        <td class="text-center p-2">{{ requisition.pgr.zone}}</td>                                                      
+                        {% endif %}       
+                                                
+                        {% if requisition.active_status%}      
+                        <td class="text-center p-2" style="white-space: nowrap; background-color: greenyellow;">Active</td>
+                        {% else %}
+                        <td class="text-center p-2" style="white-space: nowrap; background-color: rgb(239, 117, 10);">Inactive</td>
+                        {% endif %}      
+                 
+                                                                       
                         
                     </tr>
                     {% endfor %}
-                </tbody>                
+                </tbody>    
+                   
                 
             </table>
+
+                    <!-- Pagination -->
+                    <div class="pagination" style="padding: 10px;">
+                        <span class="step-links">
+                            {% if adhoc_requisitions.has_previous %}
+                                <a href="?page=1">&laquo; First</a>
+                                <a href="?page={{ adhoc_requisitions.previous_page_number }}">Previous</a>
+                            {% endif %}
+                            <span class="current">
+                                Page {{ adhoc_requisitions.number }} of {{ adhoc_requisitions.paginator.num_pages }}.
+                            </span>
+                            {% if adhoc_requisitions.has_next %}
+                                <a href="?page={{ adhoc_requisitions.next_page_number }}">Next</a>
+                                <a href="?page={{ adhoc_requisitions.paginator.num_pages }}">Last &raquo;</a>
+                            {% endif %}
+                        </span>
+                    </div>
         </div>   
 
         

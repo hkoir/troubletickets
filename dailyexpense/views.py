@@ -37,8 +37,9 @@ def common_search(request):
     eticket_results = eTicket.objects.filter(
         Q(region__icontains=query) |
         Q(zone__icontains=query) |
-        Q(mp__icontains=query)
-    ).values('id', 'region', 'zone', 'mp')
+        Q(mp__icontains=query) |
+        Q(internal_ticket_number__icontains=query)
+    ).values('id', 'region', 'zone', 'mp','internal_ticket_number')
 
     addpginfo_results = AddPGInfo.objects.filter(
         Q(PGNumber__icontains=query) |
@@ -75,6 +76,8 @@ def common_search(request):
             results.append({'id': et['id'], 'text': et['zone'], 'model': 'eTicket'})
         elif query in et['mp'].lower():
             results.append({'id': et['id'], 'text': et['mp'], 'model': 'eTicket'})
+        elif query in et['internal_ticket_number'].lower():
+            results.append({'id': et['id'], 'text': et['internal_ticket_number'], 'model': 'eTicket'})
 
     for pg in addpginfo_results:
         if query in pg['PGNumber'].lower():
@@ -135,7 +138,7 @@ def money_requisition(request):
     return render(request, 'expenses/money_requisition/money_requisition_form.html', {'form': form})
 
 
-
+from collections import defaultdict
 @login_required
 def all_approval_status(request):
     days = None
@@ -143,7 +146,6 @@ def all_approval_status(request):
     end_date = None
     region = None
     zone = None
-    mp = None
     region_approvals = None
     zone_approvals = None
 
@@ -156,7 +158,7 @@ def all_approval_status(request):
         days = form.cleaned_data.get('days')
         region = form.cleaned_data.get('region')
         zone = form.cleaned_data.get('zone')
-        mp = form.cleaned_data.get('mp')
+        purpose_approvals = defaultdict(list)
 
         if start_date and end_date:
             money_requisitions = money_requisitions.filter(created_at__range=(start_date, end_date))
@@ -169,8 +171,7 @@ def all_approval_status(request):
             money_requisitions = money_requisitions.filter(region=region)
         if zone:
             money_requisitions = money_requisitions.filter(zone=zone)
-        if mp:
-            money_requisitions = money_requisitions.filter(mp=mp)
+        
 
         # Calculate region-wise and zone-wise summaries
         region_approvals = money_requisitions.values('region').annotate(
@@ -185,9 +186,18 @@ def all_approval_status(request):
             num_requisitions=Count('id')
         ).order_by('zone')
 
+        purpose_approvals = {}
+        purposes = money_requisitions.values_list('purpose', flat=True).distinct()
+        for purpose in purposes:
+            approvals = money_requisitions.filter(purpose=purpose).values('region', 'zone').annotate(
+                total_requisition=Sum('requisition_amount'),
+                total_approved=Sum('approved_amount'),
+                num_requisitions=Count('id')
+            ).order_by('region', 'zone')
+            purpose_approvals[purpose] = approvals
     # Pagination logic
     page_obj = None
-    money_per_page = 2
+    money_per_page = 5
     paginator = Paginator(money_requisitions, money_per_page)
     page_number = request.GET.get('page', 1)
 
@@ -205,6 +215,7 @@ def all_approval_status(request):
         'page_obj': page_obj,
         'region_approvals': region_approvals,
         'zone_approvals': zone_approvals,
+        'purpose_approvals': purpose_approvals,
         'days': days,
         'form': form,
         'start_date': start_date,
@@ -596,7 +607,8 @@ def download_expense_requisition_data(request):
 def daily_expense_summary(request):
     form = dailyExpenseSummaryForm(request.GET or {'days': 7})
     grouped_summary_data = []
-    report_date = None
+    start_date = None
+    end_date = None
     days = None
     grouped_data=[]
 
@@ -607,6 +619,8 @@ def daily_expense_summary(request):
     toll_amount=None
     night_bill_amount=None
     food_amount=None
+    pg_local_fuel_purchase = None
+    vehicle_local_fuel_purchase =None
   
 
     if form.is_valid():
@@ -617,6 +631,7 @@ def daily_expense_summary(request):
         zone = form.cleaned_data.get('zone')
         mp = form.cleaned_data.get('mp')
         data = None 
+    
 
         if start_date and end_date:
             data = DailyExpenseRequisition.objects.filter(created_at__range=(start_date, end_date))
@@ -785,10 +800,9 @@ def daily_expense_summary(request):
         'form': form,
         'days': days,
         'start_date':start_date,
-        'end_date':end_date,
-        'report_date': report_date,
+        'end_date':end_date,     
         'grouped_summary_data': grouped_summary_data,
-         'total_requisition_amount_count': total_requisition_amount_count,
+        'total_requisition_amount_count': total_requisition_amount_count,
         'total_approved_amount_count': total_approved_amount_count,
         'pg_local_fuel_purchase': pg_local_fuel_purchase,
         'vehicle_local_fuel_purchase': vehicle_local_fuel_purchase,
@@ -1019,231 +1033,6 @@ def daily_expense_summary2(request):
 
        
     })
-
-
-
-########### adhoc-man and adhoc vehicle requisition management#######################
-
-@login_required
-def create_adhoc_requisition(request):
-    if request.method == 'POST':   
-        form = AdhocRequisitionForm(request.POST, request.FILES)
-        if form.is_valid():        
-            form.instance.adhoc_requester = request.user
-            form.instance.adhoc_requisition_number = generate_unique_finance_requisition_number()
-            form.save()
-            return redirect('dailyexpense:adhoc_approval_status')
-    else:     
-        form = AdhocRequisitionForm()
-    return render(request, 'expenses/adhoc_expenses/create_adhoc_requisition .html', {'form': form})
-
-
-
-
-@login_required
-def adhoc_approval_status(request):
-    days = None
-    start_date = None
-    end_date = None
-    region = None
-    zone = None
-    mp = None
-
-    form = AdhocRequisitionStatusForm(request.GET or {'days': 20})
-    expense_requisitions =  AdhocRequisition.objects.all().order_by('-created_at')
-
-    if form.is_valid():
-        start_date = form.cleaned_data.get('start_date')
-        end_date = form.cleaned_data.get('end_date')
-        days = form.cleaned_data.get('days')
-        region = form.cleaned_data.get('region')
-        zone = form.cleaned_data.get('zone')
-        mp = form.cleaned_data.get('mp')
-
-        if start_date and end_date:
-            expense_requisitions = expense_requisitions.filter(created_at__range=(start_date, end_date))
-        elif days:
-            end_date = datetime.today()
-            start_date = end_date - timedelta(days=days)
-            expense_requisitions = expense_requisitions.filter(created_at__range=(start_date, end_date))
-
-        if region:
-            expense_requisitions = expense_requisitions.filter(region=region)
-        if zone:
-           expense_requisitions = expense_requisitions.filter(zone=zone)
-        if mp:
-            expense_requisitions =  expense_requisitions.filter(mp=mp)
-
-        region_approvals = expense_requisitions.values('region').annotate(
-            total_requisition=Sum('requisition_amount'),
-            total_approved=Sum('approved_amount'),
-            num_requisitions=Count('id')
-        ).order_by('region')
-
-        zone_approvals = expense_requisitions.values('zone').annotate(
-            total_requisition=Sum('requisition_amount'),
-            total_approved=Sum('approved_amount'),
-            num_requisitions=Count('id')
-        ).order_by('zone')
-
-
-
-    page_obj = None
-    money_per_page = 2
-    paginator = Paginator(expense_requisitions, money_per_page)
-    page_number = request.GET.get('page', 1)
-
-    try:
-        page_obj = paginator.page(page_number)
-    except PageNotAnInteger:
-        page_obj = paginator.page(1)
-    except EmptyPage:
-        page_obj = paginator.page(paginator.num_pages)
-
-    form = ExpenseRequisitionStatusForm()
-    return render(request, 'expenses/adhoc_expenses/adhoc_approval_status .html', {
-        'expense_requisitions':expense_requisitions,
-        'page_obj': page_obj,
-        'region_approvals': region_approvals,
-        'zone_approvals': zone_approvals,
-        'days': days,
-        'form': form,
-        'start_date': start_date,
-        'end_date': end_date
-    })
-
-
-
-
-
-@login_required
-def adhoc_requisition_approval(request, adhoc_requisition_id):
-    adhoc_requisitions = get_object_or_404(AdhocRequisition, id=adhoc_requisition_id)
-    manager_level = request.user.manager_level
-    
-    if adhoc_requisitions.level1_approval_status == 'PENDING':
-        required_level = 'first_level'
-    elif adhoc_requisitions.level2_approval_status == 'PENDING':
-        required_level = 'second_level'
-    elif adhoc_requisitions.level3_approval_status == 'PENDING':
-        required_level = 'third_level'
-    else:  
-        return JsonResponse({"message": "Requisition already approved by all levels"}, status=400)
- 
-    if manager_level == required_level:
-        if request.method == 'POST':
-            approval_status = request.POST.get('approval_status')
-            comments = request.POST.get('comments')
-            approved_amount = request.POST.get('approved_amount')
-            approval_date = timezone.now() 
-
-            try:
-                approved_amount = Decimal(approved_amount)
-            except ValueError:
-                 messages.error(request, "Invalid approved amount")
-                 return redirect('dailyexpense:expense_approval_status', adhoc_requisition_id=adhoc_requisition_id)
-                        
-            adhoc_requisitions.approved_amount = approved_amount
-            
-            if required_level == 'first_level':
-                adhoc_requisitions.level1_comments = comments
-                adhoc_requisitions.level1_approval_status = approval_status
-                adhoc_requisitions.level1_approval_date =  approval_date
-
-            elif required_level == 'second_level':
-                adhoc_requisitions.level2_comments = comments
-                adhoc_requisitions.level2_approval_status = approval_status
-                adhoc_requisitions.level2_approval_date =  approval_date
-
-            elif required_level == 'third_level':
-                adhoc_requisitions.level3_comments = comments
-                adhoc_requisitions.level3_approval_status = approval_status
-                adhoc_requisitions.level3_approval_date = approval_date
-         
-            adhoc_requisitions.save()
-
-            return redirect('dailyexpense:adhoc_approval_status')
-        else:
-            return render(request, 'expenses/adhoc_expenses/adhoc_approval.html', {'adhoc_requisitions': adhoc_requisitions})
-    else:        
-        messages.error(request, "You can not get access at this moment. May be due to previous level approval is pending or you are not authorized from your management")
-        return redirect('dailyexpense:expense_approval_status')
-
-
-
-
-@login_required
-def adhoc_expense_received_mark(request, requisition_id): 
-    requisition = get_object_or_404(AdhocRequisition, id=requisition_id)   
-
-    if (requisition.level1_approval_status == 'Approved' and 
-        requisition.level2_approval_status == 'Approved' and 
-        requisition.level3_approval_status == 'Approved'):
-        
-        if requisition.adhoc_requester == request.user:      
-            requisition.receiving_status = 'Received'
-            requisition.save()
-            messages.success(request, 'Requisition marked as received successfully.')
-        else:
-            messages.error(request, 'You are not authorized to mark this requisition as received.')
-    else:
-        messages.error(request, 'Cannot mark as received until all three levels approve.')
-
-    return redirect('dailyexpense:adhoc_approval_status')
-
-
-
-@login_required
-def download_adhoc_requisition_data(request):
-    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-    response['Content-Disposition'] = 'attachment; filename="money_requisition_data.xlsx"'
-
-    workbook = xlsxwriter.Workbook(response)
-    worksheet = workbook.add_worksheet()
-    
-    headers = ['Date','Requisition Number','Reqquester', 'Region', 'Zone','MP','Purpose', 'Requisition Amount','Approved Amount', 'Level 1 Approval', 
-               'Level 1 Approval Date', 'Level 2 Approval', 'Level 2 Approval Date', 'Level 3 Approval', 
-               'Level 3 Approval Date', 'Receiving Status']
-    
-    for col, header in enumerate(headers):
-        worksheet.write(0, col, header)
-  
-    requisitions = AdhocRequisition.objects.all()
-    for row, requisition in enumerate(requisitions, start=1):
-        created_at_str = timezone.localtime(requisition.created_at).strftime('%Y-%m-%d %H:%M:%S')
-      
-
-        worksheet.write(row, 0, str(created_at_str))
-        worksheet.write(row, 1, str(requisition.adhoc_requisition_number))      
-        worksheet.write(row, 2, str(requisition.adhoc_requester))
-        worksheet.write(row, 3, requisition.region)
-        worksheet.write(row, 4, requisition.zone)     
-        worksheet.write(row, 6, requisition.purpose)
-        worksheet.write(row, 7, float(requisition.requisition_amount))
-
-        if requisition.approved_amount is not None:
-            worksheet.write(row, 8, float(requisition.approved_amount))
-        else:
-            worksheet.write(row, 8, "Not Approved yet")
-     
-
-        worksheet.write(row, 9, requisition.level1_approver)
-        worksheet.write(row, 10, str(requisition.level1_approval_date))
-        worksheet.write(row, 11, requisition.level2_approver)
-        worksheet.write(row, 12, str(requisition.level2_approval_date))
-        worksheet.write(row, 13, requisition.level3_approver)
-        worksheet.write(row, 14, str(requisition.level3_approval_date))
-        worksheet.write(row, 15, requisition.receiving_status)
-
-    workbook.close()
-    return response
-
-
-
-
-
-
-
 
 
 ############################### Summary OPTIMA #######################

@@ -68,7 +68,7 @@
                     <div class="col" style="padding:5px;"> no of days {{ form.days }} </div>
                     <div class="col" style="padding:5px;">  Region:{{ form.region }} </div>  
                     <div class="col" style="padding:5px;">  Zone:{{ form.zone }} </div>    
-                    <div class="col" style="padding:5px;">  mp:{{ form.mp }} </div>  
+                    
                     <div class="col" style="padding:5px;"> <button type="submit" class='btn btn-primary'>Generate Data</button></div>
                     
                 </div>
@@ -117,9 +117,43 @@
                 </tbody>
             </table>
         </div>
+
+        <div class="col-12">  
+            {% if purpose_approvals %}
+                {% for purpose, approvals in purpose_approvals.items %}
+                <h2 style="margin-top:20px">{{ purpose }} Approvals</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th class="text-center p-2">Region</th>
+                            <th class="text-center p-2">Zone</th>
+                            <th class="text-center p-2">Total Requisition</th>
+                            <th class="text-center p-2">Total Approved</th>
+                            <th class="text-center p-2">Number of Requisitions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for approval in approvals %}
+                        <tr>
+                            <td class="text-center p-2">{{ approval.region }}</td>
+                            <td class="text-center p-2">{{ approval.zone }}</td>
+                            <td class="text-center p-2">{{ approval.total_requisition }}</td>
+                            <td class="text-center p-2">{{ approval.total_approved }}</td>
+                            <td class="text-center p-2">{{ approval.num_requisitions }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% endfor %}
+            {% else %}
+                <p>No approvals to display.</p>
+            {% endif %}
+
+        </div>
         <div class="col-12">            
              <h4 style="margin-top:20px; margin-bottom:10px"> Details requisition and approval 
-            <a href="{% url 'dailyexpense:download_money_requisition_data' %}">Download</a></h4>    
+            <a href="{% url 'dailyexpense:download_money_requisition_data' %}">Download</a>
+        <a href="{% url 'dailyexpense:money_requisition' %}">apply for advance</a></h4>    
             <table>  
                 <thead>
                     <tr>

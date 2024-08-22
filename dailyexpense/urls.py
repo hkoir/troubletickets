@@ -30,12 +30,6 @@ urlpatterns = [
    
     path('common_search/', views.common_search, name='common_search'),
 
-      
-    path('create_adhoc_requisition/', views.create_adhoc_requisition, name='create_adhoc_requisition'),   
-    path('adhoc_approval_status/', views.adhoc_approval_status, name='adhoc_approval_status'), 
-    path('adhoc_requisition_approval/<int:adhoc_requisition_id>/', views.adhoc_requisition_approval, name='adhoc_requisition_approval'),   
-   
-    path('adhoc_expense_received_mark/<int:requisition_id>/', views.adhoc_expense_received_mark, name='adhoc_expense_received_mark'),
-    path('download_adhoc_requisition_data/', views.download_adhoc_requisition_data, name='download_adhoc_requisition_data'),
+ 
 ]
 

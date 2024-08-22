@@ -1,0 +1,248 @@
+{% extends "base.html" %}
+{% load static %}
+
+
+{% block content %}
+
+
+    <title>Adhoc vehicle intime form</title>
+
+    <style>
+
+   
+
+table {
+            border-collapse: collapse;
+            width: 100%;
+      
+        }
+
+        th, td {
+            border: 1px solid rgb(227, 87, 7); /* Set border color for individual cells */
+            text-align: left;
+            padding: 0px;
+        }
+        th{
+        background-color: rgb(52, 232, 100);
+      }
+      
+
+    table thead th {
+    white-space: normal;
+        }
+
+    .main-content {   
+    overflow-y: auto;
+    margin-left:0px;
+    position: absolute;
+    width: 100%;
+    left: 0;
+  
+}
+
+.main-content {   
+    overflow-y: auto;
+    margin-left:0px;
+ 
+    width: 100%;
+    left: 0;
+  
+}
+
+  #selected-pgrs {
+            list-style-type: none;
+        }
+        #selected-pgrs li {
+            margin-bottom: 5px;
+        }
+
+    </style>
+
+                   
+
+    {% if messages %}
+    <div>
+        <ul class="messages">
+            {% for message in messages %}
+                <li style="font-size: 20px; background-color: orange;";{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endif %}
+
+
+
+
+<div class="container-fluid" id="main-content">
+    <div class="row row-cols-1 row-cols-md-2 p-2">
+    
+        <div class="col">
+            <div class="card form-group" style="background-color: bisque;">
+                <div class="card-body">
+                    <h4 class="card-title" style="margin-bottom:20px">Adhoc vehicle in time out time</h4>
+                    <form method="post" enctype="multipart/form-data" id="expense-requisition-form">
+                        {% csrf_token %}
+
+                        {{ form.as_p }}
+                        
+                        <div><button type="submit" class="btn btn-primary">Submit</button></div>
+                    </form>
+                </div>
+            </div>
+        </div>     
+            
+
+        <div class="col">
+            <h4> Adhoc vehicle attendance
+            <table>  
+                <thead>
+                    <tr>
+                        <th class="text-center p-2">Date</th>
+                        <th class="text-center p-2">Vehicle naumber</th> 
+                        <th class="text-center p-2">owner name</th>   
+                        <th class="text-center p-2">owner phone</th>   
+
+                        <th class="text-center p-2">Region</th> 
+                        <th class="text-center p-2">Zone</th> 
+                        <th class="text-center p-2">MP</th>                  
+                        <th class="text-center p-2">In date</th>
+                        <th class="text-center p-2">In Time</th>
+                        <th class="text-center p-2">Out date</th>
+                        <th class="text-center p-2">Out Time</th>
+                        <th class="text-center p-2">Total working hours</th>
+                        <th class="text-center p-2">Pay rate</th>
+                        <th class="text-center p-2">Total bill amount </th>              
+                                
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for adhoc in  adhoc_attendance %}
+                    <tr>
+                        <td class="text-center p-2" style="white-space: nowrap;">{{ adhoc.created_at}}</td>
+                        <td class="text-center p-2" style="white-space:nowrap;">{{ adhoc.vehicle.vehicle_reg_number}}</td>
+                        <td class="text-center p-2" style="white-space:nowrap;">{{ adhoc.vehicle.vehicle_owner_name}}</td>
+                        <td class="text-center p-2" style="white-space:nowrap;">{{ adhoc.vehicle.vehilce_owner_mobile_number}}</td>
+                        <td class="text-center p-2" style="white-space:nowrap;">{{ adhoc.vehicle.region}}</td>
+                        <td class="text-center p-2" style="white-space:nowrap;">{{ adhoc.vehicle.zone}}</td>
+                        <td class="text-center p-2" style="white-space:nowrap;">{{ adhoc.vehicle.mp}}</td>
+
+                         <td class="text-center p-2" style="white-space: nowrap;">{{ adhoc.adhoc_in_date }}</td>
+                         <td class="text-center p-2"style="white-space: nowrap;">{{ adhoc.adhoc_in_time}}</td>
+                         <td class="text-center p-2"style="white-space: nowrap;">{{ adhoc.adhoc_out_date}}</td>
+                         <td class="text-center p-2"style="white-space: nowrap;">{{ adhoc.adhoc_out_time}}</td>
+                 
+                         <td class="text-center p-2">{{ adhoc.adhoc_working_hours|floatformat:'2'}}</td>
+                         <td class="text-center p-2">{{ adhoc.adhoc_pay_rate }}</td>
+                         <td class="text-center p-2">{{ adhoc.adhoc_bill_amount}}</td>                                                  
+                        
+                    </tr>
+                    {% endfor %}
+                </tbody>                
+                
+            </table>
+        </div>   
+
+        
+    </div>
+</div>
+
+
+
+
+<div class="col" style="height:1200px"></div>
+
+   
+<script>
+    $(document).ready(function() {
+     $('#id_pgr').select2({
+         width: '100%',
+         ajax: {
+             url: "{% url 'dailyexpense:common_search' %}",
+             dataType: 'json',
+             delay: 250,
+             data: function(params) {
+                 return {
+                     q: params.term
+                 };
+             },
+             processResults: function(data) {
+                 return {
+                     results: $.map(data.results, function(item) {
+                         return {
+                             id: item.id,
+                             text: item.text
+                         };
+                     })
+                 };
+             },
+             cache: true
+         },
+         minimumInputLength: 1,
+         placeholder: 'Search',
+         allowClear: true
+     });
+ });
+ 
+ </script>
+    
+
+    <script>
+        $(document).ready(function(){      
+            var regionZoneMapping = {
+                'Sylhet': ['','Sylhet', 'Moulovibazar','Mymensingh','Kisorganj','Tangail'], 
+                'Rangpur': ['','Rangpur', 'Dinajpur','Bagura','Rajshahi'] ,                          
+                
+            };
+         
+            $('#id_region').change(function(){
+                var selectedRegion = $(this).val();
+                var zoneChoices = regionZoneMapping[selectedRegion];
+                $('#id_zone').empty();
+                $.each(zoneChoices, function(index, value){
+                    $('#id_zone').append($('<option>').text(value).attr('value', value));
+                });
+            });
+                  
+            var zoneMpMapping = {              
+                'Sylhet': ['','Sylhet','Taherpur','Sunamganj','Bianibazar','Dorbhost','Dherai','Chatak'], // Add more MPs for Sylhet zone
+                'Moulovibazar': ['','Moulovibazar', 'Saestaganj','Juri','Baniachong'],
+                'Mymensingh': ['','Mymensingh', 'Fulpur','Valuka'] ,
+                'Kisorganj': ['','Kisorganj','Katiadi','Netrokona','Mohonpur','Austogram'],
+                'Tangail': ['','Tangail','Madhupur','Jamalpur','Sherpur','Bakshihanj','Rowmari'],
+               
+                'Rangpur':['','Rangpur','Hatibandha','Gaibandha','Ulipur','Boropar','Polasbari'],
+                'Dinajpur':['','Dinajpur','Panchghor','Jaldhaka','Thakurgaon'],
+                'Rajshahi':['','Rajshahi','Bagura','Nachole','Natore','Chapai'],
+                'Bagura':['','Bagura'],
+                '': ['']
+               
+            };
+    
+       
+            $('#id_zone').change(function(){
+                $('#id_mp').val('');
+                var selectedZone = $(this).val();
+                var mpChoices = zoneMpMapping[selectedZone];
+    
+                $('#id_mp').empty();
+                $.each(mpChoices, function(index, value){
+                    $('#id_mp').append($('<option>').text(value).attr('value', value));
+                });
+            });
+    
+    
+    
+    });          
+    
+    </script>
+    
+
+
+
+    <div class="col" style="height:1200px"></div>
+
+
+{% endblock %}
+
+
+

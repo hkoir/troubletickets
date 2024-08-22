@@ -98,7 +98,11 @@ table {
                 <thead>
                     <tr>
                         <th class="text-center p-2">Date</th>
-                        <th class="text-center p-2">Adhoc name</th>                    
+                        <th class="text-center p-2">Adhoc name</th> 
+                        <th class="text-center p-2">Adhoc Phone</th>   
+                        <th class="text-center p-2">Region</th> 
+                        <th class="text-center p-2">Zone</th> 
+                        <th class="text-center p-2">MP</th>                  
                         <th class="text-center p-2">In date</th>
                         <th class="text-center p-2">In Time</th>
                         <th class="text-center p-2">Out date</th>
@@ -114,13 +118,18 @@ table {
                     <tr>
                         <td class="text-center p-2" style="white-space: nowrap;">{{ adhoc.created_at}}</td>
                         <td class="text-center p-2" style="white-space:nowrap;">{{ adhoc.pgr.name}}</td>
+                        <td class="text-center p-2" style="white-space:nowrap;">{{ adhoc.pgr.phone}}</td>
+
+                        <td class="text-center p-2" style="white-space:nowrap;">{{ adhoc.pgr.region}}</td>
+                        <td class="text-center p-2" style="white-space:nowrap;">{{ adhoc.pgr.zone}}</td>
+                        <td class="text-center p-2" style="white-space:nowrap;">{{ adhoc.pgr.mp}}</td>
 
                          <td class="text-center p-2" style="white-space: nowrap;">{{ adhoc.adhoc_in_date }}</td>
                          <td class="text-center p-2"style="white-space: nowrap;">{{ adhoc.adhoc_in_time}}</td>
                          <td class="text-center p-2"style="white-space: nowrap;">{{ adhoc.adhoc_out_date}}</td>
                          <td class="text-center p-2"style="white-space: nowrap;">{{ adhoc.adhoc_out_time}}</td>
                  
-                         <td class="text-center p-2">{{ adhoc.adhoc_working_hours}}</td>
+                         <td class="text-center p-2">{{ adhoc.adhoc_working_hours|floatformat:'2'}}</td>
                          <td class="text-center p-2">{{ adhoc.adhoc_pay_rate }}</td>
                          <td class="text-center p-2">{{ adhoc.adhoc_bill_amount}}</td>                                                  
                         
@@ -140,10 +149,42 @@ table {
 
 <div class="col" style="height:1200px"></div>
 
+<script>
+   document.addEventListener('DOMContentLoaded', function() {
+    const pgrField = document.getElementById('id_pgr');
+    const adhocRequisitionField = document.getElementById('id_adhoc_requisition');
+
+    pgrField.addEventListener('change', function() {
+        const pgrId = pgrField.value;
+
+        fetch(`/adhocman/fetch_requisitions/${pgrId}/`)
+            .then(response => response.json())
+            .then(data => {
+                while (adhocRequisitionField.firstChild) {
+                    adhocRequisitionField.removeChild(adhocRequisitionField.firstChild);
+                }
+                if (data.length > 0) {
+                    data.forEach(requisition => {
+                        const option = document.createElement('option');
+                        option.value = requisition.id;
+                        option.text = requisition.name;
+                        adhocRequisitionField.appendChild(option);
+                    });
+                } else {
+                    const option = document.createElement('option');
+                    option.text = "No active requisition found";
+                    adhocRequisitionField.appendChild(option);
+                }
+            });
+    });
+});
+
+
+</script>
    
 <script>
     $(document).ready(function() {
-     $('#id_pgr').select2({
+     $('#id_pgr,#id_adhoc_ticket').select2({
          width: '100%',
          ajax: {
              url: "{% url 'dailyexpense:common_search' %}",

@@ -781,7 +781,7 @@ def view_resource(request):
     # Pagination logic
     resource_data = []
     page_obj = None
-    resource_per_page = 10
+    resource_per_page = 5
     paginator = Paginator(resources, resource_per_page)
     page_number = request.GET.get('page', 1)
 

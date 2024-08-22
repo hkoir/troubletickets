@@ -48,12 +48,21 @@
     </style>
 
   
-
-
     <h3> Vehicle payment information</h3>
 
     <div class="container-fluid main-content  ">
         <div class="row">
+            <div class="col-xl-12">
+                <form method="GET" action="{% url 'vehicle:view_vehicle_payment' %}">
+                    <div class="container-fluid">
+                        <div class="row row-cols-2 row-cols-md-4">               
+                            <div class="col" style="padding:5px;"> Vehicle Number {{ form.vehicle_number }} </div>
+                             <div class="col" style="padding:5px;"> <button type="submit" class='btn btn-primary'>Generate Data</button></div>
+                         </div>
+                    </div>                      
+                </form>
+            </div>
+
             <div class="col-xl-12">                     
                 <table>
                     <thead>
@@ -93,6 +102,9 @@
                 </table>
     
             </div>
+
+        </div>
+    </div>
 
     <div class="col" style="height:1200px"></div>
     

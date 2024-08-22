@@ -45,19 +45,19 @@
 
          
 <div class="container-fluid main-content" style="margin-top: 20px;">
-    {% if messages %}
-    <div>
-        <ul class="messages">
-            {% for message in messages %}
-                <li style="font-size: 20px; background-color: orange;";{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-            {% endfor %}
-        </ul>
-    </div>
-{% endif %}
+        {% if messages %}
+        <div>
+            <ul class="messages">
+                {% for message in messages %}
+                    <li style="font-size: 20px; background-color: orange;";{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
 
+    <h2 class="text-center" style="margin-top:10px">Financial Approval Status</h2>
+    <p class="text-center">select date range/ or no of days but not both</p>
 
-<h2 class="text-center" style="margin-top:10px">Financial Approval Status</h2>
-<p class="text-center">select date range/ or no of days but not both</p>
      <div class="row">  
         <div class="col-12">       
             <form method="GET" action="{% url 'adhocman:adhoc_approval_status' %}" style="margin-bottom:30px">        
@@ -75,8 +75,11 @@
             </div>                
             </form>
         </div>  
-        <div class="col-12" style="margin-bottom:10px">                  
-            <!-- Region-wise summary -->                 
+        <div class="col-12" style="margin-bottom:10px"> 
+           <div class="container-fluid">
+            <div class="row row-cols-2">
+                <div class="col">
+                    <!-- Region-wise summary -->                 
             <table>
                 <thead>
                     <tr>
@@ -94,29 +97,34 @@
                     </tr>
                     {% endfor %}
                 </tbody>
-            </table>        
-        </div>            
-        <div class="col-12">                        
-         <!-- Zone-wise summary -->               
-            <table>
-                <thead>
-                    <tr>
-                        <th class="text-center p-2">Zone</th>
-                        <th class="text-center p-2">Total Requisition Amount</th>
-                        <th class="text-center p-2">Total Approved Amount</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for zone in zone_approvals %}
-                    <tr>
-                        <td class="text-center p-2">{{ zone.pgr__zone }}</td>
-                        <td class="text-center p-2">{{ zone.total_requisition|floatformat:"2" }}</td>
-                        <td class="text-center p-2">{{ zone.total_approved|floatformat:"2" }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+            </table>    
+                </div>
+                <div class="col">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th class="text-center p-2">Zone</th>
+                                <th class="text-center p-2">Total Requisition Amount</th>
+                                <th class="text-center p-2">Total Approved Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for zone in zone_approvals %}
+                            <tr>
+                                <td class="text-center p-2">{{ zone.pgr__zone }}</td>
+                                <td class="text-center p-2">{{ zone.total_requisition|floatformat:"2" }}</td>
+                                <td class="text-center p-2">{{ zone.total_approved|floatformat:"2" }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+           </div>  
+        </div>   
+
+   
         <div class="col-12">            
              <h4 style="margin-top:20px; margin-bottom:10px"> Details requisition and approval 
             <a href="{% url 'adhocman:download_adhoc_requisition_data' %}">Download</a></h4>    
@@ -126,11 +134,15 @@
 
                         <th class="text-center p-2">Requester</th>
                         <th class="text-center p-2">Requisition Date</th>
+                        <th class="text-center p-2">Requisition ID</th> 
                        
                         <th class="text-center p-2">Region</th>
                         <th class="text-center p-2">Zone</th>  
+                        <th class="text-center p-2">MP</th>  
                         <th class="text-center p-2">Hired Adhoc name</th>
-                        <th class="text-center p-2">Team leader name</th>                      
+                        <th class="text-center p-2">Hired Adhoc phone</th>
+                        <th class="text-center p-2">Team leader name</th>  
+                        <th class="text-center p-2">Team leader phone</th>                     
                         <th class="text-center p-2">Purpose</th>
                         <th class="text-center p-2">No of hire days applied</th>
                         <th class="text-center p-2">Start Date</th>
@@ -142,23 +154,25 @@
                         <th class="text-center p-2">Level 2 Approval Date</th>        
                         <th class="text-center p-2">Level 3 Approval</th>
                         <th class="text-center p-2">Level 3 Approval Date</th>  
-                        <th class="text-center p-2">Requisition ID</th>  
-                        <th class="text-center p-2">Adhoc phone</th>
-                        <th class="text-center p-2">Team leader phone</th>    
+                
+                     
                           
                                 
                     </tr>
                 </thead>
                 <tbody>
-                    {% for requisition in adhoc_requisitions %}
+                    {% for requisition in page_obj %}
                     <tr>
                         <td class="text-center p-2">{{ requisition.requester }}</td>
                         <td class="text-center p-2" style="white-space:nowrap;">{{ requisition.created_at }}</td>
-                     
+                        <td class="text-center p-2">{{ requisition.requisition_id }}</td>
                         <td class="text-center p-2">{{ requisition.pgr.region }}</td>
                         <td class="text-center p-2">{{ requisition.pgr.zone }}</td>
+                        <td class="text-center p-2">{{ requisition.pgr.mp }}</td>
                         <td class="text-center p-2">{{ requisition.pgr.name }}</td>
+                        <td class="text-center p-2">{{ requisition.pgr.phone}}</td>
                         <td class="text-center p-2">{{ requisition.pgr.pgtl.name }}</td>
+                        <td class="text-center p-2">{{ requisition.pgr.pgtl.phone }}</td>
                         <td class="text-center p-2" style="white-space: nowrap;">{{ requisition.purpose }}</td>
                         <td class="text-center p-2">{{ requisition.num_of_days_applied }}</td>
                         <td class="text-center p-2" style="white-space:nowrap;">{{ requisition.start_date }}</td>
@@ -209,9 +223,8 @@
                                              
 
                         <td class="text-center p-2" style="white-space: nowrap;">{{ requisition.level3_approval_date }}</td>
-                        <td class="text-center p-2">{{ requisition.requisition_id }}</td>
-                        <td class="text-center p-2">{{ requisition.pgr.phone }}</td>
-                        <td class="text-center p-2">{{ requisition.pgr.pgtl.phone }}</td>
+               
+                     
                         
                        
                                

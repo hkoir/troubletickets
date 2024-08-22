@@ -1,0 +1,519 @@
+{% extends "base.html" %}
+{% load static %}
+
+
+
+{% block content %}
+
+<style>
+    
+
+  
+
+    table {
+            border-collapse: collapse;
+            width: 100%;
+      
+        }
+
+        th, td {
+            border: 1px solid rgb(227, 87, 7); /* Set border color for individual cells */
+            text-align: left;
+            padding: 0px;
+        }
+        th{
+        background-color: rgb(52, 232, 100);
+      }
+      
+
+    table thead th {
+    white-space: normal;
+        }
+
+    .main-content {   
+    overflow-y: auto;
+    margin-left:0px;
+    position: absolute;
+    width: 100%;
+    left: 0;
+    top:0;
+  
+}
+.button-group {
+    display: flex;
+    gap: 10px; /* Adjust the space between buttons as needed */
+}
+
+.button-group .btn {
+    flex: 1;
+}
+</style>
+   
+
+         
+<div class="container-fluid main-content" style="margin-top: 20px;">
+    {% if messages %}
+    <div>
+        <ul class="messages">
+            {% for message in messages %}
+                <li style="font-size: 20px; background-color: orange;";{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endif %}
+
+
+<h2 class="text-center" style="margin-top:100px">Civil_Power Financial Approval Status</h2>
+<p class="text-center">select date range/ or no of days but not both</p>
+     <div class="row">  
+        <div class="col-12">       
+            <form method="GET" action="{% url 'billable:civil_power_approval_status2' %}" style="margin-bottom:30px">        
+            <div class="container-fluid">
+                <div class="row row-cols-2 row-cols-md-6">        
+                    <div class="col" style="padding:5px;">  Start Date:  {{ form.start_date }} </div>
+                    <div class="col" style="padding:5px;">  End Date:  {{ form.end_date }} </div>
+                    <div class="col" style="padding:5px;"> no of days {{ form.days }} </div>
+                    <div class="col" style="padding:5px;">  Region:{{ form.region }} </div>  
+                    <div class="col" style="padding:5px;">  Zone:{{ form.zone }} </div>    
+                    
+                    <div class="col" style="padding:5px;"> <button type="submit" class='btn btn-primary'>Generate Data</button></div>
+                    
+                </div>
+            </div>                
+            </form>
+        </div>  
+        <div class="col-12" style="margin-bottom:10px">                  
+            <!-- Region-wise summary -->                 
+            <table>
+                <thead>
+                    <tr>
+                        <th class="text-center p-2">Region</th>
+                        <th class="text-center p-2">Total Requisition Amount</th>
+                        <th class="text-center p-2">Total Approved Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for region in region_approvals %}
+                    <tr>
+                        <td class="text-center p-2">{{ region.region }}</td>
+                        <td class="text-center p-2">{{ region.total_requisition|floatformat:"2" }}</td>
+                        <td class="text-center p-2">{{ region.total_approved|floatformat:"2" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>        
+        </div>            
+        <div class="col-12">                        
+         <!-- Zone-wise summary -->               
+            <table>
+                <thead>
+                    <tr>
+                        <th class="text-center p-2">Zone</th>
+                        <th class="text-center p-2">Total Requisition Amount</th>
+                        <th class="text-center p-2">Total Approved Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for zone in zone_approvals %}
+                    <tr>
+                        <td class="text-center p-2">{{ zone.zone }}</td>
+                        <td class="text-center p-2">{{ zone.total_requisition|floatformat:"2" }}</td>
+                        <td class="text-center p-2">{{ zone.total_approved|floatformat:"2" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="col-12">            
+             <h4 style="margin-top:20px; margin-bottom:10px"> Details requisition and approval:
+            <a href="{% url 'billable:download_money_requisition_data' %}">Download</a>:
+        <a href="{% url 'billable:civil_power_requisition' %}">Apply for Civil_Power expense</a></h4>    
+            <table>  
+                <thead>
+                    <tr>
+                        <th class="text-center p-2">Chat</th>
+                        <th class="text-center p-2">Action</th>
+                        <th class="text-center p-2">Requester</th>
+                        <th class="text-center p-2">Requisition Date</th>
+                        <th class="text-center p-2">Requisition ID</th>
+                        <th class="text-center p-2">Region</th>
+                        <th class="text-center p-2">Zone</th>                     
+                        <th class="text-center p-2">Purpose</th>
+                        <th class="text-center p-2">Qty</th>
+                        <th class="text-center p-2">Site code</th>
+                        <th class="text-center p-2">TT number</th>
+                        <th class="text-center p-2">SOR Rate</th>                   
+                       
+
+                        <th class="text-center p-2">Requisition Amount</th> 
+                        <th class="text-center p-2">Requisition Supporting Docs</th> 
+
+                        <th class="text-center p-2" style="background-color: rgb(235, 175, 86);">Approved amount</th>
+                        <th class="text-center p-2" style="background-color: rgb(235, 175, 86);" >Level 1 Approval</th>   
+                        <th class="text-center p-2" style="background-color: rgb(235, 175, 86);">Level 1 Approval Date</th>          
+                        <th class="text-center p-2" style="background-color: rgb(235, 175, 86);">Level 2 Approval</th>  
+                        <th class="text-center p-2"  style="background-color: rgb(235, 175, 86);">Level 2 Approval Date</th>        
+                        <th class="text-center p-2" style="background-color: rgb(235, 175, 86);">Level 3 Approval</th>
+                        <th class="text-center p-2" style="background-color: rgb(235, 175, 86);">Level 3 Approval Date</th>  
+
+                        <th class="text-center p-2" style="background-color: rgb(255, 251, 127);">Upload payment docs</th>   
+                        <th class="text-center p-2" style="background-color:  rgb(255, 251, 127);">Payment document</th>
+                        <th class="text-center p-2" style="background-color:  rgb(255, 251, 127);">Payment upload date</th>   
+                        <th class="text-center p-2" style="background-color:  rgb(255, 251, 127);">Receiving Status</th>    
+                        
+                        
+                        <th class="text-center p-2" style="background-color: aquamarine;">TT open date</th>
+                        <th class="text-center p-2" style="background-color: aquamarine;">Work completion date</th>
+                        <th class="text-center p-2" style="background-color: aquamarine;">task completion image</th>
+                        <th class="text-center p-2" style="background-color: aquamarine;">TT Status</th>                                          
+                        <th class="text-center p-2" style="background-color: aquamarine;">TT close date</th>
+                                
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for requisition in page_obj %}
+                    <tr>                           
+                         <td class="text-center p-2" style="white-space: nowrap; "><a  href="{% url 'billable:chat' requisition.id %}"style="text-decoration:none;">Message</a></td>
+                       
+                         {% if requisition.TT_status == "closed" %}
+                        <td class="text-center p-2"><i class="fas fa-check" style="color: green;">Done</i></td>
+                        {% else %}
+                        <td class="text-center p-2" style="white-space: nowrap;"><a href="{% url 'billable:update_work' requisition.id %}">Update work status</a></td>
+                        {% endif %}
+
+                        <td class="text-center p-2">{{ requisition.requester }}</td>
+                        <td class="text-center p-2" style="white-space:nowrap;">{{ requisition.created_at }}</td>
+                        <td class="text-center p-2">{{ requisition.requisition_number }}</td>
+                        <td class="text-center p-2">{{ requisition.region }}</td>
+                        <td class="text-center p-2">{{ requisition.zone }}</td>
+
+                        <td class="text-center p-2" style="white-space: nowrap;">{{ requisition.task_name }}</td>
+                        <td class="text-center p-2" style="white-space: nowrap;">{{ requisition.qty }}</td>
+                        <td class="text-center p-2" style="white-space: nowrap;">{{ requisition.site_code }}</td>
+                        <td class="text-center p-2" style="white-space: nowrap;">{{ requisition.TT_number }}</td>
+                        <td class="text-center p-2" style="white-space: nowrap;">{{ requisition.SOR_rate }}</td>
+                        <td class="text-center p-2">{{ requisition.requisition_amount }}</td>
+
+                        <td class="text-center p-2" style="white-space:nowrap;">
+                            {% if requisition.supporting_documents %}
+                                {% if requisition.supporting_documents.url|slice:'-3:' == 'pdf' %}
+                                    <a href="{{ requisition.supporting_documents.url }}" target="_blank">
+                                        View PDF
+                                    </a>
+                                {% else %}
+                                    <a href="{{ requisition.supporting_documents.url }}" target="_blank">
+                                        <img 
+                                            src="{{ requisition.supporting_documents.url }}" 
+                                            alt="Supporting Docs" 
+                                            style="cursor: pointer; width:50px;height:50px"
+                                        >
+                                    </a>
+                                {% endif %}
+                            {% else %}
+                                No Docs available
+                            {% endif %}
+                        </td>
+
+
+
+
+                        <td class="text-center p-2">{{ requisition.approved_amount }}</td>
+                
+                        <!-- Level 1 Approval -->
+                    <td class="text-center p-2">
+                        {% if requisition.level1_approval_status == 'Approved' %}
+                            <span style="background-color: rgb(192, 243, 75); font-size: 20px;">Approved</span>
+                        {% elif requisition.level1_approval_status == 'Rejected' %}
+                            <span style="background: red; font-size: 20px;">Rejected</span>
+                        {% elif request.user.manager_level == 'first_level' %}
+                        <div class="mt-2 d-flex justify-content-between align-items-center">
+                            <label for="approved_amount" class="me-2">Amount:</label>
+                            <input type="number" id="approved_amount" name="approved_amount" class="form-control me-2" placeholder="Enter" style="width: 150px;">
+                            
+                            <button class="btn btn-primary approve-btn me-2" data-id="{{ requisition.id }}" data-approval-status="Approved" data-level="level1">Approve</button>
+                            <button class="btn btn-danger approve-btn" data-id="{{ requisition.id }}" data-approval-status="Rejected" data-level="level1">Reject</button>
+                        </div>
+                        {% endif %}
+                    </td>
+                    <td class="text-center p-2" style="white-space: nowrap;">{{ requisition.level1_approval_date }}</td>
+
+                    <!-- Level 2 Approval -->
+                    <td class="text-center p-2">
+                        {% if requisition.level2_approval_status == 'Approved' %}
+                            <span style="background-color: rgb(192, 243, 75); font-size: 20px;">Approved</span>
+                        {% elif requisition.level2_approval_status == 'Rejected' %}
+                            <span style="background: red; font-size: 20px;">Rejected</span>
+                        {% elif request.user.manager_level == 'first_level' %}
+                        <div class="mt-2 d-flex justify-content-between align-items-center">
+                            <label for="approved_amount" class="me-2">Amount:</label>
+                            <input type="number" id="approved_amount" name="approved_amount" class="form-control me-2" placeholder="Enter" style="width: 150px;">
+                            
+                            <button class="btn btn-primary approve-btn me-2" data-id="{{ requisition.id }}" data-approval-status="Approved" data-level="level2">Approve</button>
+                            <button class="btn btn-danger approve-btn" data-id="{{ requisition.id }}" data-approval-status="Rejected" data-level="level2">Reject</button>
+                        </div>
+                        {% endif %}
+                    </td>
+
+                    <td class="text-center p-2" style="white-space: nowrap;">{{ requisition.level2_approval_date }}</td>
+
+                    <!-- Level 3 Approval -->
+                    <td class="text-center p-2">
+                        {% if requisition.level3_approval_status == 'Approved' %}
+                            <span style="background-color: rgb(192, 243, 75); font-size: 20px;">Approved</span>
+                        {% elif requisition.level3_approval_status == 'Rejected' %}
+                            <span style="background: red; font-size: 20px;">Rejected</span>
+                        {% elif request.user.manager_level == 'first_level' %}
+                        <div class="mt-2 d-flex justify-content-between align-items-center">
+                            <label for="approved_amount" class="me-2">Amount:</label>
+                            <input type="number" id="approved_amount" name="approved_amount" class="form-control me-2" placeholder="Enter" style="width: 150px;">
+                            
+                            <button class="btn btn-primary approve-btn me-2" data-id="{{ requisition.id }}" data-approval-status="Approved" data-level="level3">Approve</button>
+                            <button class="btn btn-danger approve-btn" data-id="{{ requisition.id }}" data-approval-status="Rejected" data-level="level3">Reject</button>
+                        </div>
+                        {% endif %}
+                    </td>
+
+                
+                        <td class="text-center p-2" style="white-space: nowrap;">{{ requisition.level3_approval_date }}</td>
+                      
+                    {% if requisition.sending_document %}
+                    <td class="text-center p-2" style="white-space: nowrap;"><i class="fas fa-check" style="color: green;">Uploaded</i></td>
+                        {% else %}
+                    
+                        <td class="text-center p-2" style="white-space: nowrap;">
+                            <a href="{% url 'billable:upload_money_sending_doc' requisition.id %}">Upload Money sending docs</a>
+                        </td>
+
+                    {% endif %}
+                       
+                        <td class="text-center p-2" style="white-space:nowrap;">
+                            {% if requisition.sending_document %}
+                                {% if requisition.sending_document.url|slice:'-3:' == 'pdf' %}
+                                    <a href="{{ requisition.sending_document.url }}" target="_blank">
+                                        View PDF
+                                    </a>
+                                {% else %}
+                                    <a href="{{ requisition.sending_document.url }}" target="_blank">
+                                        <img 
+                                            src="{{ requisition.sending_document.url }}" 
+                                            alt="Supporting Docs" 
+                                            style="cursor: pointer; width:50px;height:50px"
+                                        >
+                                    </a>
+                                {% endif %}
+                            {% else %}
+                                No Docs available
+                            {% endif %}
+                        </td>
+
+                        <td class="text-center p-2" style="white-space: nowrap;">{{ requisition.money_sending_date }}</td>
+                        
+                       
+                        <td class="text-center p-2">
+                            {% if requisition.receiving_status == 'Received' %}
+                                Received
+                            {% elif requisition.requester == request.user %}
+                                <form method="post" action="{% url 'billable:mark_received' requisition_id=requisition.id %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-success">Pending</button>
+                                </form>
+                            {% else %}
+                               login require
+                            {% endif %}
+                        </td>
+
+
+                       
+                        <td class="text-center p-2" style="white-space: nowrap;">{{ requisition.TT_open_date }}</td>
+                        <td class="text-center p-2" style="white-space: nowrap;">{{ requisition.work_completion_date }}</td>
+
+                        <td class="text-center p-2" style="white-space:nowrap;">
+                            {% if requisition.task_completion_image %}
+                                {% if requisition.task_completion_image.url|slice:'-3:' == 'pdf' %}
+                                    <a href="{{ requisition.task_completion_image.url }}" target="_blank">
+                                        View PDF
+                                    </a>
+                                {% else %}
+                                    <a href="{{ requisition.task_completion_image.url }}" target="_blank">
+                                        <img 
+                                            src="{{ requisition.task_completion_image.url }}" 
+                                            alt="Supporting Docs" 
+                                            style="cursor: pointer; width:50px;height:50px"
+                                        >
+                                    </a>
+                                {% endif %}
+                            {% else %}
+                                No Docs available
+                            {% endif %}
+                        </td>
+
+                        
+                        <td class="text-center p-2" style="white-space: nowrap;">{{ requisition.TT_status }}</td>
+                        <td class="text-center p-2" style="white-space: nowrap;">{{ requisition.TT_close_date }}</td>
+                                             
+                        
+
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                 
+                
+            </table>
+        </div>   
+        
+        
+
+<div class="pagination" style="padding:10px">
+    {% if page_obj.has_previous %}
+        <a style="margin:10px; font-size: 14px;" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+    {% endif %}
+    
+    {% for num in page_obj.paginator.page_range %}
+        {% if page_obj.number == num %}
+            <span style="margin:10px; font-size:14px">{{ num }}</span>
+        {% else %}
+            <a style="margin:10px; font-size:14px" href="?page={{ num }}">{{ num }}</a>
+        {% endif %}
+    {% endfor %}
+    
+    {% if page_obj.has_next %}
+        <a style="margin:10px; font-size:14px" href="?page={{ page_obj.next_page_number }}">Next</a>
+    {% endif %}
+</div>
+
+
+    </div>
+</div>
+
+<div class="col" style="height:1200px"></div>
+
+
+
+
+
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+    $('.approve-btn').click(function() {
+        var requisitionId = $(this).data('id');
+        var level = $(this).data('level');
+        const approvalStatus = $(this).data('approval-status'); 
+        const approved_amount = $('#approved_amount').val();
+        var url = "{% url 'billable:requisition_approval2' 0 %}".replace('0', requisitionId);
+        
+        $.ajax({
+            url: url,
+            method: 'POST',
+            data: {
+                'approval_level': level,
+                'approval_status': approvalStatus,
+                'approved_amount': approved_amount,
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            },
+            success: function(response) {
+                alert('Approval successful');
+                location.reload();
+            },
+            error: function(response) {
+                alert('Approval failed: ' + response.responseJSON.message);
+            }
+        });
+    });
+});
+</script>
+
+
+
+
+
+
+
+<script>
+    function approveLevel1(requisitionId) {      
+     
+        $.ajax({
+            url: '/dailyexpense:requisition_approval/',
+            method: 'POST',
+            data: { 'requisition_id': requisitionId },
+            success: function(data) {
+                // Handle success response
+                alert('Level 1 approval successful');
+            },
+            error: function(xhr, status, error) {
+                // Handle error response
+                alert('Error: ' + error);
+            }
+        });
+        // For demonstration purposes, let's just show an alert
+        alert('Level 1 approval for requisition ID ' + requisitionId);
+    }
+
+    function approveLevel2(requisitionId) {
+        alert('Level 2 approval for requisition ID ' + requisitionId);
+    }
+
+    function approveLevel3(requisitionId) {  
+        alert('Level 3 approval for requisition ID ' + requisitionId);
+    }
+
+
+
+
+
+
+
+    $(document).ready(function(){      
+            var regionZoneMapping = {
+                'Sylhet': ['','Sylhet', 'Moulovibazar','Mymensingh','Kisorganj','Tangail'], 
+                'Rangpur': ['','Rangpur', 'Dinajpur','Bagura','Rajshahi'] ,                          
+                
+            };
+         
+            $('#id_region').change(function(){
+                var selectedRegion = $(this).val();
+                var zoneChoices = regionZoneMapping[selectedRegion];
+                $('#id_zone').empty();
+                $.each(zoneChoices, function(index, value){
+                    $('#id_zone').append($('<option>').text(value).attr('value', value));
+                });
+            });
+                  
+            var zoneMpMapping = {              
+                'Sylhet': ['','Sylhet','Taherpur','Sunamganj','Bianibazar','Dorbhost','Dherai','Chatak'], // Add more MPs for Sylhet zone
+                'Moulovibazar': ['','Moulovibazar', 'Saestaganj','Juri','Baniachong'],
+                'Mymensingh': ['','Mymensingh', 'Fulpur','Valuka'] ,
+                'Kisorganj': ['','Kisorganj','Katiadi','Netrokona','Mohonpur','Austogram'],
+                'Tangail': ['','Tangail','Madhupur','Jamalpur','Sherpur','Bakshihanj','Rowmari'],
+               
+                'Rangpur':['','Rangpur','Hatibandha','Gaibandha','Ulipur','Boropar','Polasbari'],
+                'Dinajpur':['','Dinajpur','Panchghor','Jaldhaka','Thakurgaon'],
+                'Rajshahi':['','Rajshahi','Bagura','Nachole','Natore','Chapai'],
+                'Bagura':['','Bagura'],
+                '': ['']
+               
+            };
+
+       
+            $('#id_zone').change(function(){
+                $('#id_mp').val('');
+                var selectedZone = $(this).val();
+                var mpChoices = zoneMpMapping[selectedZone];
+
+                $('#id_mp').empty();
+                $.each(mpChoices, function(index, value){
+                    $('#id_mp').append($('<option>').text(value).attr('value', value));
+                });
+            });
+            
+        });
+
+
+
+</script>
+
+
+{% endblock %}
+
+

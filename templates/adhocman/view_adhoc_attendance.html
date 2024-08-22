@@ -55,33 +55,61 @@ table {
     
 
 <div class="container-fluid" id="main-content">
-    <div class="row row-cols-1 row-cols-md-2 p-2">
+    <div class="row">
+
+        <div class="col-12">       
+            <form method="GET" action="{% url 'adhocman:view_adhoc_attendance' %}" style="margin-bottom:30px">        
+            <div class="container-fluid">
+                <div class="row row-cols-2 row-cols-md-6">        
+                    <div class="col" style="padding:5px;">  Start Date:  {{ form.start_date }} </div>
+                    <div class="col" style="padding:5px;">  End Date:  {{ form.end_date }} </div>
+                    <div class="col" style="padding:5px;"> no of days {{ form.days }} </div>
+                    <div class="col" style="padding:5px;">  Region:{{ form.region }} </div>  
+                    <div class="col" style="padding:5px;">  Zone:{{ form.zone }} </div>    
+                    <div class="col" style="padding:5px;">  mp:{{ form.mp }} </div>  
+                    <div class="col" style="padding:5px;">  PGR:{{ form.pgr }} </div>  
+                    <div class="col" style="padding:5px; margin-top:20px; margin-left:30px"> <button type="submit" class='btn btn-primary'>Generate Data</button></div>
+                    
+                </div>
+            </div>                
+            </form>
+        </div>  
     
              
 
         <div class="col">
-            <h4> Adhoc attendance and bill pay</h4>
+            <h4 class="text-center"> Adhoc attendance and bill pay: <a href="{% url 'adhocman:adhoc_pgr_grand_summary' %}">View Summary</a></h4>
             <table>  
                 <thead>
                     <tr>
-                        <th class="text-center p-2">Enter Out time</th>
+                        <th class="text-center p-2" style="white-space: nowrap;">Enter Out time</th>
 
                         <th class="text-center p-2">Date</th>
+                        <th class="text-center p-2">Region</th>
+                        <th class="text-center p-2">Zone</th>
+                        <th class="text-center p-2">MP</th>
                         <th class="text-center p-2">Adhoc name</th>
                         <th class="text-center p-2">Adhoc phone</th>
+                        <th class="text-center p-2">Adhoc photo</th>
                         <th class="text-center p-2">Team leader name</th>
                         <th class="text-center p-2">Team leader phone</th>
+                        <th class="text-center p-2">TL Photo</th>
                         <th class="text-center p-2">In date</th>
                         <th class="text-center p-2">In Time</th>
                         <th class="text-center p-2">Out date</th>
                         <th class="text-center p-2">Out Time</th>
                         <th class="text-center p-2">Total working hours</th>
+                        <th class="text-center p-2">Total PGRH</th>
                         <th class="text-center p-2">Pay rate</th>
                         <th class="text-center p-2">Total bill amount</th>
+                        <th class="text-center p-2">Payment media</th>
+                        <th class="text-center p-2">Payment number</th>
                         <th class="text-center p-2">Pay bill to this adhoc</th>
                         <th class="text-center p-2">Payment amount</th>
                         <th class="text-center p-2" style="white-space: normal;">Transaction ID</th>
                         <th class="text-center p-2">Payment Docs</th>
+
+                    
                       
                                         
                                 
@@ -91,16 +119,45 @@ table {
                     {% for adhoc in adhoc_attendance_data %}
                     <tr>
                         {% if adhoc.adhoc_out_time %}
-                        <td class="text-center p-2" style="white-space: nowrap;">In and Out time already given</td>
+                        <td class="text-center p-2" style="white-space: nowrap;"><i class="fas fa-check" style="color: green;">Done</i></td>
                         {% else %}
                         <td class="text-center p-2" style="white-space: nowrap;"><a href="{% url 'adhocman:adhoc_outtime' adhoc.id %}">Enter Out time</a></td>
                         {% endif %}
                         <td class="text-center p-2" style="white-space: nowrap;">{{ adhoc.created_at}}</td>
 
+                        <td class="text-center p-2" style="white-space:nowrap;">{{ adhoc.pgr.region}}</td>
+                        <td class="text-center p-2" style="white-space:nowrap;">{{ adhoc.pgr.zone}}</td>
+                        <td class="text-center p-2" style="white-space:nowrap;">{{ adhoc.pgr.mp}}</td>
+
                         <td class="text-center p-2" style="white-space:nowrap;">{{ adhoc.pgr.name}}</td>
                         <td class="text-center p-2" style="white-space:nowrap;">{{ adhoc.pgr.phone}}</td>
+                        <td class="text-center p-2" style="white-space:nowrap;">
+                            {% if adhoc.pgr.PGR_photo %}
+                            <a href="{{ adhoc.pgr.PGR_photo.url }}" target="_blank">
+                              <img 
+                                src="{{ adhoc.pgr.PGR_photo.url }}" 
+                                alt="PGR_Photo" 
+                                style="cursor: pointer; width:50px;height:50px">
+                            </a>
+                          {% else %}
+                            No file available
+                          {% endif %}
+                        </td>
                         <td class="text-center p-2" style="white-space:nowrap;">{{ adhoc.pgr.pgtl.name}}</td>
                         <td class="text-center p-2" style="white-space:nowrap;">{{ adhoc.pgr.pgtl.phone}}</td>
+
+                        <td class="text-center p-2" style="white-space:nowrap;">
+                            {% if adhoc.pgr.pgtl.PGTL_photo %}
+                            <a href="{{ adhoc.pgr.pgtl.PGTL_photo.url }}" target="_blank">
+                              <img 
+                                src="{{ adhoc.pgr.pgtl.PGTL_photo.url }}" 
+                                alt="PGTL_Photo" 
+                                style="cursor: pointer; width:50px;height:50px">
+                            </a>
+                          {% else %}
+                            No file available
+                          {% endif %}
+                        </td>
                         
 
 
@@ -109,15 +166,15 @@ table {
                          <td class="text-center p-2"style="white-space: nowrap;">{{ adhoc.adhoc_out_date}}</td>
                          <td class="text-center p-2"style="white-space: nowrap;">{{ adhoc.adhoc_out_time}}</td>
                  
-                         <td class="text-center p-2">{{ adhoc.adhoc_working_hours}}</td>
+                         <td class="text-center p-2">{{ adhoc.adhoc_working_hours|floatformat:'2'}}</td>
+                         <td class="text-center p-2">{{ adhoc.adhoc_ticket.internal_generator_running_hours}}</td>
                          <td class="text-center p-2">{{ adhoc.adhoc_pay_rate }}</td>
                          <td class="text-center p-2">{{ adhoc.adhoc_bill_amount}}</td>
-                         {% if adhoc.adhoc_payment.transaction_id %}
-                         <td class="text-center p-2">Paid</td>
-                         {% else %}
-                         <td class="text-center p-2" style="white-space: nowrap;"><a href="{% url 'adhocman:create_adhoc_payment' adhoc.id %}">Pay bill to this adhoc</a></td>
-                         {% endif %}
+                         <td class="text-center p-2">{{ adhoc.pgr.payment_number_choice}}</td>
+                         <td class="text-center p-2">{{ adhoc.pgr.payment_number}}</td>
 
+                         <td class="text-center p-2" style="white-space: nowrap;"><a href="{% url 'adhocman:create_adhoc_payment' adhoc.id %}">Update Payment</a></td>
+                       
                          <td class="text-center p-2">{{ adhoc.adhoc_payment.adhoc_paid_amount}}</td>
 
                          <td class="text-center p-2">
@@ -139,6 +196,8 @@ table {
                             No file available
                             {% endif %}
                         </td>
+                        
+                       
                     </tr>
                     {% endfor %}
                 </tbody> 
@@ -146,9 +205,27 @@ table {
                 
             </table>
         </div>   
-
-        
+       
     </div>
+
+    
+<div class="pagination" style="padding:10px">
+    {% if page_obj.has_previous %}
+        <a style="margin:10px; font-size: 14px;" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+    {% endif %}
+    
+    {% for num in page_obj.paginator.page_range %}
+        {% if page_obj.number == num %}
+            <span style="margin:10px; font-size:14px">{{ num }}</span>
+        {% else %}
+            <a style="margin:10px; font-size:14px" href="?page={{ num }}">{{ num }}</a>
+        {% endif %}
+    {% endfor %}
+    
+    {% if page_obj.has_next %}
+        <a style="margin:10px; font-size:14px" href="?page={{ page_obj.next_page_number }}">Next</a>
+    {% endif %}
+</div>
 </div>
 
 
@@ -244,7 +321,7 @@ table {
 
 
 
-    <div class="col" style="height:1200px"></div>
+  
 
 
 {% endblock %}

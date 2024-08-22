@@ -260,7 +260,39 @@ def create_child_ticket(request, parent_ticket_id):
 
     return render(request, 'tickets/edotco/create_child_tt.html', {'form': form})
 
+@login_required
+def create_child_ticke_mobile(request, parent_ticket_id):
+    parent_ticket = get_object_or_404(eTicket, id=parent_ticket_id)
+    ticket_status = parent_ticket.ticket_status
+    if request.method == 'POST':
+        form = CreateChildTicketForm(request.POST, request.FILES)
+        if form.is_valid():
+            ticket = form.save(commit=False)
+            ticket.parent_ticket = parent_ticket
 
+            if form.cleaned_data['UploadPicture'] and form.cleaned_data['TakePicture']:
+                print('Please select only one option for picture')
+                form.add_error('UploadPicture', 'Please select only one option for picture')
+                form.add_error('TakePicture', 'Please select only one option for picture')
+            elif form.cleaned_data['UploadPicture']:
+                ticket.child_tt_image = form.cleaned_data['UploadPicture']
+            elif form.cleaned_data['TakePicture']:
+                ticket.child_tt_image = form.cleaned_data['TakePicture']
+            ticket.child_ticket_number = generate_unique_ticket_number()
+            ticket.save()
+            # Update the parent ticket's status
+            parent_ticket.ticket_status = form.cleaned_data.get('ticket_status', parent_ticket.ticket_status)
+            parent_ticket.save()
+
+            return redirect('tickets:view_tt_start_stop')
+    else:
+        initial_data = {
+            'parent_ticket_number': parent_ticket.internal_ticket_number,
+            'ticket_status': ticket_status
+        }
+        form = CreateChildTicketForm(initial=initial_data)
+
+    return render(request, 'tickets/edotco/create_child_tt.html', {'form': form})
 
 @login_required
 def view_child_tickets(request, parent_ticket_id):
@@ -274,7 +306,7 @@ def view_child_ticket_mobile(request, parent_ticket_id):
     parent_ticket = get_object_or_404(eTicket, pk=parent_ticket_id)  
     child_tickets = parent_ticket.child_tickets.all()
     
-    return render(request, 'tickets/edotco/view_child_tickets_single_mobile.html', {'parent_ticket': parent_ticket, 'child_tickets': child_tickets})
+    return render(request,'tickets/edotco/view_child_tickets_single_mobile.html', {'parent_ticket': parent_ticket, 'child_tickets': child_tickets})
 
 
 ################## ajax view to update for PG stop only ################################
@@ -496,8 +528,9 @@ def view_tt_edotco(request):
     region = None
     zone = None
     mp = None
+    ticket_number=None
     
-    form = SummaryReportChartForm(request.GET or {'days': 20})
+    form = SummaryReportChartForm(request.GET or {'days':60})
     tickets = eTicket.objects.all().order_by('-created_at')
 
     user = request.user
@@ -515,6 +548,7 @@ def view_tt_edotco(request):
         region = form.cleaned_data.get('region')
         zone = form.cleaned_data.get('zone')
         mp = form.cleaned_data.get('mp')
+        ticket_number = form.cleaned_data.get('ticket_number')
         
         if start_date and end_date:
             tickets = tickets.filter(created_at__range=(start_date, end_date))
@@ -531,6 +565,9 @@ def view_tt_edotco(request):
             tickets = tickets.filter(zone=zone)
         if mp:
             tickets = tickets.filter(mp=mp)
+
+        if ticket_number:
+            tickets = tickets.filter(internal_ticket_number=ticket_number)
     
     # Pagination logic
     ticket_data = []
@@ -625,6 +662,7 @@ def view_tt_start_stop(request):
     region = None
     zone = None
     mp = None
+    ticket_number = None
     
     form = SummaryReportChartForm(request.GET or {'days': 20})
     tickets = eTicket.objects.all().order_by('-created_at')
@@ -644,6 +682,7 @@ def view_tt_start_stop(request):
         region = form.cleaned_data.get('region')
         zone = form.cleaned_data.get('zone')
         mp = form.cleaned_data.get('mp')
+        ticket_number = form.cleaned_data.get('ticket_number')
         
         if start_date and end_date:
             tickets = tickets.filter(created_at__range=(start_date, end_date))
@@ -660,6 +699,12 @@ def view_tt_start_stop(request):
             tickets = tickets.filter(zone=zone)
         if mp:
             tickets = tickets.filter(mp=mp)
+        
+        if ticket_number:
+            tickets = tickets.filter(internal_ticket_number = ticket_number)
+
+        
+        
     
     # Pagination logic
     ticket_data = []
@@ -938,19 +983,101 @@ def summary_report_view(request):
                     total_hepta_calculated_fuel=Sum('internal_calculated_fuel_litre', output_field=DurationField()),
                     total_edotco_calculated_fuel=Sum('customer_calculated_fuel_litre', output_field=DurationField()),
                     total_fuel_difference=ExpressionWrapper(
-                        F('total_hepta_calculated_fuel') - F('total_edotco_calculated_fuel'),
+                     F('total_edotco_calculated_fuel') -  F('total_hepta_calculated_fuel'),
                         output_field=DecimalField(max_digits=10, decimal_places=2)
                     )
                 ) \
                 .order_by('region', 'zone')
             summary_data = list(summary)
-
+    form = SummaryReportForm()
     return render(request, 'tickets/edotco/summary_report.html', {
         'summary_data': summary_data,
         'form': form,
         'days': days,
         'report_date': report_date,
     })
+
+
+
+
+
+
+@login_required
+def summary_report_view_customerwise(request):
+    form = SummaryReportForm(request.GET or {'days': 20})
+    summary_data = []
+    report_date = None
+    days = None
+
+    if form.is_valid():
+        report_date = form.cleaned_data.get('report_date')
+        days = form.cleaned_data.get('days')
+
+        if report_date:
+            summary = eTicket.objects.filter(created_at__date=report_date).values('customer_name', 'region', 'zone') \
+                .annotate(
+                    num_tickets=Count('id'),
+                    num_closed_tickets=Count('id', filter=Q(ticket_status='closed')),
+                    num_valid_tickets=Count('id', filter=Q(ticket_status='TT_Valid')),
+                    num_invalid_tickets=Count('id', filter=Q(ticket_status='TT_invalid')),
+                    num_miss_tickets=Count('id', filter=Q(ticket_status='TT_Miss')),
+                    num_running_tickets=Count('id', filter=Q(ticket_status='running')),
+                    num_connected_tickets=Count('id', filter=Q(ticket_status='TT_connected')),
+                    num_otw_tickets=Count('id', filter=Q(ticket_status='onTheWay')),
+                    num_open_tickets=Count('id', filter=Q(ticket_status='open')),
+                    num_team_assign_tickets=Count('id', filter=Q(ticket_status='team_assign')),
+                    num_adhoc_PGR=Count('id', filter=Q(assigned_to__PGR_category='adhoc')),
+                    num_adhoc_vehicle=Count('id', filter=Q(vehicle__vehicle_rental_type='adhoc')),
+                    total_hepta_running_hours=Sum('internal_generator_running_hours', output_field=DurationField()),
+                    total_edotco_running_hours=Sum('customer_generator_running_hours', output_field=DurationField()),
+                    total_hepta_calculated_fuel=Sum('internal_calculated_fuel_litre', output_field=DurationField()),
+                    total_edotco_calculated_fuel=Sum('customer_calculated_fuel_litre', output_field=DurationField()),
+                    total_fuel_difference=ExpressionWrapper(
+                        F('total_hepta_calculated_fuel') - F('total_edotco_calculated_fuel'),
+                        output_field=DecimalField(max_digits=10, decimal_places=2)
+                    )
+                ) \
+                .order_by('customer_name', 'region', 'zone')
+            summary_data = list(summary)
+
+        elif days:
+            start_date = datetime.now() - timedelta(days=days)
+            summary = eTicket.objects.filter(created_at__gte=start_date).values('customer_name', 'region', 'zone') \
+                .annotate(
+                    num_tickets=Count('id'),
+                    num_closed_tickets=Count('id', filter=Q(ticket_status='closed')),
+                    num_valid_tickets=Count('id', filter=Q(ticket_status='TT_Valid')),
+                    num_invalid_tickets=Count('id', filter=Q(ticket_status='TT_invalid')),
+                    num_miss_tickets=Count('id', filter=Q(ticket_status='TT_Miss')),
+                    num_running_tickets=Count('id', filter=Q(ticket_status='running')),
+                    num_connected_tickets=Count('id', filter=Q(ticket_status='TT_connected')),
+                    num_otw_tickets=Count('id', filter=Q(ticket_status='onTheWay')),
+                    num_open_tickets=Count('id', filter=Q(ticket_status='open')),
+                    num_team_assign_tickets=Count('id', filter=Q(ticket_status='team_assign')),
+                    num_adhoc_PGR=Count('id', filter=Q(assigned_to__PGR_category='adhoc')),
+                    num_adhoc_vehicle=Count('id', filter=Q(vehicle__vehicle_rental_type='adhoc')),
+                    total_hepta_running_hours=Sum('internal_generator_running_hours', output_field=DurationField()),
+                    total_edotco_running_hours=Sum('customer_generator_running_hours', output_field=DurationField()),
+                    total_hepta_calculated_fuel=Sum('internal_calculated_fuel_litre', output_field=DurationField()),
+                    total_edotco_calculated_fuel=Sum('customer_calculated_fuel_litre', output_field=DurationField()),
+                    total_fuel_difference=ExpressionWrapper(
+                        F('total_hepta_calculated_fuel') - F('total_edotco_calculated_fuel'),
+                        output_field=DecimalField(max_digits=10, decimal_places=2)
+                    )
+                ) \
+                .order_by('customer_name', 'region', 'zone')
+            summary_data = list(summary)
+
+    form = SummaryReportForm()
+    return render(request, 'tickets/edotco/summary_report_customerwise.html', {
+        'summary_data': summary_data,
+        'form': form,
+        'days': days,
+        'report_date': report_date,
+    })
+
+
+
 
 
 @login_required
@@ -1117,7 +1244,7 @@ def zone_report_view(request):
       
     # Pagination logic
     page_obj = None
-    zone_tickets_per_page = 10
+    zone_tickets_per_page = 1
     paginator = Paginator(zone_tickets , zone_tickets_per_page)
     page_number = request.GET.get('page', 1)
 
@@ -1140,49 +1267,67 @@ def zone_report_view(request):
 
 
 
-
 @login_required
-def mp_report_view(request): 
-    form = MPReportForm(request.GET or {'days': 20})
-    etickets = []
-    mp = None
-    start_date = None
-    end_date = None
+def mp_report_view(request):
     days = None
+    start_date = None
+    end_date = None  
+    mp = None
+    mp_tickets=[]
 
+    form = MPReportForm(request.GET or {'days': 20})
+    tickets = eTicket.objects.all().order_by('-created_at')
+ 
     if form.is_valid():
-        mp = form.cleaned_data.get('mp')
-        days = form.cleaned_data.get('days')
         start_date = form.cleaned_data.get('start_date')
         end_date = form.cleaned_data.get('end_date')
-        
-        query = eTicket.objects.filter(mp=mp)
+        days = form.cleaned_data.get('days')   
+        mp = form.cleaned_data.get('mp')    
 
-        if days is not None:
-            start_date = datetime.now() - timedelta(days=days)
-            query = query.filter(created_at__gte=start_date)
-        elif start_date and end_date:
-            if start_date <= end_date:
-                query = query.filter(created_at__range=(start_date, end_date))
-            else:
-                etickets = []
+        mp_tickets = tickets.filter(mp=mp)
 
-        etickets = list(query)
-        for ticket in etickets:
+        if start_date and end_date:
+           mp_tickets = mp_tickets.filter(created_at__range=(start_date, end_date))
+        elif days:
+            end_date = datetime.today()
+            start_date = end_date - timedelta(days=days)
+            mp_tickets  = mp_tickets .filter(created_at__range=(start_date, end_date))
+
+        for ticket in mp_tickets:
             internal_hours = ticket.internal_generator_running_hours.total_seconds() / 3600 if ticket.internal_generator_running_hours else 0
             customer_hours = ticket.customer_generator_running_hours.total_seconds() / 3600 if ticket.customer_generator_running_hours else 0
             fuel_difference = (internal_hours * 2.4) - (customer_hours * 2.4)
             ticket.fuel_difference = fuel_difference
 
+      
+        # Pagination logic
+        page_obj = None
+        mp_tickets_per_page = 1
+        paginator = Paginator(mp_tickets , mp_tickets_per_page)
+        page_number = request.GET.get('page', 1)
+
+        try:
+            page_obj = paginator.page(page_number)
+        except PageNotAnInteger:
+            page_obj = paginator.page(1)
+        except EmptyPage:
+            page_obj = paginator.page(paginator.num_pages)
+
+        query_params = request.GET.copy()
+        if 'page' in query_params:
+            del query_params['page']
+        query_params = query_params.urlencode()
+
     form = MPReportForm()
-    return render(request, 'tickets/edotco/mp_report.html', 
-                  {
-                      'etickets': etickets,
-                      'form': form,
-                      'days': days,
-                      'start_date': start_date,
-                      'end_date': end_date
-                  })
+    return render(request, 'tickets/edotco/mp_report.html', {
+        'mp_tickets':mp_tickets,
+        'page_obj': page_obj,       
+        'days': days,
+        'form': form,
+        'start_date': start_date,
+        'end_date': end_date,
+       'query_params': query_params,
+    })
 
 
 
@@ -1544,3 +1689,4 @@ def datewise_summary_edotco(request):
         'structured_data': structured_data,
         'zones': sorted_zones
     })
+

@@ -47,116 +47,130 @@
 
 
 
-<form method="GET" action="{% url 'vehicle:view_vehicle_info' %}">
-    <div class="container-fluid">
-        <div class="row row-cols-2 row-cols-md-4">      
-         <div class="col" style="padding:5px;">  Region:{{ form.region }} </div>  
-         <div class="col" style="padding:5px;">  Zone:{{ form.zone }} </div>    
-         <div class="col" style="padding:5px;">  mp:{{ form.mp }} </div>    
-         <div class="col" style="padding:5px;">  Vehicle Reg Number:{{ form.vehicle_reg_number }} </div> 
-         <div class="col" style="padding:5px;"> <button type="submit" class='btn btn-primary'>Generate Data</button></div>
-           
-        </div>
-    </div>
-      
-    </form>
+
 
 
 
 <div class="container-fluid" id ='main-content'>
-    <h1>Vehicle database</h1>
-    <table>
-        <thead>
-            <tr>
-                <th class="text-center p-2">Update</th>
-                <th class="text-center p-2">Delete</th>
-                <th class="text-center p-2">View History</th>
+    <div class="row">
+        <div class="col-xl-12">
+            <form method="GET" action="{% url 'vehicle:view_vehicle_info' %}">
+                <div class="container-fluid">
+                    <div class="row row-cols-2 row-cols-md-4">      
+                     <div class="col" style="padding:5px;">  Region:{{ form.region }} </div>  
+                     <div class="col" style="padding:5px;">  Zone:{{ form.zone }} </div>    
+                     <div class="col" style="padding:5px;">  mp:{{ form.mp }} </div>    
+                     <div class="col" style="padding:5px;">  Vehicle Reg Number:{{ form.vehicle_reg_number }} </div> 
+                     <div class="col" style="padding:5px;"> <button type="submit" class='btn btn-primary'>Generate Data</button></div>
+                       
+                    </div>
+                </div>                  
+            </form>
+        </div>
 
-                <th class="text-center p-2">Region</th>
-                <th class="text-center p-2">Zone</th>
-                <th class="text-center p-2">MP</th>
+        <div class="col-xl-12">
+            <h1>Vehicle database</h1>
+            <table>
+                <thead>
+                    <tr>
+                        <th class="text-center p-2">Update</th>
+                        <th class="text-center p-2">Delete</th>
+                        <th class="text-center p-2">View History</th>
 
-                <th class="text-center p-2">Vehicle Owner</th>
+                        <th class="text-center p-2">Region</th>
+                        <th class="text-center p-2">Zone</th>
+                        <th class="text-center p-2">MP</th>
 
-                <th class="text-center p-2">Phone no</th>
-                <th class="text-center p-2">Address</th>
-                <th class="text-center p-2">Company Name</th>
+                        <th class="text-center p-2">Vehicle Owner</th>
 
-                <th class="text-center p-2">Vehicle Registration no</th>
-                <th class="text-center p-2">Joining Date</th>
-                <th class="text-center p-2">Supporting Docs</th>
+                        <th class="text-center p-2">Phone no</th>
+                        <th class="text-center p-2">Address</th>
+                        <th class="text-center p-2">Company Name</th>
 
-       
-                <th class="text-center p-2">vehicle fuel type</th>
-                <th class="text-center p-2"> vehicle fuel unit price</th>
-                <th class="text-center p-2"> vehicle Model name </th>
-                <th class="text-center p-2">vehicle rental category </th>     
-                <th class="text-center p-2">vehicle rental type </th>        
-                <th class="text-center p-2"> vehicle rent </th>
-              
-                <th class="text-center p-2"> vehicle overtime rate </th>
-                <th class="text-center p-2"> Driver overtime rate </th>
-                <th class="text-center p-2">vehicle operational mode</th>
-                <th class="text-center p-2">vehicle kilometer_commit per liter</th>
-                <th class="text-center p-2"> vehicle money commit per kilometer</th>         
-                <th class="text-center p-2">Admin</th>
-                <th class="text-center p-2">Vehicle ID</th>
+                        <th class="text-center p-2">Vehicle Registration no</th>
+                        <th class="text-center p-2">Joining Date</th>
+                        <th class="text-center p-2">Supporting Docs</th>
 
-                <th class="text-center p-2">Created at</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for vehicle in vehicle_info %}
+            
+                        <th class="text-center p-2">vehicle fuel type</th>
+                        <th class="text-center p-2">vehicle fuel unit price</th>
+                        <th class="text-center p-2"> vehicle Model name </th>
+                        <th class="text-center p-2">vehicle rental category </th>     
+                        <th class="text-center p-2">vehicle rental type </th>        
+                        <th class="text-center p-2"> vehicle rent </th>
+                                               
+                        <th class="text-center p-2"> Rate/km for Gasoline </th>
+                        <th class="text-center p-2"> Rate/km for CNG </th>
+                        <th class="text-center p-2"> Maximum CNG Kilometer/day </th>
 
-            <tr>
-                <td style="white-space: nowrap;"><a class='text-center p-2' href="{% url 'vehicle:update_vehicle_database' vehicle.id %}">Update Vehicle</a></td>
-                <td style="white-space: nowrap;"><a class='text-center p-2' href="{% url 'vehicle:delete_vehicle_database' vehicle.id %}">Delete Vehicle</a></td>
-                <td style="white-space: nowrap;"><a class='text-center p-2' href="{% url 'vehicle:vehicle_detail' vehicle.id %}">View history</a></td>
-                <td class="text-center p-2"style="white-space: nowrap;">{{ vehicle.region }}</td>
-                <td class="text-center p-2"style="white-space: nowrap;">{{ vehicle.zone }}</td>
-                <td class="text-center p-2"style="white-space: nowrap;">{{ vehicle.mp }}</td>
-                <td class="text-center p-2"style="white-space: nowrap;">{{ vehicle.vehicle_owner_name }}</td>
-                <td class="text-center p-2"style="white-space: nowrap;">{{ vehicle.vehilce_owner_mobile_number }}</td>
-             
-                <td class="text-center p-2" style="white-space: nowrap;">{{ vehicle.vehicle_owner_address }}</td>
-                
-                <td class="text-center p-2" style="white-space: nowrap;">{{ vehicle.vehicle_owner_company_name }}</td>
+                        <th class="text-center p-2"> vehicle overtime rate </th>
+                        <th class="text-center p-2"> Driver overtime rate </th>
+                        <th class="text-center p-2">vehicle operational mode</th>
+                        <th class="text-center p-2">vehicle kilometer_commit per liter</th>
+        
+                        <th class="text-center p-2">Admin</th>
+                        <th class="text-center p-2">Vehicle ID</th>
 
-                <td class="text-center p-2"style="white-space: nowrap;">{{ vehicle.vehicle_reg_number }}</td>
-                <td class="text-center p-2"style="white-space: nowrap;">{{ vehicle.vehicle_joining_date }}</td>
-                <td class="text-center p-2"style="white-space: nowrap;">
-                    {% if vehicle.vehicle_supporting_documents %}
-                    <a href="{{ vehicle.vehicle_supporting_documents.url }}" target="_blank">
-                        <img src="{{ vehicle.vehicle_supporting_documents.url }}" alt="Supporting Document" style="cursor: pointer; width: 50px; height: 50px;">
-                    </a>
-                    {% else %}
-                    No image available
-                    {% endif %}
-                </td>   
+                        <th class="text-center p-2">Created at</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for vehicle in vehicle_info %}
+
+                    <tr>
+                        <td style="white-space: nowrap;"><a class='text-center p-2' href="{% url 'vehicle:update_vehicle_database' vehicle.id %}">Update Vehicle</a></td>
+                        <td style="white-space: nowrap;"><a class='text-center p-2' href="{% url 'vehicle:delete_vehicle_database' vehicle.id %}">Delete Vehicle</a></td>
+                        <td style="white-space: nowrap;"><a class='text-center p-2' href="{% url 'vehicle:vehicle_detail' vehicle.id %}">View history</a></td>
+                        <td class="text-center p-2"style="white-space: nowrap;">{{ vehicle.region }}</td>
+                        <td class="text-center p-2"style="white-space: nowrap;">{{ vehicle.zone }}</td>
+                        <td class="text-center p-2"style="white-space: nowrap;">{{ vehicle.mp }}</td>
+                        <td class="text-center p-2"style="white-space: nowrap;">{{ vehicle.vehicle_owner_name }}</td>
+                        <td class="text-center p-2"style="white-space: nowrap;">{{ vehicle.vehilce_owner_mobile_number }}</td>
+                    
+                        <td class="text-center p-2" style="white-space: nowrap;">{{ vehicle.vehicle_owner_address }}</td>
+                        
+                        <td class="text-center p-2" style="white-space: nowrap;">{{ vehicle.vehicle_owner_company_name }}</td>
+
+                        <td class="text-center p-2"style="white-space: nowrap;">{{ vehicle.vehicle_reg_number }}</td>
+                        <td class="text-center p-2"style="white-space: nowrap;">{{ vehicle.vehicle_joining_date }}</td>
+                        <td class="text-center p-2"style="white-space: nowrap;">
+                            {% if vehicle.vehicle_supporting_documents %}
+                            <a href="{{ vehicle.vehicle_supporting_documents.url }}" target="_blank">
+                                <img src="{{ vehicle.vehicle_supporting_documents.url }}" alt="Supporting Document" style="cursor: pointer; width: 50px; height: 50px;">
+                            </a>
+                            {% else %}
+                            No image available
+                            {% endif %}
+                        </td>   
 
 
 
-                <td class="text-center p-2"style="white-space: nowrap;">{{ vehicle.vehicle_fuel_type }}</td>
-                <td class="text-center p-2"style="white-space: nowrap;">{{ vehicle.vehicle_fuel_unit_price }}</td>
-                <td class="text-center p-2"style="white-space: nowrap;">{{ vehicle.vehicle_brand_name }}</td>
-                <td class="text-center p-2"style="white-space: nowrap;">{{ vehicle.vehicle_rental_category }}</td>
-                <td class="text-center p-2"style="white-space: nowrap;">{{ vehicle.vehicle_rental_type }}</td>
+                        <td class="text-center p-2"style="white-space: nowrap;">{{ vehicle.vehicle_fuel_type }}</td>
+                        <td class="text-center p-2"style="white-space: nowrap;">{{ vehicle.vehicle_fuel_unit_price }}</td>
+                        <td class="text-center p-2"style="white-space: nowrap;">{{ vehicle.vehicle_brand_name }}</td>
+                        <td class="text-center p-2"style="white-space: nowrap;">{{ vehicle.vehicle_rental_category }}</td>
+                        <td class="text-center p-2"style="white-space: nowrap;">{{ vehicle.vehicle_rental_type }}</td>
+                        <td class="text-center p-2"style="white-space: nowrap;">{{ vehicle.vehicle_rent }}</td>  
+                       
+                        <td class="text-center p-2"style="white-space: nowrap;">{{ vehicle.vehicle_money_commit_per_kilometer_gasoline }}</td>  
+                        <td class="text-center p-2"style="white-space: nowrap;">{{ vehicle.vehicle_money_commit_per_kilometer_CNG }}</td>  
+                        <td class="text-center p-2"style="white-space: nowrap;">{{ vehicle.vehicle_max_kilometer_CNG }}</td>  
 
-                <td class="text-center p-2"style="white-space: nowrap;">{{ vehicle.vehicle_rent }}</td>               
-
-                <td class="text-center p-2"style="white-space: nowrap;">{{ vehicle.vehicle_body_overtime_rate }}</td>
-                <td class="text-center p-2"style="white-space: nowrap;">{{ vehicle.vehicle_driver_overtime_rate }}</td>
-                <td class="text-center p-2"style="white-space: nowrap;">{{ vehicle.vehicle_operational_mode }}</td>
-                <td class="text-center p-2"style="white-space: nowrap;">{{ vehicle.vehicle_kilometer_commit_per_liter}}</td>
-                <td class="text-center p-2"style="white-space: nowrap;">{{ vehicle.vehicle_money_commit_per_kilometer }}</td>
-                <td class="text-center p-2"style="white-space: nowrap;">{{ vehicle.vehicle_add_requester }}</td>
-                
-                <td class="text-center p-2"style="white-space: nowrap;">{{ vehicle.vehicle_id }}</td>
-                <td class="text-center p-2"style="white-space: nowrap;">{{ vehicle.created_at }}</td>
-            </tr> 
-            {% endfor %} 
-        </tbody>
-    </table>
+                        <td class="text-center p-2"style="white-space: nowrap;">{{ vehicle.vehicle_body_overtime_rate }}</td>
+                        <td class="text-center p-2"style="white-space: nowrap;">{{ vehicle.vehicle_driver_overtime_rate }}</td>
+                        <td class="text-center p-2"style="white-space: nowrap;">{{ vehicle.vehicle_operational_mode }}</td>
+                        <td class="text-center p-2"style="white-space: nowrap;">{{ vehicle.vehicle_kilometer_commit_per_liter}}</td>
+                        
+                        <td class="text-center p-2"style="white-space: nowrap;">{{ vehicle.vehicle_add_requester }}</td>
+                        
+                        <td class="text-center p-2"style="white-space: nowrap;">{{ vehicle.vehicle_id }}</td>
+                        <td class="text-center p-2"style="white-space: nowrap;">{{ vehicle.created_at }}</td>
+                    </tr> 
+                    {% endfor %} 
+                </tbody>
+            </table>
+        </div>
+            
 
     <div class="pagination" style="padding:10px">
         {% if page_obj.has_previous %}
@@ -176,7 +190,7 @@
         {% endif %}
     </div>
 
-
+    </div>
 
 </div>
 

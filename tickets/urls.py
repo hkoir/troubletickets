@@ -12,7 +12,7 @@ urlpatterns = [
      path('parent_ticket_status_update/<int:ticket_id>/',views.parent_ticket_status_update, name='parent_ticket_status_update'),
         
      path('create_child_ticket/<int:parent_ticket_id>/', views.create_child_ticket, name='create_child_ticket'),
-    
+     path('create_child_ticke_mobile/<int:parent_ticket_id>/', views.create_child_ticke_mobile, name='create_child_ticke_mobile'),
      path('view_all_parent_tickets_with_children/', views.view_all_parent_tickets_with_children, name='view_all_parent_tickets_with_children'),
      path('view_child_tickets/<int:parent_ticket_id>/', views.view_child_tickets, name='view_child_tickets'),
      path('view_child_ticket_mobile/<int:parent_ticket_id>/', views.view_child_ticket_mobile, name='view_child_ticket_mobile'),
@@ -32,6 +32,7 @@ urlpatterns = [
      path('chat/<str:ticket_id>/', views.chat, name='chat'),     
     
      path('summary_report_view/', views.summary_report_view, name='summary_report_view'), 
+     path('summary_report_view_customerwise/', views.summary_report_view_customerwise, name='summary_report_view_customerwise'), 
      path('summary_report_view_region/', views.summary_report_view_region, name='summary_report_view_region'),
      path('summary_report_view_hourly/', views.summary_report_view_hourly, name='summary_report_view_hourly'),
      path('mp_report_view/', views.mp_report_view, name='mp_report_view'), 

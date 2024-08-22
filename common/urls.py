@@ -25,5 +25,13 @@ urlpatterns = [
      path('add_notice/', views.add_notice, name='add_notice'), 
      path('view_notices/', views.view_notices, name='view_notices'),      
 
+     path('fuel_by_pump/', views.fuel_by_pump, name='fuel_by_pump'),   
+     path('datewise_fuel_withdraw/', views.datewise_fuel_withdraw, name='datewise_fuel_withdraw'),   
+
+     path('fuel_pump_payment/', views.fuel_pump_payment, name='fuel_pump_payment'),  
+     path('view_pump_payment_history/<int:pump_id>/', views.view_pump_payment_history, name='view_pump_payment_history'),  
+ 
+      path('all_expenditure/', views.all_expenditure, name='all_expenditure'),  
+
 ]
 

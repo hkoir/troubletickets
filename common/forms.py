@@ -25,7 +25,7 @@ class viewFuelPumpForm(forms.Form):
     region = forms.ChoiceField(choices=REGION_CHOICES, required=False)
     zone = forms.ChoiceField(choices=ZONE_CHOICES, required=False)
     mp = forms.ChoiceField(choices=MP_CHOICES, required=False)  
-    fuel_pump_name = forms.ChoiceField(required=False)  
+    fuel_pump_name = forms.CharField(required=False)  
 
 
 
@@ -38,7 +38,7 @@ class PGRForm(forms.ModelForm):
     class Meta:
         model = PGRdatabase
         fields = [
-            'region', 'zone', 'mp', 'name', 'PGR_category', 'phone', 'email',
+            'region', 'zone', 'mp', 'name', 'PGR_category', 'phone','payment_number','payment_number_choice', 'email',
             'address', 'joining_date', 'pgtl', 'reference_person_name',
             'reference_person_phone', 'PGR_birth_certificate'
         ]
@@ -77,7 +77,7 @@ class PGTLForm(forms.ModelForm):
     class Meta:
         model = PGTLdatabase
         fields = [
-            'region', 'zone', 'mp', 'name','phone', 'email',
+            'region', 'zone', 'mp', 'name','phone','payment_number','payment_number_choice', 'email',
             'address','joining_date','reference_person_name','reference_person_phone', 'PGTL_birth_certificate'
         ]
 
@@ -126,6 +126,34 @@ class PGRViewForm(forms.Form):
         required=False
     )
 
+    pgr = forms.CharField(
+        label='PGR Name',    
+        required=False
+    )
+
+    region = forms.ChoiceField(choices=REGION_CHOICES, required=False)
+    zone = forms.ChoiceField(choices=ZONE_CHOICES, required=False)
+    mp = forms.ChoiceField(choices=MP_CHOICES, required=False)
+
+
+
+class AllExpenseForm(forms.Form):
+    start_date = forms.DateField(
+        label='Start Date',
+        widget=forms.DateInput(attrs={'type': 'date'}),
+        required=False
+    )
+    end_date = forms.DateField(
+        label='End Date',
+        widget=forms.DateInput(attrs={'type': 'date'}),
+        required=False
+    )
+    days = forms.IntegerField(
+        label='Number of Days',
+        min_value=1,
+        required=False
+    )
+
     region = forms.ChoiceField(choices=REGION_CHOICES, required=False)
     zone = forms.ChoiceField(choices=ZONE_CHOICES, required=False)
     mp = forms.ChoiceField(choices=MP_CHOICES, required=False)
@@ -134,3 +162,25 @@ class PGRViewForm(forms.Form):
 
 class ExcelUploadForm(forms.Form):
     excel_file = forms.FileField()
+
+
+
+
+class FuelWithdrawForm(forms.Form):    
+    start_date = forms.DateField(label='Start Date', widget=forms.DateInput(attrs={'type': 'date'}))
+    end_date = forms.DateField(label='End Date', widget=forms.DateInput(attrs={'type': 'date'}))
+
+
+class FuelPumpSearchForm(forms.Form):
+    fuel_pump_name = forms.CharField(label='Fuel Pump Name', max_length=100)
+    start_date = forms.DateField(label='Start Date', widget=forms.DateInput(attrs={'type': 'date'}))
+    end_date = forms.DateField(label='End Date', widget=forms.DateInput(attrs={'type': 'date'}))
+
+
+from.models import fuelPumpPayment
+
+class FuelPumpPaymentForm(forms.ModelForm):
+    payment_date= forms.DateField(label='Payment date', required=False, widget=forms.DateInput(attrs={'type': 'date'}))
+    class Meta:
+        model = fuelPumpPayment
+        exclude =['created_at','payment_id']    

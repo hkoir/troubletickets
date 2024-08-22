@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+{% load static %}
+{% load duration_filters %}
+
+
+{% block content %}
+
+<title>View PG fault details</title>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+   
+<style>
+
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    
+    }
+    
+    th,td{
+        border: 1px solid black; /* Set border color for individual cells */
+        text-align: left;
+        padding: 0px;
+    }
+    
+    th {
+        background-color: rgb(38, 233, 129);
+        
+    }
+    
+    table thead th {
+    white-space: normal;
+    }
+    
+
+    .main-content {   
+    overflow-y: auto;
+    margin-left:0px;
+    position: absolute;
+    width: 100%;
+    left: 0;
+  
+}
+    
+    
+    </style>
+
+
+
+<div class="container-fluid main-content">
+    <div class="row">
+        <div class="col-xl-12">
+            <h4>Please write pg number</h4>            
+            <form method="POST" action="">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button class="btn btn-primary" type="submit">Submit</button>
+            </form> 
+        </div>
+        
+        <div class="col-xl-12">  
+        {% if pg_details %}
+        <h4>PG fuel Details</h4>
+        <table>
+             <thead>
+                    <tr>
+                        <th class="text-center p-2">Region </th>
+                        <th class="text-center p-2">Zone</th>
+                        <th class="text-center p-2">MP</th>
+                        <th class="text-center p-2">PG Number</th>
+                        <th class="text-center p-2">PG deployment type</th>
+                        <th class="text-center p-2" style="white-space: nowrap;">Fixed PG Site code</th>
+                        <th class="text-center p-2">Refill Date</th>
+                        <th class="text-center p-2">Refill Amount</th>
+                        <th class="text-center p-2">Refill User</th>
+                        <th class="text-center p-2">Refill code</th>
+                        <th class="text-center p-2">Refill type</th>
+                        <th class="text-center p-2">Source of purchase</th>
+                        <th class="text-center p-2">Fuel rate</th>
+                        <th class="text-center p-2">Fuel cost</th>
+                        <!-- other headers... -->
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for detail in pg_details %}
+                        <tr>
+                            <td class="text-center p-2">{{ detail.region }}</td>
+                            <td class="text-center p-2">{{ detail.zone }}</td>
+                            <td class="text-center p-2">{{ detail.mp }}</td>
+                            <td class="text-center p-2">{{ detail.pgnumber.PGNumber }}</td>
+                            <td class="text-center p-2">{{ detail.pgnumber.PG_deployment_type }}</td>
+
+                            {% if detail.pgnumber.PG_deployment_type == 'fixed' %}
+                            <td class="text-center p-2">{{ detail.pgnumber.fixed_PG_site_code }}</td>
+                            {% else %}
+                            <td class="text-center p-2">N/A(Movable PG)</td>
+                            {% endif %}
+                    
+                            <td class="text-center p-2" style="white-space: nowrap;">{{ detail.refill_date }}</td>
+                            <td class="text-center p-2">{{ detail.refill_amount}}</td>
+                            <td class="text-center p-2">{{ detail.refill_requester}}</td>
+                            <td class="text-center p-2">{{ detail.fuel_refill_code}}</td>
+                            <td class="text-center p-2">{{ detail.refill_type}}</td>
+
+                            {% if detail.fuel_pump.fuel_pump_name %}
+                            <td class="text-center p-2">{{ detail.fuel_pump.fuel_pump_name}}</td>  
+                            {% else %}
+                            <td class="text-center p-2">{{ detail.fuel_supplier_name}}</td>
+                            {% endif %}
+                            <td class="text-center p-2">{{ detail.fuel_rate}}</td>
+                            <td class="text-center p-2">{{ detail.fuel_cost}}</td>
+                            <!-- other fields... -->
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    </div>
+
+
+    </div>
+</div>
+
+
+<div class="col" style="height:1200px"></div>
+
+
+{% endblock %}

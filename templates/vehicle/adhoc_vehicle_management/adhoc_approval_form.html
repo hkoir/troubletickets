@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% load static %}
+
+
+
+{% block content %}
+
+<style>
+    
+html, body { 
+    font-family: Verdana, sans-serif; 
+  
+  }
+</style>
+
+
+<h4 class="text-center" style="margin-top:10px">Reports</h4>
+
+
+<div class="container-fluid">
+    <div class="row row-cols-1 row-cols-md-3 p-2">
+
+
+        <div class="col"></div>
+        <div class="col">
+            <div class="card" style="margin-top:10px;padding:10px;background-color: bisque;">
+                <div class="card-body">
+                    <h5 class="card-title">Requisition Approval</h5>
+                    <p style="margin-bottom:20px">   Applied no of days: {{ requisition.num_of_days_applied }} <br>
+                        Applied for: {{ requisition.purpose }}
+                   </p>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        <label for="approval_status">Approval Choice:</label>
+                        <select id="approval_status" name="approval_status" class="form-control">
+                            <option value="Approved">Approved</option>
+                            <option value="Rejected">Rejected</option>
+                        </select>
+                        <br>
+                        <label for="approved_amount">Approved qty:</label>
+                        <input type="number" step="0.01" id="num_of_days_approved" name="num_of_days_approved" class="form-control" value="{{ requisition.num_of_days_approved }}">
+                        <br>
+                        <label for="comments">Comments:</label>
+                        <textarea id="comments" name="comments" class="form-control"></textarea>
+                        <br>
+                        <div><button type="submit" class="btn btn-primary">Submit</button></div>
+                    </form>                   
+
+
+                </div>
+            </div>
+        </div>
+        <div class="col"></div>
+    </div>
+</div>
+
+<div class="col" style="height:1200px"></div>
+
+{% endblock %}

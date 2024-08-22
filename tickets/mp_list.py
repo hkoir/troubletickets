@@ -1,5 +1,6 @@
 
 MP_CHOICES = [
+     ('', ''),
     ('Sylhet', 'Sylhet'),
     ('Taherpur', 'Taherpur'),   
     ('Sunamganj', 'Sunamganj'),
@@ -64,6 +65,7 @@ MP_CHOICES = [
 
 
 ZONE_CHOICES = [
+     ('', ''),
     ('Sylhet', 'Sylhet'),
     ('Moulovibazar', 'Moulovibazar'),
     ('Mymensingh', 'Mymensingh'),
@@ -79,6 +81,7 @@ ZONE_CHOICES = [
 
 
 REGION_CHOICES = [
+        ('', ''),
         ('Sylhet', 'Sylhet'),
         ('Rangpur', 'Rangpur'),
        

@@ -1,0 +1,380 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% load duration_filters %}
+
+{% block content %}
+
+
+    <title>Adhoc attendance form</title>
+
+    <style>
+
+
+
+table {
+            border-collapse: collapse;
+            width: 100%;
+      
+        }
+
+        th, td {
+            border: 1px solid rgb(227, 87, 7); /* Set border color for individual cells */
+            text-align: left;
+            padding: 0px;
+        }
+        th{
+        background-color: rgb(52, 232, 100);
+      }
+      
+
+    table thead th {
+    white-space: normal;
+        }
+
+    #main-content {   
+    overflow-y: auto;
+    margin-left:0px;
+    position: absolute;
+    width: 100%;
+    left: 0;
+  
+}
+
+
+
+  #selected-pgrs {
+            list-style-type: none;
+        }
+        #selected-pgrs li {
+            margin-bottom: 5px;
+        }
+
+    </style>
+
+      
+    
+
+<div class="container-fluid" id="main-content">
+    <div class="row">
+
+        <div class="col-12">       
+            <form method="GET" action="{% url 'vehicle:view_adhoc_attendance' %}" style="margin-bottom:30px">        
+            <div class="container-fluid">
+                <div class="row row-cols-2 row-cols-md-6">        
+                    <div class="col" style="padding:5px;">  Start Date:  {{ form.start_date }} </div>
+                    <div class="col" style="padding:5px;">  End Date:  {{ form.end_date }} </div>
+                    <div class="col" style="padding:5px;"> no of days {{ form.days }} </div>
+                    <div class="col" style="padding:5px;">  Region:{{ form.region }} </div>  
+                    <div class="col" style="padding:5px;">  Zone:{{ form.zone }} </div>    
+                    <div class="col" style="padding:5px;">  mp:{{ form.mp }} </div>  
+                    <div class="col" style="padding:5px;"> <button type="submit" class='btn btn-primary'>Generate Data</button></div>
+                    
+                </div>
+            </div>                
+            </form>
+        </div>  
+    
+             
+
+        <div class="col">
+            <h4 class="text-center"> Adhoc attendance and bill pay: 
+                <a href="{% url 'vehicle:adhoc_summary_view' %}">View Summary payment</a>:
+                <a href="{% url 'vehicle:create_adhoc_requisition' %}">Apply for adhoc vehicle</a></h4>
+            <table>  
+                <thead>
+                    <tr>
+                   
+
+                        <th class="text-center p-2">Date</th>
+                        <th class="text-center p-2">Region</th>
+                        <th class="text-center p-2">Zone</th>
+                        <th class="text-center p-2">MP</th>
+                        <th  class="text-center p-2">Vehicle rent/day</th>
+                        <th  class="text-center p-2">Vehicle rental category</th>
+                        <th  class="text-center p-2">Vehicle contact hours</th>
+                        <th  class="text-center p-2">Vehicle overtime rate</th>
+
+                        <th class="text-center p-2">Vehicle Number</th>
+                        <th class="text-center p-2">Owner name</th>
+                        <th class="text-center p-2">Owner phone</th>                     
+                        <th class="text-center p-2">In date</th>
+                        <th class="text-center p-2">In Time</th>
+                        <th class="text-center p-2">Enter Out time</th>
+                        <th class="text-center p-2">Out date</th>
+                        <th class="text-center p-2">Out Time</th>
+                        <th class="text-center p-2">Total working hours</th>
+                        <th class="text-center p-2">Total km run</th>
+                        <th class="text-center p-2" style="background-color: rgb(246, 64, 64);">Total fault Duration</th>
+                      
+                        <th class="text-center p-2">Vehicle base body rent</th>
+                        <th class="text-center p-2">vehicle overtime rent</th>                  
+                        <th class="text-center p-2" style="background-color: bisque;">Total body bill amount</th>
+
+                        <th class="text-center p-2">Total kilometer cost CNG</th>                        
+                        <th class="text-center p-2">Total kilometer cost gasoline</th>                        
+                        <th class="text-center p-2" style="background-color: aquamarine;">Total kilometer cost</th>
+
+                        <th class="text-center p-2" style="background-color: gold;">Grand Total bill amount</th>
+
+                        <th class="text-center p-2">Pay bill to this adhoc</th>
+                        <th class="text-center p-2">Payment amount</th>
+                        <th class="text-center p-2" style="white-space: normal;">Transaction ID</th>
+                        <th class="text-center p-2">Payment Docs</th>
+                      
+                                        
+                                
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for adhoc in adhoc_attendance_data %}
+                    <tr>
+                       
+                        <td class="text-center p-2" style="white-space: nowrap;">{{ adhoc.created_at}}</td>
+
+                        <td class="text-center p-2" style="white-space:nowrap;">{{ adhoc.vehicle.region}}</td>
+                        <td class="text-center p-2" style="white-space:nowrap;">{{ adhoc.vehicle.zone}}</td>
+                        <td class="text-center p-2" style="white-space:nowrap;">{{ adhoc.vehicle.mp}}</td>
+                        <td class="text-center p-2" style="white-space:nowrap;">{{ adhoc.vehicle.vehicle_rent}}</td>
+                        <td class="text-center p-2" style="white-space:nowrap;">{{ adhoc.vehicle.vehicle_rental_category}}</td>
+                        <td class="text-center p-2" style="white-space:nowrap;">{{ adhoc.vehicle.vehicle_hour_contact}}</td>
+                        <td class="text-center p-2" style="white-space:nowrap;">{{ adhoc.vehicle.vehicle_body_overtime_rate}}</td>
+                        <td class="text-center p-2" style="white-space:nowrap;">{{ adhoc.vehicle.vehicle_reg_number}}</td>
+                        <td class="text-center p-2" style="white-space:nowrap;">{{ adhoc.vehicle.vehicle_owner_name}}</td>
+                        <td class="text-center p-2" style="white-space:nowrap;">{{ adhoc.vehicle.vehilce_owner_mobile_number}}</td>
+                                             
+                        <td class="text-center p-2" style="white-space: nowrap;">{{ adhoc.adhoc_in_date }}</td>
+                         <td class="text-center p-2"style="white-space: nowrap;">{{ adhoc.adhoc_in_time}}</td>
+                                                 
+                        <td class="text-center p-2" style="white-space: nowrap;">  
+                            {% if adhoc.adhoc_out_time %}                           
+                             <i class="fas fa-check" style="color:green">done</i> </td>
+                             {% else %}                         
+                            <button class="btn btn-primary btn-sm updateOutTimeBtn" data-attendance-id="{{ adhoc.id }}">Submit</button>
+                            {% endif %}
+                        </td>                          
+                         
+                        <td class="text-center p-2" style="white-space: nowrap;">
+                            {% if not adhoc.adhoc_out_time %}                        
+                             <input type="date" class="form-control adhocOutDateInput" name="adhoc_out_date" required>
+                                {% else %}
+                                    {{ adhoc.adhoc_out_date }}
+                                {% endif %}
+                        </td>
+                        <td class="text-center p-2" style="white-space: nowrap;">
+                            {% if not adhoc.adhoc_out_time %}
+                                <input type="time" class="form-control adhocOutTimeInput" name="adhoc_out_time" required>
+                            {% else %}
+                                {{ adhoc.adhoc_out_time }}
+                            {% endif %}
+                        </td>
+                            
+                 
+                         <td class="text-center p-2">{{ adhoc.adhoc_working_hours|floatformat:'2'}}</td>
+                         <td class="text-center p-2">{{ adhoc.vehicle_running_data.day_end_kilometer_run}}</td>
+                         <td class="text-center p-2">{{ adhoc.vehicle_fault.fault_duration_hours|floatformat:'2'}}</td>
+
+                         <td class="text-center p-2">{{ adhoc.adhoc_vehicle_base_bill_amount}}</td>
+                         <td class="text-center p-2">{{ adhoc.adhoc_vehicle_overtime_bill_amount}}</td>
+                         <td class="text-center p-2">{{ adhoc.adhoc_vehicle_total_bill_amount}}</td>
+
+                         <td class="text-center p-2">{{ adhoc.vehicle_running_data.day_end_kilometer_cost_CNG}}</td>
+                         <td class="text-center p-2">{{ adhoc.vehicle_running_data.day_end_kilometer_cost_gasoline}}</td>
+                         <td class="text-center p-2">{{ adhoc.vehicle_running_data.total_kilometer_cost}}</td>
+
+                         <td class="text-center p-2">{{ adhoc.vehicle_running_data.total_kilometer_cost|add:adhoc.adhoc_vehicle_total_bill_amount }}</td>
+                    
+
+                         {% if adhoc.adhoc_out_time %}
+                         <td class="text-center p-2" style="white-space: nowrap;"><a href="{% url 'vehicle:create_adhoc_payment' adhoc.id %}">Make/update payment</a></td>
+                         {% else %}
+                         <td class="text-center p-2" style="white-space: nowrap;background-color: red;">Out time is pending</td>
+                         {% endif %}
+
+                         <td class="text-center p-2">{{ adhoc.adhoc_payment.adhoc_paid_amount}}</td>
+
+                         <td class="text-center p-2">
+                            {% if adhoc.adhoc_payment %}
+                                {{ adhoc.adhoc_payment.transaction_id }}
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </td>
+                        <td class="text-center p-2" style="white-space: nowrap;">
+                            {% if adhoc.adhoc_payment and adhoc.adhoc_payment.payment_supporting_document %}
+                            <a href="{{ adhoc.adhoc_payment.payment_supporting_document.url }}" target="_blank">
+                                <img 
+                                    src="{{ adhoc.adhoc_payment.payment_supporting_document.url }}" 
+                                    alt="Adhoc Payment documents" 
+                                    style="cursor: pointer; width:50px;height:50px">
+                            </a>
+                            {% else %}
+                            No file available
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody> 
+                 
+                
+            </table>
+        </div>   
+
+        
+    </div>
+
+
+    
+<div class="pagination" style="padding:10px">
+    {% if page_obj.has_previous %}
+        <a style="margin:10px; font-size: 14px;" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+    {% endif %}
+    
+    {% for num in page_obj.paginator.page_range %}
+        {% if page_obj.number == num %}
+            <span style="margin:10px; font-size:14px">{{ num }}</span>
+        {% else %}
+            <a style="margin:10px; font-size:14px" href="?page={{ num }}">{{ num }}</a>
+        {% endif %}
+    {% endfor %}
+    
+    {% if page_obj.has_next %}
+        <a style="margin:10px; font-size:14px" href="?page={{ page_obj.next_page_number }}">Next</a>
+    {% endif %}
+</div>
+</div>
+
+
+
+
+<div class="col" style="height:1200px"></div>
+
+   <script>
+  $(document).ready(function() {
+    $('.updateOutTimeBtn').click(function(e) {
+        e.preventDefault();
+
+        var $row = $(this).closest('tr');
+        var adhoc_out_date = $row.find('.adhocOutDateInput').val();
+        var adhoc_out_time = $row.find('.adhocOutTimeInput').val();
+        var attendanceId = $(this).data('attendance-id');
+
+        $.ajax({
+            url: "{% url 'vehicle:adhoc_outtime2' 0 %}".replace('0', attendanceId),
+            type: 'POST',
+            data: {
+                'adhoc_out_date': adhoc_out_date,
+                'adhoc_out_time': adhoc_out_time,
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            },
+            success: function(response) {
+                if (response.success) {
+                    alert(response.message);
+                    location.reload();  // Optionally reload the page or update the DOM
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                alert('An error occurred: ' + error);
+            }
+        });
+    });
+});
+
+
+   </script>
+<script>
+    $(document).ready(function() {
+     $('#id_pgr').select2({
+         width: '100%',
+         ajax: {
+             url: "{% url 'dailyexpense:common_search' %}",
+             dataType: 'json',
+             delay: 250,
+             data: function(params) {
+                 return {
+                     q: params.term
+                 };
+             },
+             processResults: function(data) {
+                 return {
+                     results: $.map(data.results, function(item) {
+                         return {
+                             id: item.id,
+                             text: item.text
+                         };
+                     })
+                 };
+             },
+             cache: true
+         },
+         minimumInputLength: 1,
+         placeholder: 'Search',
+         allowClear: true
+     });
+ });
+ 
+ </script>
+    
+
+    <script>
+        $(document).ready(function(){      
+            var regionZoneMapping = {
+                'Sylhet': ['','Sylhet', 'Moulovibazar','Mymensingh','Kisorganj','Tangail'], 
+                'Rangpur': ['','Rangpur', 'Dinajpur','Bagura','Rajshahi'] ,                          
+                
+            };
+         
+            $('#id_region').change(function(){
+                var selectedRegion = $(this).val();
+                var zoneChoices = regionZoneMapping[selectedRegion];
+                $('#id_zone').empty();
+                $.each(zoneChoices, function(index, value){
+                    $('#id_zone').append($('<option>').text(value).attr('value', value));
+                });
+            });
+                  
+            var zoneMpMapping = {              
+                'Sylhet': ['','Sylhet','Taherpur','Sunamganj','Bianibazar','Dorbhost','Dherai','Chatak'], // Add more MPs for Sylhet zone
+                'Moulovibazar': ['','Moulovibazar', 'Saestaganj','Juri','Baniachong'],
+                'Mymensingh': ['','Mymensingh', 'Fulpur','Valuka'] ,
+                'Kisorganj': ['','Kisorganj','Katiadi','Netrokona','Mohonpur','Austogram'],
+                'Tangail': ['','Tangail','Madhupur','Jamalpur','Sherpur','Bakshihanj','Rowmari'],
+               
+                'Rangpur':['','Rangpur','Hatibandha','Gaibandha','Ulipur','Boropar','Polasbari'],
+                'Dinajpur':['','Dinajpur','Panchghor','Jaldhaka','Thakurgaon'],
+                'Rajshahi':['','Rajshahi','Bagura','Nachole','Natore','Chapai'],
+                'Bagura':['','Bagura'],
+                '': ['']
+               
+            };
+    
+       
+            $('#id_zone').change(function(){
+                $('#id_mp').val('');
+                var selectedZone = $(this).val();
+                var mpChoices = zoneMpMapping[selectedZone];
+    
+                $('#id_mp').empty();
+                $.each(mpChoices, function(index, value){
+                    $('#id_mp').append($('<option>').text(value).attr('value', value));
+                });
+            });
+    
+    
+    
+    });          
+    
+    </script>
+    
+
+
+
+    <div class="col" style="height:1200px"></div>
+
+
+{% endblock %}
+
+
+

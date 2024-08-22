@@ -33,13 +33,21 @@ class PGDatabaseViewForm(forms.Form):
     PGNumber = forms.CharField(required=False)
    
    
+from django import forms
+from .models import PGFuelRefill, FuelPumpDatabase, AddPGInfo
+
+from django import forms
+from .models import PGFuelRefill, FuelPumpDatabase, AddPGInfo
+
 class PGFuelRefillForm(forms.ModelForm):
-    refill_date = forms.DateField(label='PG refil date', required=False, widget=forms.DateInput(attrs={'type': 'date'}))
+    refill_date = forms.DateField(label='Refill date', required=False, widget=forms.DateInput(attrs={'type': 'date'}))
     pgnumber = forms.ModelChoiceField(queryset=AddPGInfo.objects.all(), required=False, label='PG Number', widget=forms.Select(attrs={'class': 'form-control'}))
+    fuel_pump = forms.ModelChoiceField(queryset=FuelPumpDatabase.objects.all(), required=False, label='Fuel Pump', widget=forms.Select(attrs={'class': 'form-control'}))
+   
 
     class Meta:
         model = PGFuelRefill
-        exclude = ['fuel_refill_code', 'refill_requester', 'fuel_cost', 'created_at'] 
+        exclude = ['fuel_refill_code', 'refill_requester', 'fuel_cost', 'created_at']
 
     def clean_refill_date(self):
         refill_date = self.cleaned_data['refill_date']
@@ -87,11 +95,49 @@ class UpdatePGFaultRecordForm(forms.ModelForm):
   
   
 class PGNumberForm(forms.Form):
-    pg_number = forms.CharField(label='PG Number', max_length=50)
+    pg_number = forms.CharField(label='PG Number', max_length=50,required=False)
 
 
 
 
 
+
+class PgDetailsForm(forms.Form):   
+    start_date = forms.DateField(
+        label='Start Date',
+        widget=forms.DateInput(attrs={'type': 'date'}),
+        required=False
+    )
+    end_date = forms.DateField(
+        label='End Date',
+        widget=forms.DateInput(attrs={'type': 'date'}),
+        required=False
+    )
+    days = forms.IntegerField(
+        label='Number of Days',
+        min_value=1,
+        required=False
+    )
+  
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        start_date = cleaned_data.get('start_date')
+        end_date = cleaned_data.get('end_date')
+        days = cleaned_data.get('days')    
+
+        if start_date and end_date and days:
+            raise forms.ValidationError('Please specify either a date range or the number of days, but not both.')
+        
+        if (start_date and not end_date) or (end_date and not start_date):
+            raise forms.ValidationError('Both start and end dates must be specified if you choose date range.')
+        
+        if not (start_date or end_date or days):
+            raise forms.ValidationError('Please specify a date range or number of days for the report.')
+
+        if start_date and end_date and start_date > end_date:
+            raise forms.ValidationError('Start date must be earlier than end date.')
+
+        return cleaned_data
 
 

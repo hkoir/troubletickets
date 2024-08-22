@@ -22,7 +22,8 @@ from .models import AddPGInfo,PGFuelRefill,PGFaultRecord
 
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
-
+from.forms import PgDetailsForm
+from django.http import JsonResponse
 
 
 
@@ -156,7 +157,6 @@ def add_pg_fuel2(request):
 
 
 
-
 @login_required
 def add_pg_fuel(request):
     if request.method == 'POST':   
@@ -164,26 +164,33 @@ def add_pg_fuel(request):
         if form.is_valid():
             pg_number = form.cleaned_data.get('pgnumber')  
      
-            pg_instance = AddPGInfo.objects.get(PGNumber=pg_number)
+            try:
+                pg_instance = AddPGInfo.objects.get(PGNumber=pg_number)
+            except AddPGInfo.DoesNotExist:
+                messages.error(request, f'PG with number {pg_number} does not exist.')
+                return redirect('generator:add_pg_fuel')
+                
             if pg_instance.PG_status == 'faulty':
-                    messages.error(request, f'Thiss is a faulty PG: {pg_number} and you can not refil faulty PG. If the PG is repaired then pls update PG database first and then try again')
+                messages.error(request, f'This is a faulty PG: {pg_number} and you cannot refill a faulty PG. If the PG is repaired, please update the PG database first and then try again.')
             else:
                 form.instance.refill_requester = request.user
                 form.instance.fuel_refill_code = generate_unique_finance_requisition_number()
                 form.save()
                 messages.success(request, f'Fuel refilled successfully for PG: {pg_number}')
                 return redirect('generator:view_pg_fuel')
+        else:
+            print(form.errors)  # Print form errors to the console or log them
        
     else:
         form = PGFuelRefillForm()
+  
     return render(request, 'generator/add_pg_fuel.html', {'form': form})
 
 
 
 @login_required
 def view_pg_fuel(request):
-    pg_info = PGFuelRefill.objects.all().order_by('-created_at')
-
+    pg_info = PGFuelRefill.objects.all().order_by('-created_at')       
     # CSV download logic
     if 'download_csv' in request.GET:
         response = HttpResponse(content_type='text/csv')
@@ -210,27 +217,41 @@ def view_pg_fuel(request):
     except EmptyPage:
         page_obj = paginator.page(paginator.num_pages)
 
-    form = PGDatabaseViewForm()
     return render(request, 'generator/view_pg_fuel.html', {
         'pg_info': pg_info,
         'page_obj': page_obj,
-        'form': form,
+   
     })
 
 
-
-
-from django.http import JsonResponse
-
-
-
 @login_required
-def pg_summary_report(request):
+def view_pg_details_fuel(request):
+    pg_details = None
+    if request.method == 'POST':
+        form = PGNumberForm(request.POST)
+        if form.is_valid():
+            pg_number = form.cleaned_data['pg_number']
+            pg_info = get_object_or_404(AddPGInfo, PGNumber=pg_number)
+            pg_details = PGFuelRefill.objects.filter(pgnumber=pg_info).order_by('-created_at')
+    else:
+        form = PGNumberForm()
+    form = PGNumberForm()
+    return render(request, 'generator/pg_fuel_record_details.html', {'form': form, 'pg_details': pg_details})
+
+
+from generator.models import AddPGInfo
+@login_required
+def pg_summary_report_by_PG(request):
     form = vehicleSummaryReportForm(request.GET or {'days': 20})
     tickets = eTicket.objects.all().order_by('-created_at')  
     pg_fuel_refill = PGFuelRefill.objects.all()
     pgfuel_advance_from_daily_expense = DailyExpenseRequisition.objects.all()
+    pg_fault = PGFaultRecord.objects.all()
 
+  
+
+  
+    
     pg_summary_reports = {} 
     processed_pg = {}
     days = None
@@ -238,6 +259,11 @@ def pg_summary_report(request):
     end_date = None
     fuel_consumed_per_run_hour = 0
     total_fuel_cost = 0
+    pg_number=None
+ 
+
+
+
 
     if form.is_valid():
         start_date = form.cleaned_data.get('start_date')
@@ -246,35 +272,55 @@ def pg_summary_report(request):
         region = form.cleaned_data.get('region')
         zone = form.cleaned_data.get('zone')
         mp = form.cleaned_data.get('mp')
+        pg_number = form.cleaned_data.get('pg_number')
+        
 
         if start_date and end_date:
             tickets = tickets.filter(created_at__range=(start_date, end_date))
             pg_fuel_refill = pg_fuel_refill.filter(created_at__range=(start_date, end_date))
             pgfuel_advance_from_daily_expense = pgfuel_advance_from_daily_expense.filter(created_at__range=(start_date, end_date))
+            pg_fault = pg_fault.filter(created_at__range=(start_date, end_date))
+
+          
         elif days:
             end_date = timezone.now()
             start_date = end_date - timedelta(days=days)
             tickets = tickets.filter(created_at__range=(start_date, end_date))
             pg_fuel_refill = pg_fuel_refill.filter(created_at__range=(start_date, end_date))
             pgfuel_advance_from_daily_expense = pgfuel_advance_from_daily_expense.filter(created_at__range=(start_date, end_date))
+            pg_fault = pg_fault.filter(created_at__range=(start_date, end_date))
+   
 
         if region:
+            # pginfo = get_object_or_404(AddPGInfo,PGNumber=pg_number)
             tickets = tickets.filter(region=region)
             pg_fuel_refill = pg_fuel_refill.filter(region=region)
             pgfuel_advance_from_daily_expense = pgfuel_advance_from_daily_expense.filter(region=region)
+            pg_fault= pg_fault.filter(region=region)
         if zone:
             tickets = tickets.filter(zone=zone)
             pg_fuel_refill = pg_fuel_refill.filter(zone=zone)
             pgfuel_advance_from_daily_expense = pgfuel_advance_from_daily_expense.filter(zone=zone)
+            pg_fault= pg_fault.filter(zone=zone)
         if mp:
             tickets = tickets.filter(mp=mp)
             pg_fuel_refill = pg_fuel_refill.filter(mp=mp)
             pgfuel_advance_from_daily_expense = pgfuel_advance_from_daily_expense.filter(mp=mp)
+            pg_fault= pg_fault.filter(mp=mp)
 
+        if pg_number:
+            tickets = tickets.filter(pgnumber__PGNumber=pg_number)
+            pg_fuel_refill = pg_fuel_refill.filter(pgnumber__PGNumber=pg_number)
+            pgfuel_advance_from_daily_expense = pgfuel_advance_from_daily_expense.filter(pgnumber__PGNumber=pg_number)
+            pg_fault= pg_fault.filter(pgnumber__PGNumber=pg_number)
 
+  
+
+        processed_pgnumbers = set()
         for data in tickets:
             region = data.region
-            zone = data.zone
+            zone = data.zone        
+        
 
             if data.pgnumber:
                 PG_deployment_type = data.pgnumber.PG_deployment_type if data.pgnumber.PG_deployment_type else 'None'
@@ -287,7 +333,7 @@ def pg_summary_report(request):
             try:
                 pgnumber = data.pgnumber
             except AddPGInfo.DoesNotExist:
-                continue  # Skip this iteration if AddPGInfo does not exist
+                continue  
 
             if pgnumber in processed_pg:
                 continue
@@ -300,7 +346,9 @@ def pg_summary_report(request):
                 pg_summary_reports[region][zone] = {}
             if pgnumber not in pg_summary_reports[region][zone]:
                 pg_summary_reports[region][zone][pgnumber] = {
-                    'PG_deploymeny_type': PG_deployment_type,
+
+        
+                    'PG_deployment_type': PG_deployment_type,
                     'PG_deployed_site_code': PG_deployed_site_code,
                     'total_refill_amount': 0,
                     'total_fuel_local_purchase': 0,
@@ -313,12 +361,22 @@ def pg_summary_report(request):
                     'fuel_consumed_per_run_hour': 0,
                     'total_fuel_consumed': 0,
                     'fuel_balance': 0,
-                    'total_refill_from_pump': 0
+                    'total_refill_from_pump': 0,
+                    'total_pg_fault_hours':0,
+                    'total_required_fuel_cost':0
                 }
 
             pgfuel_advance_from_daily_expense_filtered = pgfuel_advance_from_daily_expense.filter(pgnumber=pgnumber, purpose='pg_local_fuel_purchase')
             total_fuel_cash_advance_taken = pgfuel_advance_from_daily_expense_filtered.aggregate(total_fuel_cash_advance_taken=Sum('requisition_amount'))['total_fuel_cash_advance_taken'] or 0
-          
+           
+            total_pg_fault_hours = pg_fault.filter(pgnumber=pgnumber)
+            total_pg_fault_hours =   total_pg_fault_hours.aggregate(total_pg_fault_hours=Sum('fault_duration'))['total_pg_fault_hours']
+            if total_pg_fault_hours is not None and isinstance(total_pg_fault_hours, timedelta):
+                total_pg_fault_hours = total_pg_fault_hours.total_seconds() / 3600
+            else:
+                total_pg_fault_hours = 0
+
+
 
             related_refills = pg_fuel_refill.filter(pgnumber=data.pgnumber)
             total_refill_amount = related_refills.aggregate(total_refill_amount=Sum('refill_amount'))['total_refill_amount'] or 0
@@ -330,7 +388,7 @@ def pg_summary_report(request):
             total_refill_from_pump =  pump_refills.aggregate(total_refill_from_pump=Sum('refill_amount'))['total_refill_from_pump'] or 0
             total_fuel_cost = related_refills.aggregate(total_fuel_cost=Sum('fuel_cost'))['total_fuel_cost'] or 0
 
-            total_tt_handle = tickets.filter(pgnumber=data.pgnumber).aggregate(total_tt_handle=Count('internal_ticket_number'))['total_tt_handle'] or 0
+            total_tt_handle = tickets.filter(pgnumber=data.pgnumber).aggregate(total_tt_handle=Count('id'))['total_tt_handle'] or 0
             total_run_hour = tickets.filter(pgnumber=data.pgnumber).aggregate(total_run_hour=Sum(F('internal_generator_running_hours')))['total_run_hour'] or timedelta(0)
             total_run_hour_seconds = total_run_hour.total_seconds() if isinstance(total_run_hour, timedelta) else 0
             total_run_hour_hours = total_run_hour_seconds / 3600
@@ -342,6 +400,14 @@ def pg_summary_report(request):
             else:
                 fuel_consumed_per_run_hour = 0
             fuel_balance = total_refill_amount - total_fuel_consumed
+            tolerance = 1e-9
+            if fuel_balance <= 5.0:
+                required_fuel_litre = 20.0
+                required_fuel_cost = 20.0 * 135.0
+            else:
+                required_fuel_cost = 0.0
+                required_fuel_litre = 0.0
+
 
             pg_summary_reports[region][zone][pgnumber]['total_refill_amount'] += total_refill_amount
             pg_summary_reports[region][zone][pgnumber]['total_fuel_local_purchase'] += total_fuel_local_purchase
@@ -357,6 +423,8 @@ def pg_summary_report(request):
             pg_summary_reports[region][zone][pgnumber]['fuel_consumed_per_run_hour'] += fuel_consumed_per_run_hour
             pg_summary_reports[region][zone][pgnumber]['fuel_balance'] += fuel_balance
 
+            pg_summary_reports[region][zone][pgnumber]['total_pg_fault_hours'] += total_pg_fault_hours
+            pg_summary_reports[region][zone][pgnumber]['total_required_fuel_cost'] += required_fuel_cost
     # Flatten the nested dictionary into a list of tuples for pagination
     flat_summary_reports = []
     for region, zones in pg_summary_reports.items():
@@ -385,8 +453,180 @@ def pg_summary_report(request):
         'region': region,
         'zone': zone,
         'mp': mp,
+        
+       
     })
 
+@login_required
+def pg_summary_report_by_zone(request):
+    form = vehicleSummaryReportForm(request.GET or {'days': 20})
+    tickets = eTicket.objects.all().order_by('-created_at')
+    pg_fuel_refill = PGFuelRefill.objects.all().order_by('-created_at')
+    pgfuel_advance_from_daily_expense = DailyExpenseRequisition.objects.all().order_by('-created_at')
+    pg_fault = PGFaultRecord.objects.all().order_by('-created_at')
+
+    pg_summary_reports = {}
+
+    days = None
+    start_date = None
+    end_date = None
+
+    if form.is_valid():
+        start_date = form.cleaned_data.get('start_date')
+        end_date = form.cleaned_data.get('end_date')
+        days = form.cleaned_data.get('days')
+        region = form.cleaned_data.get('region')
+        zone = form.cleaned_data.get('zone')
+        mp = form.cleaned_data.get('mp')
+        pg_number = form.cleaned_data.get('pg_number')
+
+        # Filtering based on form data
+        if start_date and end_date:
+            tickets = tickets.filter(created_at__range=(start_date, end_date))
+            pg_fuel_refill = pg_fuel_refill.filter(created_at__range=(start_date, end_date))
+            pgfuel_advance_from_daily_expense = pgfuel_advance_from_daily_expense.filter(created_at__range=(start_date, end_date))
+            pg_fault = pg_fault.filter(created_at__range=(start_date, end_date))
+        elif days:
+            end_date = timezone.now()
+            start_date = end_date - timedelta(days=days)
+            tickets = tickets.filter(created_at__range=(start_date, end_date))
+            pg_fuel_refill = pg_fuel_refill.filter(created_at__range=(start_date, end_date))
+            pgfuel_advance_from_daily_expense = pgfuel_advance_from_daily_expense.filter(created_at__range=(start_date, end_date))
+            pg_fault = pg_fault.filter(created_at__range=(start_date, end_date))
+
+        if region:
+            tickets = tickets.filter(region= region)
+            pg_fuel_refill = pg_fuel_refill.filter(region=region)
+            pgfuel_advance_from_daily_expense = pgfuel_advance_from_daily_expense.filter(region=region)
+            pg_fault = pg_fault.filter(region=region)
+        if zone:
+            tickets = tickets.filter(zone=zone)
+            pg_fuel_refill = pg_fuel_refill.filter(zone=zone)
+            pgfuel_advance_from_daily_expense = pgfuel_advance_from_daily_expense.filter(zone=zone)
+            pg_fault = pg_fault.filter(zone=zone)
+        if mp:
+            tickets = tickets.filter(mp=mp)
+            pg_fuel_refill = pg_fuel_refill.filter(mp=mp)
+            pgfuel_advance_from_daily_expense = pgfuel_advance_from_daily_expense.filter(mp=mp)
+            pg_fault = pg_fault.filter(mp=mp)
+
+        # Summarize data by region and zone
+        for data in tickets:
+            region = data.region
+            zone = data.zone
+
+            if region not in pg_summary_reports:
+                pg_summary_reports[region] = {}
+            if zone not in pg_summary_reports[region]:
+                pg_summary_reports[region][zone] = {
+                    'total_refill_amount': 0,
+                    'total_fuel_local_purchase': 0,
+                    'total_fuel_cash_advance_taken': 0,
+                    'total_fuel_cash_advance': 0,
+                    'total_tt_handle': 0,
+                    'total_run_hour': 0,
+                    'total_fuel_cost': 0,
+                    'fuel_consumed_per_tt': 0,
+                    'fuel_consumed_per_run_hour': 0,
+                    'total_fuel_consumed': 0,
+                    'fuel_balance': 0,
+                    'total_refill_from_pump': 0,
+                    'total_pg_fault_hours': 0,
+                    'total_required_fuel_cost': 0,
+                    'total_required_fuel_litre': 0
+                }
+
+            # Perform aggregations for each zone independently
+            # Filter tickets for the specific pgnumber and zone
+            zone_tickets = tickets.filter(pgnumber=data.pgnumber, zone=zone)
+
+            # Counting the number of tickets for this pgnumber and zone combination
+            total_tt_handle = zone_tickets.count()
+
+            # Other aggregations remain unchanged
+            pgfuel_advance_from_daily_expense_filtered = pgfuel_advance_from_daily_expense.filter(pgnumber=data.pgnumber, purpose='pg_local_fuel_purchase')
+            total_fuel_cash_advance_taken = pgfuel_advance_from_daily_expense_filtered.aggregate(total_fuel_cash_advance_taken=Sum('requisition_amount'))['total_fuel_cash_advance_taken'] or 0
+
+            total_pg_fault_hours = pg_fault.filter(pgnumber=data.pgnumber).aggregate(total_pg_fault_hours=Sum('fault_duration'))['total_pg_fault_hours'] or 0
+            total_pg_fault_hours = total_pg_fault_hours.total_seconds() if isinstance(total_pg_fault_hours, timedelta) else 0
+            total_pg_fault_hours = total_pg_fault_hours / 3600
+
+            related_refills = pg_fuel_refill.filter(pgnumber=data.pgnumber)
+            total_refill_amount = related_refills.aggregate(total_refill_amount=Sum('refill_amount'))['total_refill_amount'] or 0
+
+            others_refills = related_refills.filter(refill_type='local_purchase')
+            total_fuel_local_purchase = others_refills.aggregate(total_fuel_local_purchase=Sum('refill_amount'))['total_fuel_local_purchase'] or 0
+
+            pump_refills = related_refills.filter(refill_type='pump')
+            total_refill_from_pump = pump_refills.aggregate(total_refill_from_pump=Sum('refill_amount'))['total_refill_from_pump'] or 0
+            total_fuel_cost = related_refills.aggregate(total_fuel_cost=Sum('fuel_cost'))['total_fuel_cost'] or 0
+
+            total_run_hour = zone_tickets.aggregate(total_run_hour=Sum(F('internal_generator_running_hours')))['total_run_hour'] or timedelta(0)
+            total_run_hour_seconds = total_run_hour.total_seconds() if isinstance(total_run_hour, timedelta) else 0
+            total_run_hour_hours = total_run_hour_seconds / 3600
+            fuel_consumed_per_tt = total_fuel_cost / total_tt_handle if total_tt_handle else 0
+            total_fuel_consumed = Decimal(total_run_hour_hours) * Decimal(2.4)
+
+            if total_run_hour_hours:
+                fuel_consumed_per_run_hour = float(total_refill_amount) / float(total_run_hour_hours)
+            else:
+                fuel_consumed_per_run_hour = 0
+
+            fuel_balance = total_refill_amount - total_fuel_consumed
+
+
+            # Accumulate values for the zone
+            zone_summary = pg_summary_reports[region][zone]
+            zone_summary['total_refill_amount'] += total_refill_amount
+            zone_summary['total_fuel_local_purchase'] += total_fuel_local_purchase
+            zone_summary['total_refill_from_pump'] += total_refill_from_pump
+            zone_summary['total_fuel_cash_advance_taken'] += total_fuel_cash_advance_taken
+            zone_summary['total_fuel_cost'] += total_fuel_cost
+            zone_summary['total_fuel_consumed'] += total_fuel_consumed
+            zone_summary['total_tt_handle'] = total_tt_handle
+            zone_summary['total_run_hour'] += total_run_hour_hours
+            zone_summary['fuel_consumed_per_tt'] += float(fuel_consumed_per_tt)
+            zone_summary['fuel_consumed_per_run_hour'] += fuel_consumed_per_run_hour
+            zone_summary['fuel_balance'] += fuel_balance
+            zone_summary['total_pg_fault_hours'] += total_pg_fault_hours
+       
+           
+            # Apply the condition for total_required_fuel_litre
+            if zone_summary['fuel_balance'] <= 5.0:
+                zone_summary['total_required_fuel_litre'] = 20.0
+                zone_summary['total_required_fuel_cost'] = 20.0 * 135.0
+            else:
+                zone_summary['total_required_fuel_litre'] = 0
+                zone_summary['total_required_fuel_cost'] += 0
+
+
+
+
+    # Flatten the nested dictionary into a list of tuples for pagination
+    flat_summary_reports = []
+    for region, zones in pg_summary_reports.items():
+        for zone, summary in zones.items():
+            flat_summary_reports.append((region, zone, summary))
+
+    grand_total_required_fuel_cost = sum(data['total_required_fuel_cost'] for _, zones in pg_summary_reports.items() for _, data in zones.items())
+
+    paginator = Paginator(flat_summary_reports, 10)  # Assuming 10 items per page
+
+    page_number = request.GET.get('page')
+    try:
+        page_obj = paginator.page(page_number)
+    except PageNotAnInteger:
+        page_obj = paginator.page(1)
+    except EmptyPage:
+        page_obj = paginator.page(paginator.num_pages)
+
+    form = vehicleSummaryReportForm()
+    return render(request, 'generator/pg_summary_report2.html', {
+        'pg_summary_reports': pg_summary_reports,
+        'grand_total_required_fuel_cost': grand_total_required_fuel_cost,
+        'form': form,
+        'page_obj': page_obj
+    })
 
 
 @login_required
@@ -554,8 +794,37 @@ def view_pg_details_fault(request):
             pg_details = PGFaultRecord.objects.filter(pgnumber=pg_info)
     else:
         form = PGNumberForm()
-
+    form = PGNumberForm()
     return render(request, 'generator/pg_fault_record_details.html', {'form': form, 'pg_details': pg_details})
+
+
+
+
+
+
+def vendorwise_pg_summary(request): 
+    summary_data = []   
+       
+    summary = AddPGInfo.objects.all().values('PG_supplier', 'region', 'zone') \
+                .annotate(
+                    num_pg_count=Count('id'),
+                    num_5kva=Count('id', filter=Q(PG_capacity='5kva')),
+                    num_8kva=Count('id', filter=Q(PG_capacity='8kva')),
+                    num_honda_brand=Count('id', filter=Q(PG_brand='Honda')),
+                    num_Mitshubishi_brand=Count('id', filter=Q(PG_brand='Mistsubishi')),
+                    num_chinese_brand=Count('id', filter=Q(PG_brand='chinese')),                                    
+                ) \
+                .order_by('PG_supplier', 'region', 'zone')
+    
+    summary_data = list(summary)
+      
+       
+    return render(request, 'generator/pg_summary_vendorwise.html', {
+        'summary_data': summary_data,
+      
+    })
+
+
 
 
 def pg_management(request):

@@ -53,9 +53,15 @@ html, body {
                         <h5 class="card-title">Add Start Stop Time</h5>
                         <form method="post" enctype="multipart/form-data" id="ticketForm">
                             {% csrf_token %}
-                            {{ form.as_p }}
-                
-                            <div><button type="submit" class="btn btn-primary">Submit</button></div>
+                            <div class="container">
+                                <div class="row">
+                                    <div class="col-12 p-2">Ticket Number:{{ form.parent_ticket_number }}</div>
+                                    <div class="col-12 p-2" style="color:red; font-weight: bold;">Start Time: {{ form.child_internal_generator_start_time }}</div> 
+                                     <div class="col-12 p-2"> Take Picture: {{ form.TakePicture}}</div>
+                                    <div class="col-12 p-2"> Upload Picture: {{ form.UploadPicture}}</div>                
+                                    <div class="col-12 p-2"><button type="submit" class="btn btn-primary">Submit</button></div>
+                                 </div>
+                             </div>
                         </form>
                     </div>
                 </div>

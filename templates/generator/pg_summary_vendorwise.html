@@ -1,0 +1,96 @@
+
+ 
+{% extends "base.html" %}
+{% load static %}
+
+
+{% block content %}
+
+
+
+<style>
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+
+}
+
+th, td {
+    border: 1px solid black; /* Set border color for individual cells */
+    text-align: left;
+    padding: 0px;
+}
+
+th {
+    background-color: rgb(13, 151, 72);
+    color:white;
+}
+
+table thead th {
+white-space: normal;
+}
+
+#main-content {   
+        overflow-y: auto;
+        margin-left:0px;
+        position: absolute;
+        width: 100%;
+        left: 0;
+    
+    }
+
+</style>
+
+
+
+<h4>Summary Report</h4>
+
+
+
+    <div class="container-fluid" id="main-content">
+        <div class="row row-cols-1">
+            <div class="col-xl-12">
+                   
+                {% regroup summary_data by PG_supplier as pg_vendors %}
+                
+                {% for group in pg_vendors %}
+                    <h5>Vendor: {{ group.grouper }}</h5>
+                    <table border="1">
+                        <thead>
+                            <tr>
+                                <th class="text-center p-2">Region</th>
+                                <th class="text-center p-2">Zone</th>
+                                <th class="text-center p-2">Total PG count</th>
+                                <th class="text-center p-2">5kva</th>
+                                <th class="text-center p-2">8kva</th>
+                                <th class="text-center p-2">Honda</th>
+                                <th class="text-center p-2">Mitsubishi</th>
+                                <th class="text-center p-2">Chinese</th>
+                             
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in group.list %}
+                                <tr>
+                                    <td class="text-center p-2">{{ item.region }}</td>
+                                    <td class="text-center p-2">{{ item.zone }}</td>
+                                    <td class="text-center p-2">{{ item.num_pg_count }}</td>
+                                    <td class="text-center p-2">{{ item.num_5kva }}</td>
+                                    <td class="text-center p-2">{{ item.num_8kva }}</td>
+                                    <td class="text-center p-2">{{ item.num_honda_brand }}</td>
+                                    <td class="text-center p-2">{{ item.num_Mitshubishi_brand }}</td>
+                                    <td class="text-center p-2">{{ item.num_chinese_brand }}</td>
+                                   
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    
+<div class="col" style="height:1200px"></div>
+
+{% endblock %}

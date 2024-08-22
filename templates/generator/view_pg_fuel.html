@@ -45,112 +45,110 @@
     
     
     </style>
+       
 
+     
 
+<div class="container-fluid main-content  ">
+    <div class="row">
+        <div class="col-xl-12">
 
-
-<div class="container-fluid main-content">
-    <h1>PGFuel re_fill status</h1>
+        <h1>PGFuel re_fill status</h1>    
+        <form method="GET" action="{% url 'generator:view_pg_fuel' %}">        
+            <button type="submit" name="download_csv" class="btn btn-primary">Export CSV</button>
+        </form>
+        <h4 class="text-center"> <a href="{% url 'generator:view_pg_details_fuel'%}">View fuel details for a specific PG number</a></h4>  
     
-    <form method="GET" action="{% url 'generator:view_pg_fuel' %}">        
-        <button type="submit" name="download_csv" class="btn btn-primary">Export CSV</button>
-    </form>
-    
-    <table>
-        <thead>
-            <tr>
-               
-                <th class="text-center p-2">Created at </th>
-                <th class="text-center p-2">User</th>
-                <th class="text-center p-2">fuel_refill_code</th>
-                <th class="text-center p-2">Region</th>
-                <th class="text-center p-2">Zone</th>
-                <th class="text-center p-2">MP</th>
-                <th class="text-center p-2">Refill Date</th>
-                <th class="text-center p-2">PG Number</th>
-                <th class="text-center p-2">refill amount(litre)</th>
-                <th class="text-center p-2">Fuel rate</th>
-                <th class="text-center p-2">Fuel cost</th>
-                <th class="text-center p-2">fuel pump supplier name</th>
-                <th class="text-center p-2">fuel supplier phone</th>
-                <th class="text-center p-2">fuel supplier address</th>
-                <th class="text-center p-2">refill supporting documents</th>
-                                                                
-                           
-               
-            </tr>
-        </thead>
-        <tbody>
-            {% for fuel in page_obj %}
+            <table>
+                <thead>
+                    <tr>
+                    
+                        <th class="text-center p-2">Created at </th>
+                        <th class="text-center p-2">User</th>
+                        <th class="text-center p-2">fuel_refill_code</th>
+                        <th class="text-center p-2">Region</th>
+                        <th class="text-center p-2">Zone</th>
+                        <th class="text-center p-2">MP</th>
+                        <th class="text-center p-2">Refill Date</th>
+                        <th class="text-center p-2">PG Number</th>
+                        <th class="text-center p-2">refill amount(litre)</th>
+                        <th class="text-center p-2">Fuel rate</th>
+                        <th class="text-center p-2">Fuel cost</th>
+                        <th class="text-center p-2">fuel pump supplier name</th>
+                        <th class="text-center p-2">fuel supplier phone</th>
+                        <th class="text-center p-2">fuel supplier address</th>
+                        <th class="text-center p-2">refill supporting documents</th>
+                                                                        
+                                
+                    
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for fuel in page_obj %}
 
-            <tr>
-                <td class="text-center p-2"style="white-space: nowrap;">{{ fuel.created_at }}</td>
-                <td class="text-center p-2"style="white-space: nowrap;">{{ fuel.refill_requester }}</td>              
-                <td class="text-center p-2"style="white-space: nowrap;">{{ fuel.fuel_refill_code }}</td>
-                <td class="text-center p-2"style="white-space: nowrap;">{{ fuel.region }}</td>
-                <td class="text-center p-2"style="white-space: nowrap;">{{ fuel.zone }}</td>
-                <td class="text-center p-2"style="white-space: nowrap;">{{ fuel.mp }}</td>
+                    <tr>
+                        <td class="text-center p-2"style="white-space: nowrap;">{{ fuel.created_at }}</td>
+                        <td class="text-center p-2"style="white-space: nowrap;">{{ fuel.refill_requester }}</td>              
+                        <td class="text-center p-2"style="white-space: nowrap;">{{ fuel.fuel_refill_code }}</td>
+                        <td class="text-center p-2"style="white-space: nowrap;">{{ fuel.region }}</td>
+                        <td class="text-center p-2"style="white-space: nowrap;">{{ fuel.zone }}</td>
+                        <td class="text-center p-2"style="white-space: nowrap;">{{ fuel.mp }}</td>
 
-                <td class="text-center p-2" style="white-space: nowrap;">{{ fuel.refill_date}}</td>
-                <td class="text-center p-2" style="white-space: nowrap;">{{ fuel.pgnumber.PGNumber }}</td>
-                <td class="text-center p-2"style="white-space: nowrap;">{{ fuel.refill_amount }}</td>  
+                        <td class="text-center p-2" style="white-space: nowrap;">{{ fuel.refill_date}}</td>
+                        <td class="text-center p-2" style="white-space: nowrap;">{{ fuel.pgnumber.PGNumber }}</td>
+                        <td class="text-center p-2"style="white-space: nowrap;">{{ fuel.refill_amount }}</td>  
 
-                {% if fuel.fuel_pump.fuel_unit_price %}
-                <td class="text-center p-2" style="white-space: nowrap;">{{ fuel.fuel_pump.fuel_unit_price}}</td>
-               {% else %}
-               <td class="text-center p-2" style="white-space: nowrap;">{{ fuel.fuel_rate}}</td>
-               {% endif %}
-                <td class="text-center p-2" style="white-space: nowrap;">{{ fuel.fuel_cost}}</td>
+                        {% if fuel.fuel_pump.fuel_unit_price %}
+                        <td class="text-center p-2" style="white-space: nowrap;">{{ fuel.fuel_pump.fuel_unit_price}}</td>
+                    {% else %}
+                    <td class="text-center p-2" style="white-space: nowrap;">{{ fuel.fuel_rate}}</td>
+                    {% endif %}
+                        <td class="text-center p-2" style="white-space: nowrap;">{{ fuel.fuel_cost}}</td>
 
-                {% if fuel.fuel_pump %}
-                <td class="text-center p-2" style="white-space: nowrap;">{{ fuel.fuel_pump.fuel_pump_name  }}</td> 
-                <td class="text-center p-2"style="white-space: nowrap;">{{ fuel.fuel_pump.fuel_pump_phone }}</td>
-                <td class="text-center p-2"style="white-space: nowrap;">{{ fuel.fuel_pump.fuel_pump_address }}</td>
-                {% else %}
-                <td class="text-center p-2" style="white-space: nowrap;">{{ fuel.fuel_supplier_name  }}</td> 
-                <td class="text-center p-2"style="white-space: nowrap;">{{ fuel.fuel_supplier_phone }}</td>
-                <td class="text-center p-2"style="white-space: nowrap;">{{ fuel.fuel_supplier_address }}</td>
+                        {% if fuel.fuel_pump %}
+                        <td class="text-center p-2" style="white-space: nowrap;">{{ fuel.fuel_pump.fuel_pump_name  }}</td> 
+                        <td class="text-center p-2"style="white-space: nowrap;">{{ fuel.fuel_pump.fuel_pump_phone }}</td>
+                        <td class="text-center p-2"style="white-space: nowrap;">{{ fuel.fuel_pump.fuel_pump_address }}</td>
+                        {% else %}
+                        <td class="text-center p-2" style="white-space: nowrap;">{{ fuel.fuel_supplier_name  }}</td> 
+                        <td class="text-center p-2"style="white-space: nowrap;">{{ fuel.fuel_supplier_phone }}</td>
+                        <td class="text-center p-2"style="white-space: nowrap;">{{ fuel.fuel_supplier_address }}</td>
+                        {% endif %}
+                    
+                        <td class="text-center p-2"style="white-space: nowrap;">
+                            {% if fuel.refill_supporting_documents %}
+                            <a href="{{ fuel.refill_supporting_documents.url }}" target="_blank">
+                                <img src="{{ fuel.refill_supporting_documents.url }}" alt="Supporting Document" style="cursor: pointer; width: 50px; height: 50px;">
+                            </a>
+                            {% else %}
+                            No image available
+                            {% endif %}
+                        </td>  
+                    
+                    </tr> 
+                    {% endfor %} 
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination" style="padding: 10px;">
+            <span class="step-links">
+                {% if page_obj.has_previous %}
+                    <a href="?page=1">&laquo; First</a>
+                    <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
                 {% endif %}
 
+                <span class="current">
+                    Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+                </span>
 
-
-
-
-              
-                <td class="text-center p-2"style="white-space: nowrap;">
-                    {% if fuel.refill_supporting_documents %}
-                    <a href="{{ fuel.refill_supporting_documents.url }}" target="_blank">
-                        <img src="{{ fuel.refill_supporting_documents.url }}" alt="Supporting Document" style="cursor: pointer; width: 50px; height: 50px;">
-                    </a>
-                    {% else %}
-                    No image available
-                    {% endif %}
-                </td>  
-               
-            </tr> 
-            {% endfor %} 
-        </tbody>
-    </table>
-
-
-<!-- Pagination -->
-<div class="pagination" style="padding: 10px;">
-    <span class="step-links">
-        {% if page_obj.has_previous %}
-            <a href="?page=1">&laquo; First</a>
-            <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
-        {% endif %}
-
-        <span class="current">
-            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
-        </span>
-
-        {% if page_obj.has_next %}
-            <a href="?page={{ page_obj.next_page_number }}">Next</a>
-            <a href="?page={{ page_obj.paginator.num_pages }}">Last &raquo;</a>
-        {% endif %}
-    </span>
-</div>
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}">Next</a>
+                    <a href="?page={{ page_obj.paginator.num_pages }}">Last &raquo;</a>
+                {% endif %}
+            </span>
+        </div>
 
 
 </div>

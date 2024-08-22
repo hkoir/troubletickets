@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% load duration_filters %}
+
+{% block content %}
+
+    <title>PG Status Report</title>
+    <style>
+      
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    
+    }
+    
+    th,td{
+        border: 1px solid black; /* Set border color for individual cells */
+        text-align: left;
+        padding: 0px;
+    }
+    
+    th {
+        background-color: rgb(38, 233, 129);
+        
+    }
+    
+    table thead th {
+    white-space: normal;
+    }
+    </style>
+
+    <h2 class="text-center">Vehicle summary Status Report</h2>
+
+
+   
+    <table style="margin-bottom: 30px;">
+        <h4>Grand summary</h4>
+        <thead>
+            <tr>
+                <th class="text-center p-2">Total vehicle</th>
+                <th class="text-center p-2">Total permanent vehicle</th>
+                <th class="text-center p-2">Total adhoc vehicle</th>
+             
+               
+            </tr>
+        </thead>
+        <tbody>
+      
+                <tr>
+                    <td class="text-center p-2">{{ total_vehicle_count }}</td>
+                    <td class="text-center p-2">{{ total_permanent_vehicle_count }}</td>
+                    <td class="text-center p-2">{{ total_adhoc_vehicle_count }}</td>
+                   
+                  
+                </tr>
+     
+         
+        </tbody>
+    </table>
+    
+    <h4> Zone wise summary</h4>
+    <table style="margin-bottom: 30px;">
+        <thead>
+            <tr>
+                <th class="text-center p-2">Region</th>
+                <th class="text-center p-2">Zone</th>
+                <th class="text-center p-2">Total vehicle</th>
+                <th class="text-center p-2">Total permanent vehicle</th>
+                <th class="text-center p-2">Total adhoc vehicle</th>
+              
+            </tr>
+        </thead>
+        <tbody>
+            {% for data in zonewise_data %}
+                <tr>
+                    <td class="text-center p-2">{{ data.region }}</td>
+                    <td class="text-center p-2">{{ data.zone }}</td>
+                    <td class="text-center p-2">{{ data.total_count }}</td>
+                    <td class="text-center p-2">{{ data.total_permanent_vehicle_count }}</td>
+                    <td class="text-center p-2">{{ data.total_adhoc_vehicle_count }}</td>
+                   
+                </tr>
+            {% endfor %}
+
+        </tbody>
+    </table>
+    
+
+
+    <h4>Vehicle supplier-Wise summary</h4>
+    {% for supplier, data in report_data.items %}
+        <h6>Supplier: {{ supplier }}</h6>
+        <table>
+       
+            <thead>
+                <tr>
+                    <th class="text-center p-2">Region</th>
+                    <th class="text-center p-2">Zone</th>
+                    <th class="text-center p-2">MP</th>                 
+                    <th class="text-center p-2">Total Count</th>
+                    <th class="text-center p-2">Total permanent vehicle count</th>
+                    <th class="text-center p-2">Total adhoc vehicle count</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in data.entries %}
+                    <tr>
+                        <td class="text-center p-2">{{ row.region }}</td>
+                        <td class="text-center p-2">{{ row.zone }}</td>
+                        <td class="text-center p-2">{{ row.mp }}</td>
+                        <td class="text-center p-2">{{ row.total_count }}</td>
+                        <td class="text-center p-2">{{ row.total_permanent_vehicle_count }}</td>
+                        <td class="text-center p-2">{{ row.total_adhoc_vehicle_count }}</td>
+                        
+                    </tr>
+                {% endfor %}
+                <tr>
+                    <td class="text-center p-2" colspan="3"><strong>Total</strong></td>
+                    <td class="text-center p-2"><strong>{{ data.total_count }}</strong></td>
+                    <td class="text-center p-2"><strong>{{ data.total_permanent_vehicle_count }}</strong></td>
+                    <td class="text-center p-2"><strong>{{ data.total_adhoc_vehicle_count }}</strong></td>
+                   
+                </tr>
+            </tbody>
+        </table>
+    {% endfor %}
+
+
+
+
+<div class="col" style="height:600px"></div>
+
+
+
+{% endblock %}

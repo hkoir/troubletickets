@@ -46,16 +46,29 @@
 
     <div class="container-fluid main-content  ">
         <div class="row">
+            <div class="col-xl-12">                
+                <form method="GET" action="{% url 'vehicle:view_vehicle_fault' %}">
+                    <div class="container-fluid">
+                        <div class="row row-cols-2 row-cols-md-4">                    
+                            <div class="col" style="padding:5px;"> Vehicle Number {{ form.vehicle_number }} </div>
+                            <div class="col" style="padding:5px;"> <button type="submit" class='btn btn-primary'>Generate Data</button></div>
+                        </div>
+                    </div>                    
+                </form>
+            </div>
             <div class="col-xl-12">                     
                 <table>
                     <thead>
                         <tr>
+                            <th class="text-center p-2">Update fault</th>
                             <th class="text-center p-2">Region</th>
                             <th class="text-center p-2">Zone</th>
                             <th class="text-center p-2">MP</th>
                        
                             <th class="text-center p-2">Vehicle Number</th>
-                            <th class="text-center p-2">Fault date</th>                          
+                            <th class="text-center p-2">Vehicle company name</th>
+                            <th class="text-center p-2">Fault start datetime</th>
+                            <th class="text-center p-2">Fault end datetime</th>                            
                             <th class="text-center p-2">Fault type</th> 
                             <th class="text-center p-2">Incident place</th>    
                             <th class="text-center p-2">Fault duration hours</th>                          
@@ -67,11 +80,14 @@
                     {% for payment in  vehiclefault %}
                     <tbody>
                         <tr>
+                            <td class="text-center p-2" style="white-space: nowrap;"><a href="{% url 'vehicle:update_vehicle_fault' payment.id %}">update fault</a></td>
                             <td class="text-center p-2" style="white-space: nowrap;">{{ payment.region }}</td>
                             <td class="text-center p-2" style="white-space: nowrap;">{{ payment.zone}}</td>
                             <td class="text-center p-2" style="white-space: nowrap;">{{ payment.mp}}</td>
                             <td class="text-center p-2" style="white-space: nowrap;">{{ payment.vehicle.vehicle_reg_number}}</td>
-                            <td class="text-center p-2" style="white-space: nowrap;">{{ payment.created_at}}</td>
+                            <td class="text-center p-2" style="white-space: nowrap;">{{ payment.vehicle.vehicle_owner_company_name}}</td>
+                            <td class="text-center p-2" style="white-space: nowrap;">{{ payment.fault_start_time}}</td>
+                            <td class="text-center p-2" style="white-space: nowrap;">{{ payment.fault_stop_time}}</td>
                             <td class="text-center p-2" style="white-space: nowrap;">{{ payment.fault_type }}</td>
                             <td class="text-center p-2" style="white-space: nowrap;">{{ payment.fault_location}}</td>
                             <td class="text-center p-2" style="white-space: nowrap;">{{ payment.fault_duration_hours|floatformat:'2'}}</td>
@@ -80,9 +96,11 @@
                         </tr>
                     </tbody>
                     {% endfor %}
-                </table>
-    
+                </table>    
             </div>
+
+        </div>
+    </div>
 
     <div class="col" style="height:1200px"></div>
     

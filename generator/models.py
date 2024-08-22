@@ -56,30 +56,32 @@ class AddPGInfo(models.Model):
  
 
 class PGFuelRefill(models.Model):   
-    region = models.CharField(max_length=100,choices=REGION_CHOICES,null=True, blank=True)
+    region = models.CharField(max_length=100,choices=REGION_CHOICES,null=True,blank=True)
     zone = models.CharField(max_length=100,choices=ZONE_CHOICES,null=True, blank=True)
-    mp = models.CharField(max_length=100,choices=MP_CHOICES,null=True, blank=True)
+    mp = models.CharField(max_length=100,choices=MP_CHOICES,null=True,blank=True)
     refill_requester = models.ForeignKey(Customer, related_name='pg_refill_requester_name', on_delete=models.CASCADE, null=True, blank=True)
-    fuel_refill_code = models.CharField(max_length=50, default='None')
-    refill_date = models.DateField(default=timezone.now)
+    fuel_refill_code = models.CharField(max_length=50, default='None')   
     pgnumber = models.ForeignKey(AddPGInfo, related_name='pg_refill', on_delete=models.CASCADE, null=True, blank=True)
     
-    fuel_type_choices = [
-        ('diesel', 'diesel'),
-        ('octane', 'octane'),
-        ('petrol', 'petrol'),
-    ]
-    fuel_type = models.CharField(max_length=100, choices=fuel_type_choices, null=True, blank=True, default='None')
-
+ 
     REFILL_CHOICES = [
         ('pump','pump'),
         ('local_purchase','local_purchase')
     ]    
-    refill_type = models.CharField(max_length=20, choices=REFILL_CHOICES, default='pump')
+    refill_type = models.CharField(max_length=20, choices=REFILL_CHOICES, default=None,null=True,blank=True)
     fuel_pump = models.ForeignKey(FuelPumpDatabase, related_name='pump_data_info', on_delete=models.CASCADE, default=None,null=True,blank=True)
+   
     refill_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)
+    fuel_type_choices=[
+        ('diesel','diesel'),
+        ('octane','octane'),
+        ('petrol','petrol'),
+        ('CNG','CNG')
+    ]         
+    fuel_type =models.CharField(max_length=100, choices=fuel_type_choices,null=True, blank=True, default='None')        
     fuel_rate = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)
-    fuel_cost = models.DecimalField(max_digits=10, decimal_places=2, default=0.0, null=True, blank=True)     
+    fuel_cost = models.DecimalField(max_digits=10, decimal_places=2, default=0.0, null=True, blank=True)
+    refill_date = models.DateField(default=timezone.now)     
     fuel_supplier_name = models.CharField(max_length=50, default='None')
     fuel_supplier_phone = models.CharField(max_length=50, default='None')
     fuel_supplier_address = models.TextField(default='None', null=True, blank=True)
@@ -87,8 +89,8 @@ class PGFuelRefill(models.Model):
     created_at = models.DateField(default=timezone.now)
 
     def save(self, *args, **kwargs):
-        if self.refill_amount is not None and self.fuel_pump is not None and self.fuel_pump.fuel_unit_price is not None:
-            self.fuel_cost = self.refill_amount * self.fuel_pump.fuel_unit_price
+        if self.refill_amount is not None and self.fuel_pump is not None:
+            self.fuel_cost = self.refill_amount * self.fuel_rate
         else:
             self.fuel_cost = self.refill_amount * self.fuel_rate
 
@@ -100,14 +102,14 @@ class PGFuelRefill(models.Model):
 
 
 class PGFaultRecord(models.Model):
-     region = models.CharField(max_length=100,choices=REGION_CHOICES,null=True, blank=True)
+     region = models.CharField(max_length=100,choices=REGION_CHOICES,null=True,blank=True)
      zone = models.CharField(max_length=100,choices=ZONE_CHOICES,null=True, blank=True)
      mp = models.CharField(max_length=100,choices=MP_CHOICES,null=True, blank=True)  
      pgnumber = models.ForeignKey(AddPGInfo, related_name='pgfault', on_delete=models.CASCADE, null=True, blank=True)
      fault_date = models.DateField(null=True, blank=True)
      repair_date = models.DateField(null=True, blank=True)
      fault_duration = models.DurationField(null=True, blank=True)
-     fault_description = models.TextField(max_length=200,null=True, blank=True,)
+     fault_description = models.TextField(max_length=200,null=True,blank=True)
 
      fault_type_choices=[
          ('air_filter_problem','air_filter_problem'),

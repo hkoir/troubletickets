@@ -36,8 +36,7 @@ class FuelPumpDatabase(models.Model):
     fuel_pump_type = models.CharField(max_length=100,choices=pump_type_choices,null=True,blank=True)
     fuel_pump_supporting_documents = models.FileField(upload_to='fuel_pump_supporting_documents/', null=True, blank=True)
     advance_amount_given = models.DecimalField(max_digits=20,decimal_places=2,null=True,blank=True)
-    contact_date = models.DateField(null=True,blank=True)
-    fuel_unit_price=models.DecimalField(max_digits=10,decimal_places=2,null=True,blank=True)
+    contact_date = models.DateField(null=True,blank=True)    
     contact_period = models.DecimalField(max_digits=10, decimal_places=1,null=True,blank=True)
     created_at = models.DateField(default=timezone.now)
 
@@ -51,6 +50,7 @@ class fuelPumpPayment(models.Model):
     payment_amount =models.DecimalField(max_digits=15,decimal_places=2,null=True,blank=True)
     payment_date = models.DateField(null=True,blank=True,default=None)
     payment_id = models.CharField(max_length=100, default='None',null=True,blank=True)
+    payment_document = models.ImageField(upload_to="fuel_pump_payment", null=True,blank=True)
     created_at =models.DateField(default=timezone.now)
  
 
@@ -63,6 +63,14 @@ class PGTLdatabase(models.Model):
     name = models.CharField(max_length=100)    
     pgtl_id = models.CharField(max_length=150,null=True, blank=True)
     phone = models.CharField(max_length=100)
+    payment_number= models.CharField(max_length=100,null=True,blank=True)
+    payment_option=[
+        ('bikash','biksah'),
+        ('nagad','nagad'),
+        ('rocket','rocket'),
+    ]
+    payment_number_choice = models.CharField(max_length=100,choices=payment_option,null=True,blank=True, default='bikash')
+ 
     email = models.EmailField()
     address = models.TextField()
     PGTL_photo = models.ImageField(upload_to='PGTL_photo', blank=True, null=True) 
@@ -94,8 +102,19 @@ class PGRdatabase(models.Model):
         ('hourly','hourly')
     ]
     PGR_payment_type = models.CharField(max_length=100,choices=pgr_payment_type_choices, null=True,blank=True)
+
+    PGR_01hour_rate = models.DecimalField(max_digits=10,decimal_places=2,null=True,blank=True)
+    PGR_12hour_rate = models.DecimalField(max_digits=10,decimal_places=2,null=True,blank=True)
+    PGR_24hour_rate = models.DecimalField(max_digits=10,decimal_places=2,null=True,blank=True)
     PGR_pay_rate = models.DecimalField(max_digits=10,decimal_places=2,null=True,blank=True)
     phone = models.CharField(max_length=100)
+    payment_number= models.CharField(max_length=100,null=True,blank=True)
+    payment_option=[
+        ('bikash','biksah'),
+        ('nagad','nagad'),
+        ('rocket','rocket'),
+    ]
+    payment_number_choice = models.CharField(max_length=100,choices=payment_option,null=True,blank=True,default='bikash')
     email = models.EmailField()
     address = models.TextField()
     PGR_photo = models.ImageField(upload_to='PGR_photo', blank=True, null=True)

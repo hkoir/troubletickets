@@ -52,9 +52,10 @@
          <div class="col" style="padding:5px;"> No of days {{ form.days }} </div>
          <div class="col" style="padding:5px;">  Region:{{ form.region }} </div>  
          <div class="col" style="padding:5px;">  Zone:{{ form.zone }} </div>    
-         <div class="col" style="padding:5px;">  mp:{{ form.mp }} </div>    
+         <div class="col" style="padding:5px;">  mp:{{ form.mp }} </div> 
+         <div class="col" style="padding:5px;">  Vehicle Number:{{ form.vehicle_number }} </div>     
 
-         <div class="col" style="padding:5px; "> <button type="submit" class='btn btn-primary'>Generate Data</button></div>
+         <div class="col" style="padding:5px; margin-left:40px;margin-top:20px "> <button type="submit" class='btn btn-primary'>Generate Data</button></div>
            
         </div>
     </div>
@@ -90,8 +91,9 @@
                         <th class="text-center p-2">Vehicle Registration Number</th>
                         <th class="text-center p-2">Zone</th>
                         <th class="text-center p-2">No of travel days</th>
-                        <th class="text-center p-2">Vehicle daily Rent</th>
-                        <th class="text-center p-2">Vehicle rental type</th>
+                        <th class="text-center p-2">Vehicle Rent rate</th>
+                        <th class="text-center p-2">Vehicle rental cayegory</th>
+                  
                     
                         <th class="text-center p-2">Driver Over Time Rate</th>
                         <th class="text-center p-2">Body Over Time Rate</th>
@@ -114,15 +116,15 @@
                         <th class="text-center p-2">Total overtime Hours</th>
                         <th class="text-center p-2">Total Fault Hours</th>                           
 
-                        <th class="text-center p-2">Total Rent Due</th>
+                        <th class="text-center p-2">Total vehicle Rent Due</th>
                         <th  class="text-center p-2">Total Driver Overtime Due</th>
                         <th  class="text-center p-2">Total body Overtime Due</th>
                         <th  class="text-center p-2">Total bill amount</th>
 
-                        <th class="text-center p-2">Total Rent Paid</th>                
-                        <th  class="text-center p-2">Total Driver Overtime Paid</th>
-                        <th  class="text-center p-2">Total body Overtime Paid</th>
+                        <th  class="text-center p-2">Click to pay</th>
+
                         <th  class="text-center p-2">Total bill paid amount</th>
+                      
 
                        
                        
@@ -136,6 +138,7 @@
                   
                     {% for vehicle_reg_number, data in aggregated_data_page %}
                     <tr>
+                      
                         <td style="white-space: nowrap">
                             <a href="{% url 'vehicle:vehicle_detail' data.vehicle_id %}">View details</a>
                         </td>                    
@@ -143,9 +146,9 @@
                         <td class="text-center p-2" style="white-space: nowrap;">{{ vehicle_reg_number }}</td>
                         <td class="text-center p-2" style="white-space: nowrap;">{{ data.zone }}</td>
                         <td class="text-center p-2">{{ data.num_travel_dates }}</td>
-                        <td class="text-center p-2">{{ data.vehicle_rent|first|floatformat:'2' }}</td>
+                        <td class="text-center p-2">{{ data.vehicle_rental_rate|first|floatformat:'2' }}</td>
                     
-                        <td class="text-center p-2"> {{ data.vehicle_rental_type}}</td>
+                        <td class="text-center p-2"> {{ data.vehicle_rental_category_info}}</td>
                     
                         <td class="text-center p-2">{{ data.driver_overtime_rate|first }}</td>
                         <td class="text-center p-2">{{ data.vehicle_body_overtime_rate|first }}</td>
@@ -173,10 +176,14 @@
 
                         <td class="text-center p-2" style="background-color: aqua;">{{ data.total_vehicle_bill_amount|floatformat:'2' }}</td>
 
-                        <td class="text-center p-2">{{ data.vehicle_rent_paid|floatformat:'2' }}</td>                   
-                        <td class="text-center p-2">{{ data.vehicle_driver_overtime_paid|floatformat:'2' }}</td>
-                        <td class="text-center p-2">{{ data.vehicle_body_overtime_paid|floatformat:'2' }}</td>
-                        <td class="text-center p-2" style="background-color: aqua;">{{ data.total_bill_paid|floatformat:'2' }}</td>
+                      
+                        <td class="text-center p-2" style="background-color: aqua; white-space: nowrap;" ><a href="{% url 'vehicle:create_vehicle_payment'%}">Click to pay</a></td>
+                     
+                        <td class="text-center p-2" style="background-color: aqua;">{{ data.total_bill_paid |floatformat:'2' }}</td>
+                        
+                       
+                       
+                       
                        
                     </tr>
                     {% endfor %}

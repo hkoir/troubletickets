@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% load static %}
+
+
+{% block content %}
+
+
+
+    <style>
+
+    html, body { 
+       font-family: Verdana, sans-serif; 
+    
+  }
+
+
+  
+  table {
+            border-collapse: collapse;
+            width: 100%;
+      
+        }
+
+        th, td {
+            border: 1px solid rgb(227, 87, 7); /* Set border color for individual cells */
+            text-align: left;
+            padding: 0px;
+        }
+        th{
+        background-color: rgb(52, 232, 100);
+      }
+      
+
+    table thead th {
+    white-space: normal;
+        }
+
+    </style>
+
+<h4 class=" text-center" style="margin-top:10px">DOPS DASHBOARD</h4>
+
+
+
+ <div class="container-fluid">
+    <div class="row row-cols-3 row-cols-md-6 p-2">
+     
+
+        <div class="card" style="background-color: white;">
+            <a class="text-center" style="text-decoration: none;" href="{% url 'vehicle:create_adhoc_requisition' %}">
+                <i class="fas fa-truck-pickup"></i>
+                <br>Apply for adhoc vehicle</a>
+        </div>
+    
+        <div class="card" style="background-color: white;">
+            <a class="text-center" style="text-decoration: none;" href="{% url 'vehicle:adhoc_approval_status2' %}">
+                <i class="fas fa-truck-pickup"></i>
+                <br>Adhoc vehicle approval status</a>
+        </div>
+
+
+        <div class="card" style="background-color: white;">
+            <a class="text-center" style="text-decoration: none;" href="{% url 'vehicle:adhoc_intime' %}">
+                <i class="fas fa-truck-pickup"></i>
+                <br>Adhoc vehicle Intime</a>
+        </div>
+
+      
+        <div class="card" style="background-color: white;">
+            <a class="text-center" style="text-decoration: none;" href="{% url 'vehicle:view_adhoc_attendance2' %}">
+                <i class="fas fa-truck-pickup"></i>
+                <br>View adhoc attendance</a>
+        </div>
+    
+        
+        <div class="card" style="background-color: white;">
+            <a class="text-center" style="text-decoration: none;" href="{% url 'vehicle:adhoc_summary_view' %}">
+                <i class="fas fa-truck-pickup"></i>
+                <br>Adhoc vehicle summary</a>
+        </div>
+
+        <div class="card" style="background-color: white;">
+            <a class="text-center" style="text-decoration: none;" href="{% url 'vehicle:adhoc_vehicle_grand_summary' %}">
+                <i class="fas fa-truck-pickup"></i>
+                <br>Adhoc Vehicle grand summary</a>
+        </div>
+  
+    
+    
+    
+    
+    
+
+    </div>
+ </div>
+
+
+
+    <div class="col" style="height:1200px"></div>
+
+    
+{% endblock %}
+
+
+

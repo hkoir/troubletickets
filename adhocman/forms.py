@@ -3,7 +3,8 @@ from common.models import PGRdatabase
 from .models import AdhocRequisition,AdhocAttendance,AdhocPayment
 from tickets.mp_list import REGION_CHOICES,ZONE_CHOICES,MP_CHOICES
 
-
+from django.core.exceptions import ValidationError
+from datetime import datetime
 
 
 
@@ -53,16 +54,17 @@ class AdhocRequisitionStatusForm(forms.Form):
         choices=MP_CHOICES
     )
 
+    pgr=forms.CharField(required=False)
 
-from django.core.exceptions import ValidationError
+
 
 class AdhocAttendanceIntimeForm(forms.ModelForm):
     class Meta:
         model = AdhocAttendance
-        fields=['pgr','adhoc_in_date','adhoc_in_time','adhoc_pay_rate']
+        fields = ['pgr','adhoc_ticket', 'adhoc_in_date', 'adhoc_in_time', 'adhoc_pay_rate']
         widgets = {
-                'adhoc_in_date': forms.TimeInput(attrs={'type': 'date'}),
-                'adhoc_in_time': forms.TimeInput(attrs={'type': 'time'})
+            'adhoc_in_date': forms.DateInput(attrs={'type': 'date'}),
+            'adhoc_in_time': forms.TimeInput(attrs={'type': 'time'})
         }
 
     def clean(self):
@@ -96,51 +98,48 @@ class AdhocAttendanceIntimeForm(forms.ModelForm):
 
         return cleaned_data
 
-            
-                     
-from datetime import datetime
-
 class AdhocAttendanceUpdateOuttimeForm(forms.ModelForm):
     class Meta:
         model = AdhocAttendance
-        fields=['pgr','adhoc_out_date','adhoc_out_time']
-
+        fields = ['pgr','adhoc_out_date', 'adhoc_out_time']
         widgets = {
-                'adhoc_out_date': forms.TimeInput(attrs={'type': 'date'}),
-                'adhoc_out_time': forms.TimeInput(attrs={'type': 'time'})
+            'adhoc_out_date': forms.DateInput(attrs={'type': 'date'}),
+            'adhoc_out_time': forms.TimeInput(attrs={'type': 'time'})
         }
 
-        def clean(self):
-            cleaned_data = super().clean()
+    def clean(self):
+        cleaned_data = super().clean()
+        adhoc_out_date = cleaned_data.get('adhoc_out_date')
+        adhoc_out_time = cleaned_data.get('adhoc_out_time')
+
+        if self.instance and adhoc_out_date and adhoc_out_time:
             pgr = self.instance.pgr
             adhoc_in_date = self.instance.adhoc_in_date
             adhoc_in_time = self.instance.adhoc_in_time
-            adhoc_out_date = cleaned_data.get('adhoc_out_date')
-            adhoc_out_time = cleaned_data.get('adhoc_out_time')
+            requisition = self.instance.get_active_requisition()
 
-            if adhoc_out_date and adhoc_out_time:
-                requisition = self.instance.get_active_requisition()
-                if requisition:
-                    if not (requisition.start_date <= adhoc_out_date <= requisition.end_date):
-                        raise ValidationError("Out-date must be within the requisition's start and end dates.")
+            if requisition:
+                if not (requisition.start_date <= adhoc_out_date <= requisition.end_date):
+                    raise ValidationError("Out-date must be within the requisition's start and end dates.")
 
-                    existing_out_time = AdhocAttendance.objects.filter(
-                        pgr=pgr,
-                        adhoc_out_date=adhoc_out_date,
-                        adhoc_out_time=adhoc_out_time
-                    ).exclude(id=self.instance.id)
-                    if existing_out_time.exists():
-                        raise ValidationError("Out-time can be given only once within the same start-date and end-date.")
+                existing_out_time = AdhocAttendance.objects.filter(
+                    pgr=pgr,
+                    adhoc_out_date=adhoc_out_date,
+                    adhoc_out_time=adhoc_out_time
+                ).exclude(id=self.instance.id)
+                if existing_out_time.exists():
+                    raise ValidationError("Out-time can be given only once within the same start-date and end-date.")
 
-                    in_datetime = datetime.combine(adhoc_in_date, adhoc_in_time)
-                    out_datetime = datetime.combine(adhoc_out_date, adhoc_out_time)
-                    self.instance.adhoc_working_hours = out_datetime - in_datetime
-                    self.instance.adhoc_bill_amount = (self.instance.adhoc_working_hours.total_seconds() / 3600) * float(self.instance.adhoc_pay_rate)
+                in_datetime = datetime.combine(adhoc_in_date, adhoc_in_time)
+                out_datetime = datetime.combine(adhoc_out_date, adhoc_out_time)
+                self.instance.adhoc_working_hours = (out_datetime - in_datetime).total_seconds() / 3600  # in hours
+                self.instance.adhoc_bill_amount = self.instance.adhoc_working_hours * float(self.instance.adhoc_pay_rate)
 
-            return cleaned_data
+                # Explicitly set the adhoc_requisition
+                self.instance.adhoc_requisition = requisition
 
-            
-                     
+        return cleaned_data
+
 
 
 
@@ -149,4 +148,27 @@ class AdhocPaymentForm(forms.ModelForm):
         model = AdhocPayment
         exclude=['payment_id','created_at']
 
-      
+
+
+
+class PGRPaymentForm(forms.ModelForm):
+    pgr_name = forms.CharField(max_length=255)
+
+    class Meta:
+        model = AdhocPayment
+        exclude=['pgr','payment_id','created_at']
+
+    def clean_pgr_name(self):
+        pgr_name = self.cleaned_data['pgr_name']
+        try:
+            pgr = PGRdatabase.objects.get(name=pgr_name)
+        except PGRdatabase.DoesNotExist:
+            raise forms.ValidationError("PGR with this name does not exist.")
+        return pgr
+
+
+
+
+class PGRNameForm(forms.Form):
+    pgr_name = forms.CharField(max_length=100, label='PGR Name')
+

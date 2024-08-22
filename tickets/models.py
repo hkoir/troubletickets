@@ -29,9 +29,9 @@ class ChatMessage(models.Model):
 
 class eTicket(models.Model):
     created_at = models.DateTimeField(default=timezone.now)
-    region = models.CharField(max_length=100,choices=REGION_CHOICES,null=True,blank=True)
-    zone = models.CharField(max_length=100,choices=ZONE_CHOICES,null=True,blank=True)
-    mp = models.CharField(max_length=100,choices=MP_CHOICES,null=True,blank=True)
+    region = models.CharField(max_length=100,choices=REGION_CHOICES,null=True,blank=True,default=None)
+    zone = models.CharField(max_length=100,choices=ZONE_CHOICES,null=True,blank=True,default=None)
+    mp = models.CharField(max_length=100,choices=MP_CHOICES,null=True,blank=True,default=None)
     internal_ticket_number = models.CharField(max_length=50)
 
     ticket_type_choices=[
@@ -103,6 +103,11 @@ class eTicket(models.Model):
             self.fuel_difference = None
 
         super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.internal_ticket_number
+  
+
 
 
 

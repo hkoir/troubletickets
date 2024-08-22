@@ -1,0 +1,220 @@
+
+{% extends "base.html" %}
+{% load static %}
+
+{% load duration_filters %}
+
+{% block content %}
+
+<style>
+
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    
+    }
+    
+    th,td{
+        border: 1px solid black; /* Set border color for individual cells */
+        text-align: left;
+        padding: 0px;
+    }
+    
+    th {
+        background-color: rgb(38, 233, 129);
+        
+    }
+    
+    table thead th {
+    white-space: normal;
+    }
+    
+    .main-content {   
+    overflow-y: auto;
+    margin-left:0px;
+    position: absolute;
+    width: 100%;
+    left: 0;
+  
+}
+    
+    </style>
+
+<div class="container_fluid main-content">
+    <div class="row">
+        <div class="col-12">            
+        <form method="GET" action="{% url 'generator:pg_summary_report_by_zone' %}">     
+                <div class="container-fluid">
+                    <div class="row row-cols-1 row-cols-md-6">                  
+                        <div class="col">  Start Date:  {{ form.start_date }} </div>
+                        <div class="col">  End Date:  {{ form.end_date }} </div>
+                        <div class="col"> No of days {{ form.days }} </div>
+                        <div class="col">  Region:{{ form.region }} </div>  
+                        <div class="col">  Zone:{{ form.zone }} </div>    
+                        <div class="col">  mp:{{ form.mp }} </div>  
+                        <div class="col">  PG Number:{{ form.pg_number }} </div>   
+                        <div class="col" style="margin-top:20px;margin-left:20px"> <button type="submit" class='btn btn-primary'>Generate Data</button></div>
+           
+                    </div>             
+                </div>    
+            </form>
+                        
+        </div>
+
+        <div class="col-12">            
+            <h4 style="margin-top:40px; margin-left:0px">Data for
+                {% if days %}
+                    the last {{ days }} days
+                {% elif start_date and end_date %}
+                    from: {{ start_date }} to {{ end_date }}
+                {% endif %}
+            </h4>           
+
+        </div>
+        <div class="col-12">                    
+            <h2 class="text-center p-2"> 
+                <a href="{% url 'generator:view_pg_details_fuel'%}">Fuel details:</a>  
+                PG run Summary report:
+                <a href="{% url 'generator:view_pg_details_fault'%}">Fault details:</a>
+                <a href="{% url 'generator:pg_summary_report_by_PG'%}">Summary Report by PG</a>
+            </h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th class="text-center p-2">PG Region</th>
+                        <th class="text-center p-2">PG Zone</th>
+                        <th class="text-center p-2">Total Refill Amount</th>
+                        <th class="text-center p-2">Total Pump Refill</th>
+                        <th class="text-center p-2">Total Fuel Local Purchase</th>
+                        <th class="text-center p-2">Total Fuel Cash Advance Taken</th>
+                        <th class="text-center p-2">Total Fuel Cost</th>
+                        <th class="text-center p-2">Total Tickets Handled</th>
+                        <th class="text-center p-2">Total Run Hours</th>
+                        <th class="text-center p-2">Total Fuel Consumed</th>
+                        <th class="text-center p-2">Total Fuel Balance</th>
+                        <th class="text-center p-2">Total Fuel Refill litre needed</th>
+                        <th class="text-center p-2">Total Fuel Refill Cost Needed</th>
+                        <th class="text-center p-2">Total Fault Duration</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if page_obj %}
+                        {% for item in page_obj %}
+                        <tr>
+                            <td class="text-center p-2">{{ item.0 }}</td> <!-- Region -->
+                            <td class="text-center p-2">{{ item.1 }}</td> <!-- Zone -->
+                
+                            <td class="text-center p-2">{{ item.2.total_refill_amount }}</td>
+                            <td class="text-center p-2">{{ item.2.total_refill_from_pump }}</td>
+                            <td class="text-center p-2">{{ item.2.total_fuel_local_purchase }}</td>
+                            <td class="text-center p-2">{{ item.2.total_fuel_cash_advance_taken }}</td>
+                            <td class="text-center p-2">{{ item.2.total_fuel_cost }}</td>
+                            <td class="text-center p-2">{{ item.2.total_tt_handle }}</td>
+                            <td class="text-center p-2">{{ item.2.total_run_hour|floatformat:'2' }}</td>
+                            <td class="text-center p-2">{{ item.2.total_fuel_consumed|floatformat:'2' }}</td>
+                            <td class="text-center p-2">{{ item.2.fuel_balance|floatformat:'2' }}</td>
+                            <td class="text-center p-2">{{ item.2.total_required_fuel_litre }}</td>
+                            <td class="text-center p-2">{{ item.2.total_required_fuel_cost }}</td>
+                            <td class="text-center p-2">{{ item.2.total_pg_fault_hours }}</td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="14" class="text-center">No data available</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+                
+            </table>
+            <div class="text-center p-2" style="background-color: burlywood;">
+                <strong>Grand Total Required Fuel Cost:</strong> {{ grand_total_required_fuel_cost|format_currency }}
+            </div>
+        </div>
+        
+    </div>
+
+    
+   
+        <!-- Pagination -->
+        <div class="pagination" style="padding: 10px;">
+            <span class="step-links">
+                {% if page_obj.has_previous %}
+                <a href="?page=1">&laquo; First</a>
+                <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                {% endif %}
+    
+                <span class="current">
+                    Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+                </span>
+    
+                {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}">Next</a>
+                <a href="?page={{ page_obj.paginator.num_pages }}">Last &raquo;</a>
+                {% endif %}
+            </span>
+        </div>
+</div>
+
+
+
+<div class="col" style="height:1200px"></div>
+
+
+
+
+
+<script>
+
+
+    $(document).ready(function(){      
+      var regionZoneMapping = {
+          'Sylhet': ['','Sylhet', 'Moulovibazar','Mymensingh','Kisorganj','Tangail'], 
+          'Rangpur': ['','Rangpur', 'Dinajpur','Bagura','Rajshahi'] ,                          
+          
+      };
+   
+      $('#id_region').change(function(){
+          var selectedRegion = $(this).val();
+          var zoneChoices = regionZoneMapping[selectedRegion];
+          $('#id_zone').empty();
+          $.each(zoneChoices, function(index, value){
+              $('#id_zone').append($('<option>').text(value).attr('value', value));
+          });
+      });
+            
+      var zoneMpMapping = {              
+          'Sylhet': ['','Sylhet','Taherpur','Sunamganj','Bianibazar','Dorbhost','Dherai','Chatak'], // Add more MPs for Sylhet zone
+          'Moulovibazar': ['','Moulovibazar', 'Saestaganj','Juri','Baniachong'],
+          'Mymensingh': ['','Mymensingh', 'Fulpur','Valuka'] ,
+          'Kisorganj': ['','Kisorganj','Katiadi','Netrokona','Mohonpur','Austogram'],
+          'Tangail': ['','Tangail','Madhupur','Jamalpur','Sherpur','Bakshihanj','Rowmari'],
+         
+          'Rangpur':['','Rangpur','Hatibandha','Gaibandha','Ulipur','Boropar','Polasbari'],
+          'Dinajpur':['','Dinajpur','Panchghor','Jaldhaka','Thakurgaon'],
+          'Rajshahi':['','Rajshahi','Bagura','Nachole','Natore','Chapai'],
+          'Bagura':['','Bagura'],
+          '': ['']
+         
+      };
+  
+  
+      $('#id_zone').change(function(){
+          $('#id_mp').val('');
+          var selectedZone = $(this).val();
+          var mpChoices = zoneMpMapping[selectedZone];
+  
+          $('#id_mp').empty();
+          $.each(mpChoices, function(index, value){
+              $('#id_mp').append($('<option>').text(value).attr('value', value));
+          });
+      });
+      
+  });
+  
+  </script>
+
+
+
+
+
+{% endblock %}

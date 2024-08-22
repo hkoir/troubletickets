@@ -1,0 +1,257 @@
+{% extends "base.html" %}
+{% load static %}
+
+
+{% block content %}
+
+
+    <title>Adhoc Requisition form</title>
+
+    <style>
+
+   
+
+table {
+            border-collapse: collapse;
+            width: 100%;
+      
+        }
+
+        th, td {
+            border: 1px solid rgb(227, 87, 7); /* Set border color for individual cells */
+            text-align: left;
+            padding: 0px;
+        }
+        th{
+        background-color: rgb(52, 232, 100);
+      }
+      
+
+    table thead th {
+    white-space: normal;
+        }
+
+    .main-content {   
+    overflow-y: auto;
+    margin-left:0px;
+    position: absolute;
+    width: 100%;
+    left: 0;
+  
+}
+
+.main-content {   
+    overflow-y: auto;
+    margin-left:0px;
+ 
+    width: 100%;
+    left: 0;
+  
+}
+
+  #selected-pgrs {
+            list-style-type: none;
+        }
+        #selected-pgrs li {
+            margin-bottom: 5px;
+        }
+
+    </style>
+
+      
+
+<div class="container-fluid main-content">
+    <div class="row row-cols-1 row-cols-md-2">
+        <div class="col-12">
+            <div class="card form-group" style="background-color: bisque;">
+                <div class="card-body">
+                    <h4 class="card-title" style="margin-bottom:20px">Adhoc Req.Form</h4>
+                    <form method="post" enctype="multipart/form-data" id="expense-requisition-form">
+                        {% csrf_token %}
+                        {% for field in form %}
+                            <div class="form-group" style="padding:5px">
+                                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                                {% if field.name == 'purpose' %}
+                                    <textarea class="form-control" id="{{ field.id_for_label }}" name="{{ field.html_name }}" style="height: 100px;width:300px"></textarea>
+                                {% else %}
+                                    {{ field }}
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                        <div><button type="submit" class="btn btn-primary">Submit</button></div>
+                    </form>
+                </div>
+            </div>
+        </div>     
+        <div class="col-12">
+            <h4>Adhoc requisition list</h4>
+            <table>  
+                <thead>
+                    <tr>
+                        <th class="text-center p-2">Date</th>
+                        <th class="text-center p-2">Vehicle Number</th>
+                        <th class="text-center p-2">Vehicle owner</th>
+                        <th class="text-center p-2">Owner phone</th>     
+                        <th class="text-center p-2">Adhoc Region</th>
+                        <th class="text-center p-2">Adhoc Zone</th>
+                        <th class="text-center p-2">Adhoc MP</th>
+                        <th class="text-center p-2">Start date</th>
+                        <th class="text-center p-2">End date</th>
+                        <th class="text-center p-2" style="white-space: nowrap;">Days</th>
+                        <th class="text-center p-2">Purpose</th>   
+                       
+                        <th class="text-center p-2">Approval Status</th>                          
+                         <th class="text-center p-2">Current Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for requisition in adhoc_requisitions %}
+                    <tr>
+                        <td class="text-center p-2" style="white-space: nowrap;">{{ requisition.requisition_date }}</td>
+                        <td class="text-center p-2" style="white-space: nowrap;">{{ requisition.vehicle.vehicle_reg_number }}</td>
+                        <td class="text-center p-2" style="white-space: nowrap;">{{ requisition.vehicle.vehicle_owner_name }}</td>
+                        <td class="text-center p-2" style="white-space: nowrap;">{{ requisition.vehicle.vehilce_owner_mobile_number }}</td>
+                        <td class="text-center p-2" style="white-space: nowrap;">{{ requisition.vehicle.region }}</td>
+                        <td class="text-center p-2" style="white-space: nowrap;">{{ requisition.vehicle.zone }}</td>
+                        <td class="text-center p-2" style="white-space: nowrap;">{{ requisition.vehicle.mp }}</td>
+                        <td class="text-center p-2" style="white-space: nowrap;">{{ requisition.start_date }}</td>
+                        <td class="text-center p-2" style="white-space: nowrap;">{{ requisition.end_date }}</td>
+                        <td class="text-center p-2">{{ requisition.num_of_days_applied }}</td>
+                        <td class="text-center p-2">{{ requisition.purpose }}</td>
+                       
+                        {% if requisition.level1_approval_status == "Approved" %}      
+                        <td class="text-center p-2" style="white-space: nowrap; background-color: greenyellow;">Approved</td>
+                        {% else %}
+                        <td class="text-center p-2" style="white-space: nowrap; background-color: red;">Pending Approval</td>
+                        {% endif %}       
+                                                
+                        {% if requisition.active_status%}      
+                        <td class="text-center p-2" style="white-space: nowrap; background-color: greenyellow;">Active</td>
+                        {% else %}
+                        <td class="text-center p-2" style="white-space: nowrap; background-color: rgb(239, 117, 10);">Inactive</td>
+                        {% endif %}  
+                    </tr>
+                    {% endfor %}
+                </tbody>                
+            </table>
+            <!-- Pagination -->
+            <div class="pagination" style="padding: 10px;">
+                <span class="step-links">
+                    {% if adhoc_requisitions.has_previous %}
+                        <a href="?page=1">&laquo; First</a>
+                        <a href="?page={{ adhoc_requisitions.previous_page_number }}">Previous</a>
+                    {% endif %}
+                    <span class="current">
+                        Page {{ adhoc_requisitions.number }} of {{ adhoc_requisitions.paginator.num_pages }}.
+                    </span>
+                    {% if adhoc_requisitions.has_next %}
+                        <a href="?page={{ adhoc_requisitions.next_page_number }}">Next</a>
+                        <a href="?page={{ adhoc_requisitions.paginator.num_pages }}">Last &raquo;</a>
+                    {% endif %}
+                </span>
+            </div>
+        </div>   
+    </div>
+</div>
+
+
+
+
+
+<div class="col" style="height:1200px"></div>
+
+   
+<script>
+    $(document).ready(function() {
+     $('#id_pgr').select2({
+         width: '100%',
+         ajax: {
+             url: "{% url 'dailyexpense:common_search' %}",
+             dataType: 'json',
+             delay: 250,
+             data: function(params) {
+                 return {
+                     q: params.term
+                 };
+             },
+             processResults: function(data) {
+                 return {
+                     results: $.map(data.results, function(item) {
+                         return {
+                             id: item.id,
+                             text: item.text
+                         };
+                     })
+                 };
+             },
+             cache: true
+         },
+         minimumInputLength: 1,
+         placeholder: 'Search',
+         allowClear: true
+     });
+ });
+ 
+ </script>
+    
+
+    <script>
+        $(document).ready(function(){      
+            var regionZoneMapping = {
+                'Sylhet': ['','Sylhet', 'Moulovibazar','Mymensingh','Kisorganj','Tangail'], 
+                'Rangpur': ['','Rangpur', 'Dinajpur','Bagura','Rajshahi'] ,                          
+                
+            };
+         
+            $('#id_region').change(function(){
+                var selectedRegion = $(this).val();
+                var zoneChoices = regionZoneMapping[selectedRegion];
+                $('#id_zone').empty();
+                $.each(zoneChoices, function(index, value){
+                    $('#id_zone').append($('<option>').text(value).attr('value', value));
+                });
+            });
+                  
+            var zoneMpMapping = {              
+                'Sylhet': ['','Sylhet','Taherpur','Sunamganj','Bianibazar','Dorbhost','Dherai','Chatak'], // Add more MPs for Sylhet zone
+                'Moulovibazar': ['','Moulovibazar', 'Saestaganj','Juri','Baniachong'],
+                'Mymensingh': ['','Mymensingh', 'Fulpur','Valuka'] ,
+                'Kisorganj': ['','Kisorganj','Katiadi','Netrokona','Mohonpur','Austogram'],
+                'Tangail': ['','Tangail','Madhupur','Jamalpur','Sherpur','Bakshihanj','Rowmari'],
+               
+                'Rangpur':['','Rangpur','Hatibandha','Gaibandha','Ulipur','Boropar','Polasbari'],
+                'Dinajpur':['','Dinajpur','Panchghor','Jaldhaka','Thakurgaon'],
+                'Rajshahi':['','Rajshahi','Bagura','Nachole','Natore','Chapai'],
+                'Bagura':['','Bagura'],
+                '': ['']
+               
+            };
+    
+       
+            $('#id_zone').change(function(){
+                $('#id_mp').val('');
+                var selectedZone = $(this).val();
+                var mpChoices = zoneMpMapping[selectedZone];
+    
+                $('#id_mp').empty();
+                $.each(mpChoices, function(index, value){
+                    $('#id_mp').append($('<option>').text(value).attr('value', value));
+                });
+            });
+    
+    
+    
+    });          
+    
+    </script>
+    
+
+
+
+    <div class="col" style="height:1200px"></div>
+
+
+{% endblock %}
+
+
+

@@ -50,36 +50,38 @@ table {
 </style>
 
 
-
-<form method="GET" action="{% url 'common:view_pgr_database' %}">
-
-  <div class="container-fluid" class="main-content">
-      <div class="row row-cols-1 row-cols-md-4">
-
-       <div class="col" style="padding:5px; margin:5px">  Start Date:  {{ form.start_date }} </div>
-       <div class="col" style="padding:5px; margin:5px">  End Date:  {{ form.end_date }} </div>
-       <div class="col" style="padding:5px; margin:5px"> No of days {{ form.days }} </div>
-       <div class="col" style="padding:5px; margin:5px">  Region:{{ form.region }} </div>  
-       <div class="col" style="padding:5px; margin:5px">  Zone:{{ form.zone }} </div>    
-       <div class="col" style="padding:5px; margin:5px">  mp:{{ form.mp }} </div>    
-
-       <div class="col" style="padding:5px; margin:5px"> <button type="submit" class='btn btn-primary'>Generate Data</button></div>
-         
-      </div>
-  </div>
-    
-  </form>
-
-  <h4 class="text-center">Data for
-    {% if days %}
-        the last {{ days }} days
-    {% elif start_date and end_date %}
-        from: {{ start_date }} to {{ end_date }}
-    {% endif %}
-</h4> 
-
 <div class="container-fluid main-content">
   <div class="row">
+
+    <div class="col-xl-12">     
+        <form method="GET" action="{% url 'common:view_pgr_database' %}">
+
+          <div class="container-fluid">
+              <div class="row row-cols-1 row-cols-md-6">
+
+              <div class="col" style="padding:5px; margin:5px">  Start Date:  {{ form.start_date }} </div>
+              <div class="col" style="padding:5px; margin:5px">  End Date:  {{ form.end_date }} </div>
+              <div class="col" style="padding:5px; margin:5px"> No of days {{ form.days }} </div>
+              <div class="col" style="padding:5px; margin:5px">  Region:{{ form.region }} </div>  
+              <div class="col" style="padding:5px; margin:5px">  Zone:{{ form.zone }} </div>    
+              <div class="col" style="padding:5px; margin:5px">  mp:{{ form.mp }} </div>  
+              <div class="col" style="padding:5px; margin:5px">  PGR Name:{{ form.pgr }} </div>    
+
+              <div class="col" style="padding:5px; margin:5px"> <button type="submit" class='btn btn-primary'>Generate Data</button></div>
+                
+              </div>
+          </div>
+            
+          </form>
+
+          <h4 class="text-center">Data for
+            {% if days %}
+                the last {{ days }} days
+            {% elif start_date and end_date %}
+                from: {{ start_date }} to {{ end_date }}
+            {% endif %}
+        </h4> 
+    </div>
     <div class="col-xl-12">
       <table>
         <thead>
@@ -113,7 +115,7 @@ table {
           </tr>
         </thead>
         <tbody>
-          {% for pgr in pgr_list %}
+          {% for pgr in page_obj %}
             <tr>
 
               <td class="text-center p-2" style="white-space: nowrap;"><a href="{% url 'common:update_pgr_database' pgr.id %}">Update PGR database</a></td>
@@ -182,9 +184,8 @@ table {
       </table>
     </div>
   </div>
-</div>
 
-
+  
   <div class="pagination" style="padding:10px">
     {% if page_obj.has_previous %}
       <a style="margin:10px; font-size: 14px;" href="?page={{ page_obj.previous_page_number }}">Previous</a>
@@ -202,7 +203,10 @@ table {
       <a style="margin:10px; font-size:14px" href="?page={{ page_obj.next_page_number }}">Next</a>
     {% endif %}
   </div>
+
+
 </div>
+
 
   
     

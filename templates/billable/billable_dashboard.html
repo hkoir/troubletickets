@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% load static %}
+
+
+{% block content %}
+
+
+
+    <style>
+
+    html, body { 
+       font-family: Verdana, sans-serif; 
+    
+  }
+
+
+  
+  table {
+            border-collapse: collapse;
+            width: 100%;
+      
+        }
+
+        th, td {
+            border: 1px solid rgb(227, 87, 7); /* Set border color for individual cells */
+            text-align: left;
+            padding: 0px;
+        }
+        th{
+        background-color: rgb(52, 232, 100);
+      }
+      
+
+    table thead th {
+    white-space: normal;
+        }
+
+    </style>
+
+<h4 class=" text-center" style="margin-top:10px">DOPS DASHBOARD</h4>
+
+
+
+ <div class="container-fluid">
+    <div class="row row-cols-3 row-cols-md-6 p-2">
+     
+
+        <div class="card" style="background-color: white;">
+            <a class="text-center" style="text-decoration: none;" href="{% url 'billable:civil_power_requisition' %}">
+                <img class="rounded-pill" src="{% static 'images/money.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
+                <br>Apply for Civil & Power work</a>
+        </div>
+    
+        <div class="card" style="background-color: white;">
+            <a class="text-center" style="text-decoration: none;" href="{% url 'billable:civil_power_approval_status2' %}">
+                <img class="rounded-pill" src="{% static 'images/money.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
+                <br>Civil Power Requisition Status</a>
+        </div>
+    
+    
+
+
+       
+    
+
+    </div>
+ </div>
+
+
+
+    <div class="col" style="height:1200px"></div>
+
+    
+{% endblock %}
+
+
+

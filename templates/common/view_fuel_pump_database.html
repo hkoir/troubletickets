@@ -51,25 +51,26 @@ table {
 
 
 
-<form method="GET" action="{% url 'common:view_fuel_pump' %}">
-
-  <div class="container-fluid" class="main-content">
-      <div class="row row-cols-1 row-cols-md-4">
-       <div class="col" style="padding:5px; margin:5px">  Region:{{ form.region }} </div>  
-       <div class="col" style="padding:5px; margin:5px">  Zone:{{ form.zone }} </div>    
-       <div class="col" style="padding:5px; margin:5px">  mp:{{ form.mp }} </div>    
-       <div class="col" style="padding:5px; margin:5px">  Pump Name:{{ form.fuel_pump_name }} </div>    
-
-       <div class="col" style="padding:5px; margin:5px"> <button type="submit" class='btn btn-primary'>Generate Data</button></div>
-         
-      </div>
-  </div>
-    
-  </form>
 
   
 <div class="container-fluid main-content">
   <div class="row">
+
+    <div class="col-xl-12">      
+        <form method="GET" action="{% url 'common:view_fuel_pump' %}">
+          <div class="container-fluid" class="main-content">
+              <div class="row row-cols-1 row-cols-md-4">
+              <div class="col" style="padding:5px; margin:5px">  Region:{{ form.region }} </div>  
+              <div class="col" style="padding:5px; margin:5px">  Zone:{{ form.zone }} </div>    
+              <div class="col" style="padding:5px; margin:5px">  mp:{{ form.mp }} </div>    
+              <div class="col" style="padding:5px; margin:5px">  Pump Name:{{ form.fuel_pump_name }} </div>    
+              <div class="col" style="padding:5px; margin:5px"> <button type="submit" class='btn btn-primary'>Generate Data</button></div>
+              
+              </div>
+          </div>            
+          </form>
+
+    </div>
     <div class="col-xl-12">
       <table>
         <thead>
@@ -100,7 +101,7 @@ table {
           </tr>
         </thead>
         <tbody>
-          {% for pgr in pump_data %}
+          {% for pgr in page_obj %}
             <tr>
 
               <td class="text-center p-2" style="white-space: nowrap;"><a href="{% url 'common:update_fuel_pump_database' pgr.id %}">Update database</a></td>
@@ -148,8 +149,6 @@ table {
       </table>
     </div>
   </div>
-</div>
-
 
   <div class="pagination" style="padding:10px">
     {% if page_obj.has_previous %}
@@ -168,7 +167,12 @@ table {
       <a style="margin:10px; font-size:14px" href="?page={{ page_obj.next_page_number }}">Next</a>
     {% endif %}
   </div>
+
 </div>
+
+
+  
+
 
   
     
@@ -248,7 +252,7 @@ table {
 
 
 
-
+<!-- 
 
 <script>
   $(document).ready(function() {
@@ -281,7 +285,7 @@ table {
    });
 });
 
-</script>
+</script> -->
 
 
 

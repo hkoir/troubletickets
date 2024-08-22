@@ -18,12 +18,14 @@ urlpatterns = [
     path("common/", include("common.urls", namespace="common")),
     path("disaster/", include("disaster.urls", namespace="disaster")),
     path("adhocman/", include("adhocman.urls", namespace="adhocman")),
+    path("billable/", include("billable.urls", namespace="billable")),
 ]
 
 
 
-urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
 
 # Serve static files during development
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

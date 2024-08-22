@@ -28,7 +28,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'common',
     'disaster',
-    'adhocman'
+    'adhocman',
+    'billable'
 ]
 
 
