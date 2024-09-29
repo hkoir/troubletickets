@@ -41,7 +41,7 @@
     </style>
 
 
-<h4 class="text-center">Vehicle over time bill account</h4>
+
 
 <form method="GET" action="{% url 'vehicle:vehicle_overtime_calc' %}">
 
@@ -54,6 +54,7 @@
          <div class="col" style="padding:5px;">  Region:{{ form.region }} </div>  
          <div class="col" style="padding:5px;">  Zone:{{ form.zone }} </div>    
          <div class="col" style="padding:5px;">  mp:{{ form.mp }} </div>    
+         <div class="col" style="padding:5px;">  Vehicle:{{ form.vehicle_number }} </div> 
 
          <div class="col" style="padding:5px; margin:5px"> <button type="submit" class='btn btn-primary'>Generate Data</button></div>
            
@@ -66,7 +67,9 @@
 
 
 <div style="left:0px; margin-left:0px">
-    <h4 style="margin-top:40px; margin-left:0px">Data for
+    <h4 class ='text-center' style="margin-top:40px; margin-left:0px">
+      Vehicle bill account:        
+        Data for
         {% if days %}
             the last {{ days }} days
         {% elif start_date and end_date %}
@@ -77,7 +80,36 @@
 </div>
 
 
+<div class="container"></div>
+    <h4 style="margin-top:20px">Vehicle Costs Summary</h4>
+    <table>
+        <thead>
+            <tr>
+                <th class="text-center p-2">Vehicle Registration Number</th>
+                <th class="text-center p-2">Total driver Overtime Cost</th>
+                <th class="text-center p-2">Total Body Overtime Cost</th>
+                <th class="text-center p-2">Total body rental Cost</th>
+                <th class="text-center p-2" style="background-color: aliceblue;">Total vehicle cost</th>
 
+                <th class="text-center p-2" style="background-color: aqua;">Total kilometer cost</th>
+                <th class="text-center p-2" style="background-color: bisque;">Grand total cost</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for vehicle_reg_number, totals in vehicle_totals_list %}
+                <tr>
+                    <td class="text-center p-2">{{ vehicle_reg_number }}</td>
+                    <td class="text-center p-2">{{ totals.total_overtime_cost|floatformat:'2' }}</td>
+                    <td class="text-center p-2">{{ totals.total_body_overtime_cost|floatformat:'2' }}</td>
+                    <td class="text-center p-2">{{ totals.total_rent_cost|floatformat:'2' }}</td>
+                    <td class="text-center p-2">{{ totals.total_vehicle_cost|floatformat:'2' }}</td>
+
+                    <td class="text-center p-2">{{ totals.total_kilometer_cost|floatformat:'2' }}</td>
+                    <td class="text-center p-2">{{ totals.grand_total_summary|floatformat:'2' }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 
 
 
@@ -96,26 +128,54 @@
                             <thead>
                                 <tr>
                                     <th class="text-center p-2">Date</th>
-                                    <th class="text-center p-2">Travel day</th>
+                                    <th class="text-center p-2">Travel day</th>                                  
+                                    <th class="text-center p-2">Kilometer run</th>
+
                                     <th class="text-center p-2">Total Running Hours</th>
+                                 
                                     <th class="text-center p-2">Overtime hours</th>
-                                    <th class="text-center p-2">Overtime rate</th>
-                                    <th class="text-center p-2">Overtime bill amount</th>
-                                    <th class="text-center p-2">Vehicle body rent/day</th>
+                                    <th class="text-center p-2">Driver Overtime rate</th>
+                                    <th class="text-center p-2">Vehicle Overtime rate</th>
+                                    <th class="text-center p-2" style="background-color: antiquewhite;">Vehicle Overtime</th>
+                                    <th class="text-center p-2" style="background-color: antiquewhite;">Driver Overtime</th>
+                                    <th class="text-center p-2" style="background-color: antiquewhite;">Vehicle body rent/day</th>
+                                    <th class="text-center p-2" style="background-color: antiquewhite;">Total vehicle cost today</th>
+
+                                    <th class="text-center p-2" style="background-color: cyan;">Total CNG cost</th>
+                                    <th class="text-center p-2" style="background-color: cyan;">Total gasoline cost</th>
+                                    <th class="text-center p-2" style="background-color: cyan;">Total kilometer cost today</th>
+
+                                    <th class="text-center p-2" style="background-color: rgb(139, 246, 7);">Grand total cost today</th>
+
                                     <th class="text-center p-2">Rental type</th>
+                                    <th class="text-center p-2">Mode of use</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for date, data in x.items %}
                                     <tr>
                                         <td class="text-center p-2" style="white-space:nowrap;">{{ date }}</td>
-                                        <td class="text-center p-2" style="white-space:nowrap;">{{ data.remarks}}</td>
+                                        <td class="text-center p-2" style="white-space:nowrap;">{{ data.remarks}}</td>                                        
+                                        <td class="text-center p-2" style="white-space:nowrap;">{{ data.kilometer_run}}</td>
+                                      
                                         <td class="text-center p-2">{{ data.total_running_hours|floatformat:'2' }}</td>
                                         <td class="text-center p-2">{{ data.overtime_running_hours|floatformat:'2' }}</td>
                                         <td class="text-center p-2">{{ data.overtime_rate|floatformat:'2' }}</td>
+                                        <td class="text-center p-2">{{ data.body_overtime_rate|floatformat:'2' }}</td>
+                                        <td class="text-center p-2">{{ data.body_overtime_cost|floatformat:'2' }}</td>
                                         <td class="text-center p-2">{{ data.overtime_cost|floatformat:'2' }}</td>
                                         <td class="text-center p-2">{{ data.vehicle_rent_per_day|floatformat:'2' }}</td>
+                                        <td class="text-center p-2">{{ data.total_cost|floatformat:'2' }}</td>
+
+                                        <td class="text-center p-2">{{ data.total_CNG_cost|floatformat:'2' }}</td>
+                                        <td class="text-center p-2">{{ data.total_gasoline_cost|floatformat:'2' }}</td>
+                                        <td class="text-center p-2">{{ data.total_kilometer_cost|floatformat:'2' }}</td>
+
+                                        <td class="text-center p-2">{{ data.grand_total_cost|floatformat:'2' }}</td>
+
+
                                         <td class="text-center p-2">{{ data.vehicle_rental_category }}</td>
+                                        <td class="text-center p-2">{{ data.vehicle_operational_mode }}</td>
 
                                     </tr>
                                 {% endfor %}

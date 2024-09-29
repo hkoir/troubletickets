@@ -59,7 +59,7 @@ white-space: normal;
                        {{ employee.joining_date }}<br>
                        {{ employee.department }}<br>    
                         
-                        {% if request.user.manager_level == 'third_level' %}
+                        {% if request.user.manager_level == 'first_level' %}
                         <a href="{% url 'employee:update_employee' employee.id %}">Update Record</a>
                         <a href="{% url 'employee:delete_employee' employee.id %}">Delete Record</a>
                     {% endif %}

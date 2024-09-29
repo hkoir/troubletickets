@@ -56,8 +56,8 @@
 {% endif %}
 
 
-<h2 class="text-center" style="margin-top:100px">Civil_Power Financial Approval Status</h2>
-<p class="text-center">select date range/ or no of days but not both</p>
+<h4 class="text-center" style="margin-top:100px">Civil_Power Financial Approval Status: select date range/ or no of days but not both</h4>
+
      <div class="row">  
         <div class="col-12">       
             <form method="GET" action="{% url 'billable:civil_power_approval_status' %}" style="margin-bottom:30px">        
@@ -166,28 +166,28 @@
                 <tbody>
                     {% for requisition in page_obj %}
                     <tr>                           
-                         <td class="text-center p-2" style="white-space: nowrap; "><a  href="{% url 'billable:chat' requisition.id %}"style="text-decoration:none;">Message</a></td>
+                         <td class="text-center" style="white-space: nowrap; "><a  href="{% url 'billable:chat' requisition.id %}"style="text-decoration:none;">Message</a></td>
                        
                          {% if requisition.TT_status == "closed" %}
-                        <td class="text-center p-2"><i class="fas fa-check" style="color: green;">Done</i></td>
+                        <td class="text-center"><i class="fas fa-check" style="color: green;">Done</i></td>
                         {% else %}
-                        <td class="text-center p-2" style="white-space: nowrap;"><a href="{% url 'billable:update_work' requisition.id %}">Update work status</a></td>
+                        <td class="text-center" style="white-space: nowrap;"><a href="{% url 'billable:update_work' requisition.id %}">Update work status</a></td>
                         {% endif %}
 
-                        <td class="text-center p-2">{{ requisition.requester }}</td>
-                        <td class="text-center p-2" style="white-space:nowrap;">{{ requisition.created_at }}</td>
-                        <td class="text-center p-2">{{ requisition.requisition_number }}</td>
-                        <td class="text-center p-2">{{ requisition.region }}</td>
-                        <td class="text-center p-2">{{ requisition.zone }}</td>
+                        <td class="text-center">{{ requisition.requester }}</td>
+                        <td class="text-center" style="white-space:nowrap;">{{ requisition.created_at }}</td>
+                        <td class="text-center">{{ requisition.requisition_number }}</td>
+                        <td class="text-center">{{ requisition.region }}</td>
+                        <td class="text-center">{{ requisition.zone }}</td>
 
-                        <td class="text-center p-2" style="white-space: nowrap;">{{ requisition.task_name }}</td>
-                        <td class="text-center p-2" style="white-space: nowrap;">{{ requisition.qty }}</td>
-                        <td class="text-center p-2" style="white-space: nowrap;">{{ requisition.site_code }}</td>
-                        <td class="text-center p-2" style="white-space: nowrap;">{{ requisition.TT_number }}</td>
-                        <td class="text-center p-2" style="white-space: nowrap;">{{ requisition.SOR_rate }}</td>
-                        <td class="text-center p-2">{{ requisition.requisition_amount }}</td>
+                        <td class="text-center" style="white-space: nowrap;">{{ requisition.task_name }}</td>
+                        <td class="text-center" style="white-space: nowrap;">{{ requisition.qty }}</td>
+                        <td class="text-center" style="white-space: nowrap;">{{ requisition.site_code }}</td>
+                        <td class="text-center" style="white-space: nowrap;">{{ requisition.TT_number }}</td>
+                        <td class="text-center" style="white-space: nowrap;">{{ requisition.SOR_rate }}</td>
+                        <td class="text-center">{{ requisition.requisition_amount }}</td>
 
-                        <td class="text-center p-2" style="white-space:nowrap;">
+                        <td class="text-center" style="white-space:nowrap;">
                             {% if requisition.supporting_documents %}
                                 {% if requisition.supporting_documents.url|slice:'-3:' == 'pdf' %}
                                     <a href="{{ requisition.supporting_documents.url }}" target="_blank">
@@ -198,7 +198,7 @@
                                         <img 
                                             src="{{ requisition.supporting_documents.url }}" 
                                             alt="Supporting Docs" 
-                                            style="cursor: pointer; width:50px;height:50px"
+                                            style="cursor: pointer; width:40px;height:20px"
                                         >
                                     </a>
                                 {% endif %}
@@ -210,53 +210,53 @@
 
 
 
-                        <td class="text-center p-2">{{ requisition.approved_amount }}</td>
+                        <td class="text-center">{{ requisition.approved_amount }}</td>
                 
                         <!-- Level 1 Approval -->
-                        <td class="text-center p-2">
+                        <td class="text-center">
                             {% if requisition.level1_approval_status == 'approved' %}
-                                <span style="background-color: rgb(192, 243, 75); font-size: 20px;">Approved</span>
+                                <span style="background-color: rgb(192, 243, 75); font-size: 10px;">Approved</span>
                             {% elif requisition.level1_approval_status == 'Rejected' %}
-                                <span style="background: red; font-size: 20px;">Rejected</span>
+                                <span style="background: red; font-size: 10px;">Rejected</span>
                             {% elif request.user.manager_level == 'first_level' %}
                                 <a href="{% url 'billable:requisition_approval' requisition_id=requisition.id %}"  style="font-size: 20px; text-decoration: none;">Pending</a>
                             {% else %}
-                                <span style="background: goldenrod; font-size: 20px;">Pending</span>
+                                <span style="background: goldenrod; font-size: 10px;">Pending</span>
                             {% endif %}
                         </td>
-                        <td class="text-center p-2" style="white-space: nowrap;">{{ requisition.level1_approval_date }}</td>
+                        <td class="text-center" style="white-space: nowrap;">{{ requisition.level1_approval_date }}</td>
                 
                         <!-- Level 2 Approval -->
-                        <td class="text-center p-2">
+                        <td class="text-center">
                             {% if requisition.level2_approval_status == 'Approved' %}
-                                <span style="background: green; font-size: 20px;">Approved</span>
+                                <span style="background: green; font-size: 10px;">Approved</span>
                             {% elif requisition.level2_approval_status == 'Rejected' %}
-                                <span style="background: red; font-size: 20px;">Rejected</span>
+                                <span style="background: red; font-size: 10px;">Rejected</span>
                             {% elif request.user.manager_level == 'second_level' %}
                                 <a href="{% url 'billable:requisition_approval' requisition_id=requisition.id %}" style="background: goldenrod;">Pending</a>
                             {% else %}
-                                <span style="background: goldenrod; font-size: 20px;">Pending</span>
+                                <span style="background: goldenrod; font-size: 10px;">Pending</span>
                             {% endif %}
                         </td>
 
-                        <td class="text-center p-2" style="white-space: nowrap;">{{ requisition.level2_approval_date }}</td>
+                        <td class="text-center" style="white-space: nowrap;">{{ requisition.level2_approval_date }}</td>
                 
                         <!-- Level 3 Approval -->
-                        <td class="text-center p-2">
+                        <td class="text-center">
                             {% if requisition.level3_approval_status == 'Approved' %}
                                 <span style="background: green; font-size: 20px;">Approved</span>
                             {% elif requisition.level3_approval_status == 'Rejected' %}
-                                <span style="background: red; font-size: 20px;">Rejected</span>
+                                <span style="background: red; font-size: 10px;">Rejected</span>
                             {% elif request.user.manager_level == 'third_level' %}
                                 <a href="{% url 'billable:requisition_approval' requisition_id=requisition.id %}" style="background: goldenrod;">Pending</a>
                             {% else %}
-                                <span style="background: goldenrod; font-size: 20px;">Pending</span>
+                                <span style="background: goldenrod; font-size: 10px;">Pending</span>
                             {% endif %}
                         </td>
-                        <td class="text-center p-2" style="white-space: nowrap;">{{ requisition.level3_approval_date }}</td>
+                        <td class="text-center" style="white-space: nowrap;">{{ requisition.level3_approval_date }}</td>
                       
                     {% if requisition.sending_document %}
-                    <td class="text-center p-2" style="white-space: nowrap;"><i class="fas fa-check" style="color: green;">Uploaded</i></td>
+                    <td class="text-center" style="white-space: nowrap;"><i class="fas fa-check" style="color: green;">Uploaded</i></td>
                         {% else %}
                     
                         <td class="text-center p-2" style="white-space: nowrap;">
@@ -265,7 +265,7 @@
 
                     {% endif %}
                        
-                        <td class="text-center p-2" style="white-space:nowrap;">
+                        <td class="text-center" style="white-space:nowrap;">
                             {% if requisition.sending_document %}
                                 {% if requisition.sending_document.url|slice:'-3:' == 'pdf' %}
                                     <a href="{{ requisition.sending_document.url }}" target="_blank">
@@ -276,7 +276,7 @@
                                         <img 
                                             src="{{ requisition.sending_document.url }}" 
                                             alt="Supporting Docs" 
-                                            style="cursor: pointer; width:50px;height:50px"
+                                            style="cursor: pointer; width:40px;height:20px"
                                         >
                                     </a>
                                 {% endif %}
@@ -285,10 +285,10 @@
                             {% endif %}
                         </td>
 
-                        <td class="text-center p-2" style="white-space: nowrap;">{{ requisition.money_sending_date }}</td>
+                        <td class="text-center" style="white-space: nowrap;">{{ requisition.money_sending_date }}</td>
                         
                        
-                        <td class="text-center p-2">
+                        <td class="text-center">
                             {% if requisition.receiving_status == 'Received' %}
                                 Received
                             {% elif requisition.requester == request.user %}
@@ -303,10 +303,10 @@
 
 
                        
-                        <td class="text-center p-2" style="white-space: nowrap;">{{ requisition.TT_open_date }}</td>
-                        <td class="text-center p-2" style="white-space: nowrap;">{{ requisition.work_completion_date }}</td>
+                        <td class="text-center" style="white-space: nowrap;">{{ requisition.TT_open_date }}</td>
+                        <td class="text-center" style="white-space: nowrap;">{{ requisition.work_completion_date }}</td>
 
-                        <td class="text-center p-2" style="white-space:nowrap;">
+                        <td class="text-center" style="white-space:nowrap;">
                             {% if requisition.task_completion_image %}
                                 {% if requisition.task_completion_image.url|slice:'-3:' == 'pdf' %}
                                     <a href="{{ requisition.task_completion_image.url }}" target="_blank">
@@ -317,7 +317,7 @@
                                         <img 
                                             src="{{ requisition.task_completion_image.url }}" 
                                             alt="Supporting Docs" 
-                                            style="cursor: pointer; width:50px;height:50px"
+                                            style="cursor: pointer; width:40px;height:20px"
                                         >
                                     </a>
                                 {% endif %}
@@ -327,8 +327,8 @@
                         </td>
 
                         
-                        <td class="text-center p-2" style="white-space: nowrap;">{{ requisition.TT_status }}</td>
-                        <td class="text-center p-2" style="white-space: nowrap;">{{ requisition.TT_close_date }}</td>
+                        <td class="text-center" style="white-space: nowrap;">{{ requisition.TT_status }}</td>
+                        <td class="text-center" style="white-space: nowrap;">{{ requisition.TT_close_date }}</td>
                                              
                         
 
@@ -338,7 +338,11 @@
                  
                 
             </table>
-        </div>   
+        </div>  
+        
+     </div>
+
+</div>
         
         
 

@@ -4,11 +4,6 @@ from .models import CivilPower,ChatMessage
 from tickets.mp_list import REGION_CHOICES,ZONE_CHOICES,MP_CHOICES
 
 
-
-
-
-
-
 class ChatForm(forms.ModelForm):
     class Meta:
         model = ChatMessage

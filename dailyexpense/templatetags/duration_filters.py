@@ -58,6 +58,13 @@ def subtract_with_multiplier(value, arg):
     return (value*2.4) - (arg * 2.4)
 
 @register.filter
+def subtract(value, arg):
+    try:
+        return float(value) - float(arg)
+    except (ValueError, TypeError):
+        return 0
+
+@register.filter
 def add(value, arg):
     try:
         return value + arg
@@ -68,3 +75,14 @@ def add(value, arg):
 @register.filter
 def get_item(dictionary, key):
     return dictionary.get(key)
+
+
+
+
+@register.filter
+def get_region(regions, region_name):
+    return regions.get(region_name, {}).get('TT', 0)  # Default to 0 if not found
+
+@register.filter
+def get_region_pgrh(regions, region_name):
+    return regions.get(region_name, {}).get('PGRH', 0)  # Default to 0 if not found

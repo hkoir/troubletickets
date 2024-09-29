@@ -1,0 +1,247 @@
+{% extends 'base.html' %}
+
+{% load duration_filters %}
+
+{% block content %}
+
+
+<style>
+    
+
+  
+
+    table {
+            border-collapse: collapse;
+            width: 100%;
+      
+        }
+
+        th, td {
+            border: 1px solid rgb(227, 87, 7); /* Set border color for individual cells */
+            text-align: left;
+            padding: 0px;
+        }
+
+      th{
+        background-color: rgb(11, 243, 189);
+      }
+
+    table thead th {
+    white-space: normal;
+        }
+
+.main-content {   
+    overflow-y: auto;
+    margin-left:0px;
+    position: absolute;
+    width: 100%;
+    left: 0;
+  
+}
+
+</style>
+
+<div class="container-fluid main-content">
+    <div class="row">
+        <div class="col">                        
+            <form method="GET" action="{% url 'tickets:datewise_summary_edotco' %}" style="margin-bottom:30px">        
+                <div class="container-fluid" style="margin-bottom:20px">
+                    <div class="row row-cols-2 row-cols-md-6">                    
+                        <div class="col" style="padding:5px;">  Start Date:  {{ form.start_date }} </div>
+                        <div class="col" style="padding:5px;">  End Date:  {{ form.end_date }} </div>
+                        <div class="col" style="padding:5px;" > days {{ form.days }} </div>
+                        <div class="col" style="padding:5px;">  Region:{{ form.region }} </div>  
+                        <div class="col" style="padding:5px;">  select Zone:{{ form.zone }} </div>  
+                        <div class="col" style="padding:5px;"> <button type="submit" class='btn btn-primary'>Generate Data</button></div>                    
+                    </div>
+                </div>
+            <form>
+        </div>
+        <div class="col">        
+        <h4>Datewise TT Report</h4>
+            <table>
+                <thead>
+                    <tr>
+                        <th class="text-center p-2">Date</th>
+                        <th class="text-center p-2" style="background-color: blanchedalmond;" colspan="2">Rajshahi</th>                
+                        <th class="text-center p-2" style="background-color: blanchedalmond;" colspan="2">Rangpur</th>              
+                        <th class="text-center p-2" style="background-color: blanchedalmond;" colspan="2">Dinajpur</th>                
+                        <th class="text-center p-2" style="background-color: blanchedalmond;" colspan="2">Bagura</th>                
+                        <th class="text-center p-2" colspan="2">Sylhet</th>                
+                        <th class="text-center p-2" colspan="2">Moulovibazar</th>                
+                        <th class="text-center p-2" colspan="2">Mymensingh</th>                
+                        <th class="text-center p-2" colspan="2">Kisorganj</th>                
+                        <th class="text-center p-2" colspan="2">Tangail</th>
+                    </tr>
+                    <tr>
+                        <th class="text-center"></th>
+                        <th class="text-center" style="background-color: aquamarine;">TT</th>
+                        <th class="text-center" style="background-color: aquamarine;">PGRH</th>
+                        <th class="text-center" style="background-color: aquamarine;">TT</th>
+                        <th class="text-center" style="background-color: aquamarine;">PGRH</th>
+                        <th class="text-center" style="background-color: aquamarine;">TT</th>
+                        <th class="text-center" style="background-color: aquamarine;">PGRH</th>
+                        <th class="text-center" style="background-color: aquamarine;">TT</th>
+                        <th class="text-center" style="background-color: aquamarine;">PGRH</th>
+                        
+                        <th class="text-center" >TT</th>
+                        <th class="text-center" >PGRH</th>
+                        <th class="text-center">TT</th>
+                        <th class="text-center">PGRH</th>
+                        <th class="text-center">TT</th>
+                        <th class="text-center">PGRH</th>
+                        <th class="text-center">TT</th>
+                        <th class="text-center">PGRH</th>
+                        <th class="text-center">TT</th>
+                        <th class="text-center">PGRH</th>
+                    </tr>
+                </thead>
+                <tbody>
+            
+                    {% for date, regions in report_summary.items %}
+                        <tr>
+                            <td class="text-center" style="white-space: nowrap;">{{ date }}</td>
+                        {% if 'Rajshahi' in regions %}
+                            <td class="text-center">{{ regions.Rajshahi.TT }}</td>
+                            <td class="text-center">{{ regions.Rajshahi.PGRH|floatformat:2 }}</td>
+                                {% else %}
+                            <td class="text-center">0</td>
+                            <td class="text-center">0.00</td>
+                            {% endif %}
+
+                        {% if 'Rangpur' in regions %}
+                            <td class="text-center">{{ regions.Rangpur.TT }}</td>
+                            <td class="text-center">{{ regions.Rangpur.PGRH|floatformat:2 }}</td>
+                        {% else %}
+                            <td class="text-center">0</td>
+                            <td class="text-center">0.00</td>
+                        {% endif %}
+                        {% if 'Dinajpur' in regions %}
+                            <td class="text-center">{{ regions.Dinajpur.TT }}</td>
+                            <td class="text-center">{{ regions.Dinajpur.PGRH|floatformat:2 }}</td>
+                        {% else %}
+                            <td class="text-center">0</td>
+                            <td class="text-center">0.00</td>
+                        {% endif %}
+
+                        {% if 'Bagura' in regions %}
+                            <td class="text-center">{{ regions.Bagura.TT }}</td>
+                            <td class="text-center">{{ regions.Bagura.PGRH|floatformat:2 }}</td>
+                        {% else %}
+                            <td class="text-center">0</td>
+                            <td class="text-center">0.00</td>
+                        {% endif %}
+
+                        {% if 'Sylhet' in regions %}
+                            <td class="text-center">{{ regions.Sylhet.TT }}</td>
+                            <td class="text-center">{{ regions.Sylhet.PGRH|floatformat:2 }}</td>
+                        {% else %}
+                            <td class="text-center">0</td>
+                            <td class="text-center">0.00</td>
+                        {% endif %}
+
+                        {% if 'Moulovibazar' in regions %}
+                            <td class="text-center">{{ regions.Moulovibazar.TT }}</td>
+                            <td class="text-center">{{ regions.Moulovibazar.PGRH|floatformat:2 }}</td>
+                        {% else %}
+                            <td class="text-center">0</td>
+                            <td class="text-center">0.00</td>
+                        {% endif %}
+
+                        {% if 'Mymensingh' in regions %}
+                            <td class="text-center">{{ regions.Mymenssingh.TT }}</td>
+                            <td class="text-center">{{ regions.Mymensingh.PGRH|floatformat:2 }}</td>
+                        {% else %}
+                            <td class="text-center">0</td>
+                            <td class="text-center">0.00</td>
+                        {% endif %}
+
+                        {% if 'Kisorganj' in regions %}
+                            <td class="text-center">{{ regions.Kisorganj.TT }}</td>
+                            <td class="text-center">{{ regions.Kisorganj.PGRH|floatformat:2 }}</td>
+                        {% else %}
+                            <td class="text-center">0</td>
+                            <td class="text-center">0.00</td>
+                        {% endif %}
+                            
+                        {% if 'Taangail' in regions %}
+                            <td class="text-center">{{ regions.Tangail.TT }}</td>
+                            <td class="text-center">{{ regions.Tangail.PGRH|floatformat:2 }}</td>
+                        {% else %}
+                            <td class="text-center">0</td>
+                            <td class="text-center">0.00</td>
+                        {% endif %}
+                        </tr>
+                    {% endfor %}
+
+
+                    <tr>
+                        <td class="text-center"><strong>Zone total</strong></td>
+                        <td class="text-center" style="background-color: antiquewhite;"><strong>{{ rajshahi_tt }}</strong></td>
+                        <td class="text-center" style="background-color: antiquewhite;"><strong>{{ rajshahi_pgrh|floatformat:2 }}</strong></td>
+                        <td class="text-center" style="background-color: antiquewhite;"><strong>{{ rangpur_tt }}</strong></td>
+                        <td class="text-center" style="background-color: antiquewhite;"><strong>{{ rangpur_pgrh|floatformat:2 }}</strong></td>
+
+                        <td class="text-center" style="background-color: antiquewhite;"><strong>{{ dinajpur_tt }}</strong></td>
+                        <td class="text-center" style="background-color: antiquewhite;"><strong>{{ dinajpur_pgrh|floatformat:2 }}</strong></td>
+                        <td class="text-center" style="background-color: antiquewhite;"><strong>{{ bagura_tt }}</strong></td>
+                        <td class="text-center" style="background-color: antiquewhite;"><strong>{{ bagura_pgrh|floatformat:2 }}</strong></td>
+
+                        
+                        <td class="text-center"><strong>{{ sylhet_tt }}</strong></td>
+                        <td class="text-center"><strong>{{ sylhet_pgrh|floatformat:2 }}</strong></td>
+                        <td class="text-center"><strong>{{ moulovibazar_tt }}</strong></td>
+                        <td class="text-center"><strong>{{ moulovibazar_pgrh|floatformat:2 }}</strong></td>
+
+                        
+                        <td class="text-center"><strong>{{ mymensingh_tt }}</strong></td>
+                        <td class="text-center"><strong>{{ mymensingh_pgrh|floatformat:2 }}</strong></td>
+                        <td class="text-center"><strong>{{ kisorganj_tt }}</strong></td>
+                        <td class="text-center"><strong>{{ kisorganj_pgrh|floatformat:2 }}</strong></td>
+
+                        <td class="text-center"><strong>{{ tangail_tt }}</strong></td>
+                        <td class="text-center"><strong>{{ tangail_pgrh|floatformat:2 }}</strong></td>
+                    </tr>
+
+                <!-- for region total summary -->
+                    <tr>
+                        <th style="background-color: rgb(16, 247, 8);"></th>
+                        <th class="text-center" colspan="4" style="background-color: rgb(247, 243, 8);">Rangpur region TT</th>
+                        <th class="text-center" colspan="4" style="background-color: rgb(247, 243, 8);">Rangpur region PGRH</th>
+                        <th class="text-center" colspan="5" style="background-color: rgb(16, 247, 8);">Sylhet region TT</th>
+                        <th class="text-center" colspan="5" style="background-color: rgb(16, 247, 8);">Sylhet region PGRH</th>
+
+                    </tr>
+                    <tr>
+                        <td class="text-center" ><strong>Region Total</strong></td>
+                        <td class="text-center" colspan="4"><strong>{{ rangpur_region_tt }}</strong></td>
+                        <td class="text-center" colspan="4"><strong>{{ rangpur_region_pgrh|floatformat:2 }}</strong></td>
+                        <td class="text-center" colspan="5"><strong>{{ sylhet_region_tt }}</strong></td>
+                        <td class="text-center" colspan="5"><strong>{{ sylhet_region_pgrh|floatformat:2 }}</strong></td>
+                    </tr>
+
+
+                    <!-- for grand summary -->
+                    <tr>
+                        <th class="text-center" colspan="2" style="background-color: bisque;">Grand Total TT</th>
+                        <th class="text-center" colspan="2" style="background-color: bisque;">Grand total PGRH</th>
+                    </tr>
+
+                    <tr>
+                        <td class="text-center" colspan="2">{{ grand_total_tt }}</td>
+                        <td class="text-center" colspan="2">{{ grand_total_pgrh }}</td>
+                    </tr>
+
+
+                    
+            
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+    <div style="height:600px"></div>
+
+{% endblock %}

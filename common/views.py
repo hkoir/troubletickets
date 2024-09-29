@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from .forms import FuelPumpDatabaseForm
 from tickets .views import generate_unique_finance_requisition_number
 from django.shortcuts import render, redirect,get_object_or_404
-from django.db.models import Sum, Avg,Count,Q,Case, When, IntegerField,F,Max,DurationField, DecimalField
+from django.db.models import Sum, Avg,Count,Q,Case, When, IntegerField,F,Max,DurationField, DecimalField,ExpressionWrapper
 import random,json,uuid,base64,csv
 
 import pandas as pd
@@ -24,7 +24,12 @@ from generator.models import PGFuelRefill
 from .forms import FuelWithdrawForm,FuelPumpPaymentForm,FuelPumpSearchForm
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
-
+from vehicle.models import AdhocVehicleAttendance
+from adhocman.models import AdhocAttendance
+from dailyexpense.models import DailyExpenseRequisition,MoneyRequisition
+from billable.models import CivilPower
+from.forms import AllExpenseForm
+from tickets.models import eTicket
 
 
 @manager_level_required('first_level')
@@ -40,7 +45,6 @@ def add_notice(request):
     return render(request, 'common/add_notice.html', {'form': form})
 
 
-
 @login_required
 def view_notices(request):
     notices = Notice.objects.all().order_by('-created_at')
@@ -48,8 +52,7 @@ def view_notices(request):
     return render(request, 'common/view_notices.html', {'notices': notices, 'form': form})
 
 
-
-##################### Fuel pump database###############################################
+##################### Fuel pump database ###############################################
 @login_required
 def create_fuel_pump_database(request):
     if request.method == 'POST':
@@ -66,7 +69,6 @@ def create_fuel_pump_database(request):
     return render(request, 'common/create_fuel_pump.html', {'form': form})
 
 
-
 def view_fuel_pump(request):
     pump_data = FuelPumpDatabase.objects.all().order_by('-created_at')    
     form = viewFuelPumpForm(request.GET or None)
@@ -75,7 +77,6 @@ def view_fuel_pump(request):
         zone=form.cleaned_data.get('zone')
         mp = form.cleaned_data.get('mp')
         fuel_pump_name = form.cleaned_data.get('fuel_pump_name')  
-
         if region:
             pump_data = pump_data.filter(region=region)
         if zone:
@@ -86,12 +87,9 @@ def view_fuel_pump(request):
             pump_data = pump_data.filter(fuel_pump_name = fuel_pump_name)
     else:
         form=viewFuelPumpForm()
-
-     # Pagination logic
     page_obj = None 
     paginator = Paginator(pump_data, 6)
     page_number = request.GET.get('page', 1)
-
     try:
         page_obj = paginator.page(page_number)
     except PageNotAnInteger:
@@ -115,7 +113,7 @@ def update_fuel_pump_database(request, pump_id):
         if form.is_valid():
             form.save()
             messages.success(request, "Entries updated successfully")
-            return redirect('common:view_fuel_pump')  # Replace 'success_page' with the name of your success page
+            return redirect('common:view_fuel_pump')
     else:
         form = FuelPumpDatabaseForm(instance=pump_instance)
     return render(request, 'common/create_fuel_pump.html', {'form': form, 'pump_instance': pump_instance})
@@ -135,8 +133,6 @@ def create_pgr(request):
     else:
         form = PGRForm()
     return render(request, 'common/create_pgr.html', {'form': form})
-
-
 
 
 def create_pgtl(request):
@@ -161,8 +157,7 @@ def view_pgr_database(request):
     days=None
     pgr_name = None  
     form = PGRViewForm(request.GET or None)
-    pgr_list = PGRdatabase.objects.all().order_by('-created_at')
-    
+    pgr_list = PGRdatabase.objects.all().order_by('-created_at')    
     if form.is_valid():
         start_date = form.cleaned_data.get('start_date')
         end_date = form.cleaned_data.get('end_date')
@@ -170,8 +165,7 @@ def view_pgr_database(request):
         region = form.cleaned_data.get('region')
         zone = form.cleaned_data.get('zone')
         mp = form.cleaned_data.get('mp')
-        pgr_name = form.cleaned_data.get('pgr')
-        
+        pgr_name = form.cleaned_data.get('pgr')        
         if start_date and end_date:
             pgr_list = pgr_list.filter(created_at__range=(start_date, end_date))
             if region:
@@ -190,12 +184,9 @@ def view_pgr_database(request):
 
         if pgr_name:
             pgr_list = pgr_list.filter(name=pgr_name)
-
     else:
         form = PGRViewForm()
 
-    
-    # Pagination logic
     page_obj = None 
     paginator = Paginator(pgr_list, 6)
     page_number = request.GET.get('page', 1)
@@ -206,7 +197,6 @@ def view_pgr_database(request):
         page_obj = paginator.page(1)
     except EmptyPage:
         page_obj = paginator.page(paginator.num_pages)
-
     form = PGRViewForm()
     return render(request,'common/view_pgr_database.html',
         {
@@ -217,7 +207,6 @@ def view_pgr_database(request):
         'end_date':end_date,
         'page_obj':page_obj
         })
-
 
 
 def update_pgr_database(request, pgr_id):
@@ -246,14 +235,11 @@ def update_pgtl_database(request, pgtl_id):
     return render(request, 'common/update_pgtl_database.html', {'form': form, 'pgtl_instance': pgtl_instance})
 
 
-
-
 def pgr_summary_view2(request):   
     summary_data = PGRdatabase.objects.values('region', 'zone', 'mp').annotate(
         total_pgr=Count('id', filter=Q(PGR_type='PGR')),
         total_pgtl=Count('id', filter=Q(PGR_type='PGTL'))
     ).order_by('region', 'zone', 'mp')
-
     overall_summary = PGRdatabase.objects.aggregate(
         total_pgr=Count('id', filter=Q(PGR_type='PGR')),
         total_pgtl=Count('id', filter=Q(PGR_type='PGTL'))
@@ -265,35 +251,24 @@ def pgr_summary_view2(request):
             })
 
 
-
-
 def pgr_summary_view(request):
     PGR_summary_data = PGRdatabase.objects.values('region', 'zone', 'mp').annotate(
         total_pgr=Count('id'),
         total_adhoc_pgr = Count('id',filter=Q(PGR_category ='adhoc')),
         total_permanent_pgr = Count('id',filter=Q(PGR_category ='permanent'))
-
     ).order_by('region', 'zone', 'mp')
-
     PGTL_summary_data = PGTLdatabase.objects.values('region', 'zone', 'mp').annotate(
         total_pgtl=Count('id')
-    ).order_by('region', 'zone', 'mp')
-
- 
+    ).order_by('region', 'zone', 'mp') 
     combined_summary_data = defaultdict(lambda: {'total_pgr': 0, 'total_pgtl': 0,'total_adhoc_pgr':0,'total_permanent_pgr':0})
-
     for item in PGR_summary_data:
         key = (item['region'], item['zone'], item['mp'])
         combined_summary_data[key]['total_pgr'] = item['total_pgr']
         combined_summary_data[key]['total_adhoc_pgr'] = item['total_adhoc_pgr']
         combined_summary_data[key]['total_permanent_pgr'] = item['total_permanent_pgr']
-
     for item in PGTL_summary_data:
         key = (item['region'], item['zone'], item['mp'])
         combined_summary_data[key]['total_pgtl'] = item['total_pgtl']
-
-
-
     pgr_overall_summary = PGRdatabase.objects.aggregate(
         total_pgr=Count('id')
     )
@@ -311,6 +286,68 @@ def pgr_summary_view(request):
 
 
 
+
+
+from.forms import OperationalUserForm
+from.models import OperationalUser
+def create_operational_user(request):
+    if request.method == 'POST':
+        form = OperationalUserForm(request.POST,request.FILES)
+        if form.is_valid():           
+            form.save()
+            messages.success(request, "Entries created successfully")
+            return redirect('common:view_operational_user')  
+    else:
+        form = OperationalUserForm()
+    return render(request, 'common/create_operational_user.html', {'form': form})
+
+
+def view_operational_user(request):
+    user_list = OperationalUser.objects.all().order_by('-created_at')
+    form = PGRViewForm(request.GET or None)
+   
+    if form.is_valid():
+        start_date = form.cleaned_data.get('start_date')
+        end_date = form.cleaned_data.get('end_date')
+        days = form.cleaned_data.get('days')
+        region = form.cleaned_data.get('region')
+        zone = form.cleaned_data.get('zone')
+        mp = form.cleaned_data.get('mp')
+        user_name = form.cleaned_data.get('pgr')   
+
+        if start_date and end_date:
+            user_list = user_list.filter(created_at__range=(start_date, end_date))
+           
+        elif days:
+            end_date = datetime.today()
+            start_date = end_date - timedelta(days=days)
+            user_list = user_list.filter(created_at__range=(start_date, end_date))
+          
+        if region:
+            user_list = user_list.filter(region=region)
+        if zone:
+            user_list = user_list.filter(zone=zone)
+        if mp:
+            user_list = user_list.filter(mp=mp)
+   
+    form = PGRViewForm()
+    return render(request, 'common/view_operational_user.html',{'user_list':user_list,'form':form})
+
+
+
+def update_operational_user(request,user_id):
+    user_instance =get_object_or_404(OperationalUser, id=user_id)
+    form=OperationalUserForm(request.POST, request.FILES,instance = user_instance)   
+    if form.is_valid():
+        form.save()
+        return redirect('common:view_operational_user')  # Replace 'success_page' with the name of your success page
+    else:
+        form = OperationalUserForm(instance=user_instance)        
+    form = OperationalUserForm(instance=user_instance) 
+    return render(request, 'common/create_operational_user.html',{'form':form,'user_instance':user_instance})
+
+
+
 def upload_pgr_excel(request):
     if request.method == 'POST':
         form = ExcelUploadForm(request.POST, request.FILES)
@@ -318,9 +355,7 @@ def upload_pgr_excel(request):
             excel_file = request.FILES['excel_file']
             try:
                 df = pd.read_excel(excel_file)
-
                 for _, row in df.iterrows():
-
                     PGRdatabase.objects.create(
                         region=row['region'],
                         zone=row['zone'],
@@ -338,7 +373,6 @@ def upload_pgr_excel(request):
                         PGR_photo=row.get('PGR_photo', None),
                         PGR_birth_certificate=row.get('PGR_birth_certificate', None)
                     )
-
                 messages.success(request, "Data uploaded successfully")
                 return redirect('tickets:view_pgr_database')
             except Exception as e:
@@ -354,13 +388,11 @@ def fuel_by_pump2(request):
     pg_fuel_data = []
     vehicle_fuel_data = []
     combined_fuel_data = []
-
     if request.method == 'POST':
         form = FuelWithdrawForm(request.POST)
         if form.is_valid():
             start_date = form.cleaned_data['start_date']
             end_date = form.cleaned_data['end_date']
-
             payments_data = fuelPumpPayment.objects.filter(payment_date__range=[start_date, end_date]) \
                                 .values('pump__fuel_pump_name') \
                                 .annotate(total_payment=Sum('payment_amount')) \
@@ -375,7 +407,6 @@ def fuel_by_pump2(request):
                                 .values('pump__fuel_pump_name', 'pump__advance_amount_given') \
                                 .annotate(total_fuel=Sum('refill_amount'), total_fuel_cost=Sum('fuel_cost')) \
                                 .order_by('pump__fuel_pump_name')
-
     else:
         pg_fuel_data = PGFuelRefill.objects.values('fuel_pump__fuel_pump_name', 'fuel_pump__advance_amount_given') \
                         .annotate(total_fuel=Sum('refill_amount'), total_fuel_cost=Sum('fuel_cost')) \
@@ -385,7 +416,6 @@ def fuel_by_pump2(request):
                             .annotate(total_fuel=Sum('refill_amount'), total_fuel_cost=Sum('fuel_cost')) \
                             .order_by('pump__fuel_pump_name')
 
-    # Combine data
     combined_data = defaultdict(lambda: {'total_fuel': 0.0, 'total_fuel_cost': 0.0, 'advance_amount_given': 0.0, 'remaining_cost': 0.0})
     for data in pg_fuel_data:
         fuel_pump_name = data['fuel_pump__fuel_pump_name'] or 'Local purchase'
@@ -394,7 +424,6 @@ def fuel_by_pump2(request):
         advance_amount_given = float(data.get('fuel_pump__advance_amount_given', 0))
         combined_data[fuel_pump_name]['advance_amount_given'] = advance_amount_given
         combined_data[fuel_pump_name]['remaining_cost'] = combined_data[fuel_pump_name]['total_fuel_cost'] - advance_amount_given
-
     for data in vehicle_fuel_data:
         fuel_pump_name = data['pump__fuel_pump_name'] or 'Local purchase'
         combined_data[fuel_pump_name]['total_fuel'] += float(data['total_fuel'])
@@ -420,42 +449,34 @@ def fuel_by_pump(request):
     pg_fuel_data = []
     vehicle_fuel_data = []
     combined_fuel_data = []
-
     if request.method == 'POST':
         form = FuelWithdrawForm(request.POST)
         if form.is_valid():
             start_date = form.cleaned_data['start_date']
             end_date = form.cleaned_data['end_date']
-
             pg_fuel_data = PGFuelRefill.objects.filter(refill_date__range=[start_date, end_date]) \
                             .values('fuel_pump__id', 'fuel_pump__fuel_pump_name', 'fuel_pump__advance_amount_given') \
                             .annotate(total_fuel=Sum('refill_amount'), total_fuel_cost=Sum('fuel_cost')) \
                             .order_by('fuel_pump__fuel_pump_name')
-
             vehicle_fuel_data = FuelRefill.objects.filter(refill_date__range=[start_date, end_date]) \
                                 .values('pump__id', 'pump__fuel_pump_name', 'pump__advance_amount_given') \
                                 .annotate(total_fuel=Sum('refill_amount'), total_fuel_cost=Sum('fuel_cost')) \
                                 .order_by('pump__fuel_pump_name')
-
             payments_data = fuelPumpPayment.objects.filter(payment_date__range=[start_date, end_date]) \
                                 .values('pump__id', 'pump__fuel_pump_name') \
                                 .annotate(total_payment=Sum('payment_amount')) \
                                 .order_by('pump__fuel_pump_name')
-
     else:
         pg_fuel_data = PGFuelRefill.objects.values('fuel_pump__id', 'fuel_pump__fuel_pump_name', 'fuel_pump__advance_amount_given') \
                         .annotate(total_fuel=Sum('refill_amount'), total_fuel_cost=Sum('fuel_cost')) \
                         .order_by('fuel_pump__fuel_pump_name')
-
         vehicle_fuel_data = FuelRefill.objects.values('pump__id', 'pump__fuel_pump_name', 'pump__advance_amount_given') \
                             .annotate(total_fuel=Sum('refill_amount'), total_fuel_cost=Sum('fuel_cost')) \
                             .order_by('pump__fuel_pump_name')
-
         payments_data = fuelPumpPayment.objects.values('pump__id', 'pump__fuel_pump_name') \
                             .annotate(total_payment=Sum('payment_amount')) \
                             .order_by('pump__fuel_pump_name')
 
-    # Combine data
     combined_data = defaultdict(lambda: {
         'total_fuel': 0.0,
         'total_fuel_cost': 0.0,
@@ -467,26 +488,24 @@ def fuel_by_pump(request):
 
     for data in pg_fuel_data:
         fuel_pump_name = data['fuel_pump__fuel_pump_name'] or 'Local purchase'
-        combined_data[fuel_pump_name]['total_fuel'] += float(data['total_fuel'])
-        combined_data[fuel_pump_name]['total_fuel_cost'] += float(data['total_fuel_cost'])
-        advance_amount_given = float(data.get('fuel_pump__advance_amount_given', 0))
+        combined_data[fuel_pump_name]['total_fuel'] += float(data['total_fuel'] or 0)
+        combined_data[fuel_pump_name]['total_fuel_cost'] += float(data['total_fuel_cost'] or 0)
+        advance_amount_given = float(data.get('fuel_pump__advance_amount_given') or 0)
         combined_data[fuel_pump_name]['advance_amount_given'] = advance_amount_given
         combined_data[fuel_pump_name]['remaining_cost'] = advance_amount_given - combined_data[fuel_pump_name]['total_fuel_cost']
         combined_data[fuel_pump_name]['pump_id'] = data['fuel_pump__id']
-
     for data in vehicle_fuel_data:
         fuel_pump_name = data['pump__fuel_pump_name'] or 'Local purchase'
-        combined_data[fuel_pump_name]['total_fuel'] += float(data['total_fuel'])
-        combined_data[fuel_pump_name]['total_fuel_cost'] += float(data['total_fuel_cost'])
-        advance_amount_given = float(data.get('pump__advance_amount_given', 0))
+        combined_data[fuel_pump_name]['total_fuel'] += float(data['total_fuel'] or 0)
+        combined_data[fuel_pump_name]['total_fuel_cost'] += float(data['total_fuel_cost'] or 0)
+        advance_amount_given = float(data.get('pump__advance_amount_given') or 0)
         combined_data[fuel_pump_name]['advance_amount_given'] = advance_amount_given
         combined_data[fuel_pump_name]['remaining_cost'] = advance_amount_given - combined_data[fuel_pump_name]['total_fuel_cost']
         combined_data[fuel_pump_name]['pump_id'] = data['pump__id']
-
     for data in payments_data:
         fuel_pump_name = data['pump__fuel_pump_name'] or 'Local purchase'
-        combined_data[fuel_pump_name]['total_payment'] += float(data['total_payment'])
-        combined_data[fuel_pump_name]['remaining_cost'] += float(data['total_payment'])
+        combined_data[fuel_pump_name]['total_payment'] += float(data['total_payment'] or 0)
+        combined_data[fuel_pump_name]['remaining_cost'] += float(data['total_payment'] or 0)
 
     combined_fuel_data = [
         {
@@ -501,7 +520,6 @@ def fuel_by_pump(request):
         for pump_name, data in combined_data.items()
     ]
     combined_fuel_data.sort(key=lambda x: x['fuel_pump_name'])
-
     return render(request, 'common/fuel_withdraw_by_pump.html', {
         'form': form,
         'combined_fuel_data': combined_fuel_data,
@@ -515,20 +533,16 @@ def fuel_by_pump(request):
 def datewise_fuel_withdraw(request):
     pg_fuel_data = []
     vehicle_fuel_data = []
-
     if request.method == 'POST':
         form = FuelPumpSearchForm(request.POST)
         if form.is_valid():
             fuel_pump_name = form.cleaned_data['fuel_pump_name']
             start_date = form.cleaned_data['start_date']
             end_date = form.cleaned_data['end_date']
-
-            # Query both models for the given pump name and date range
             pg_fuel_data = PGFuelRefill.objects.filter(
                 fuel_pump__fuel_pump_name=fuel_pump_name,
                 refill_date__range=[start_date, end_date]
             ).order_by('refill_date')
-
             vehicle_fuel_data = FuelRefill.objects.filter(
                 pump__fuel_pump_name=fuel_pump_name,
                 refill_date__range=[start_date, end_date]
@@ -555,7 +569,6 @@ def fuel_pump_payment(request):
             return redirect('common:fuel_by_pump')
         else:
             form = FuelPumpPaymentForm()
-
     form=FuelPumpPaymentForm()
     return render(request, 'common/fuel_pump_payment.html',{'form':form})
 
@@ -566,12 +579,10 @@ def view_pump_payment_history(request, pump_id):
     end_date =None
     pump = get_object_or_404(FuelPumpDatabase, id=pump_id)
     pump_payment_data = fuelPumpPayment.objects.filter(pump=pump)
-
     form=PGRViewForm(request.GET)
     if form.is_valid():
         start_date = form.cleaned_data.get('start_date')
         end_date = form.cleaned_data.get('end_date')
-
         if start_date and end_date:
              pump_payment_data = pump_payment_data.filter(payment_date__range=[start_date, end_date]) \
 
@@ -583,13 +594,6 @@ def view_pump_payment_history(request, pump_id):
     })
 
 
-from vehicle.models import AdhocVehicleAttendance
-from adhocman.models import AdhocAttendance
-from dailyexpense.models import DailyExpenseRequisition,MoneyRequisition
-from billable.models import CivilPower
-from.forms import AllExpenseForm
-from tickets.models import eTicket
-
 def all_expenditure(request):
     adhoc_vehicle_expense = AdhocVehicleAttendance.objects.all()
     adhoc_man_expense = AdhocAttendance.objects.all()
@@ -597,23 +601,19 @@ def all_expenditure(request):
     civil_power_expense = CivilPower.objects.all()
     tickets = eTicket.objects.all()
     money_requisitions = MoneyRequisition.objects.all()
-
     start_date = None
     end_date = None
     days = None
     region = None
     zone = None
     mp = None
-
     form = AllExpenseForm(request.GET or None)
-
     if form.is_valid():
         start_date = form.cleaned_data.get('start_date')
         end_date = form.cleaned_data.get('end_date')
         days = form.cleaned_data.get('days')
         region = form.cleaned_data.get('region')
         zone = form.cleaned_data.get('zone')
-
         if start_date and end_date:
             date_range = (start_date, end_date)
             adhoc_vehicle_expense = adhoc_vehicle_expense.filter(created_at__range=date_range)
@@ -632,7 +632,6 @@ def all_expenditure(request):
             civil_power_expense = civil_power_expense.filter(created_at__range=date_range)
             tickets = tickets.filter(created_at__range=date_range)
             money_requisitions = money_requisitions.filter(created_at__range=date_range)
-
         if region:
             adhoc_vehicle_expense = adhoc_vehicle_expense.filter(vehicle__region=region)
             adhoc_man_expense = adhoc_man_expense.filter(pgr__region=region)
@@ -648,7 +647,6 @@ def all_expenditure(request):
             tickets = tickets.filter(zone=zone)
             money_requisitions = money_requisitions.filter(zone=zone)
 
-    # Aggregate total expenses from each model, grouped by region and zone
     adhoc_vehicle_expense = adhoc_vehicle_expense.values('vehicle__region', 'vehicle__zone').annotate(
         total_adhoc_vehicle=Sum(F('adhoc_vehicle_total_bill_amount'))
     )
@@ -656,39 +654,61 @@ def all_expenditure(request):
         total_adhoc_man=Sum(F('adhoc_bill_amount'))
     )
     daily_expense = daily_expense.values('region', 'zone').annotate(
-        total_daily=Sum(F('requisition_amount'))
-    )
-    civil_power_expense = civil_power_expense.values('region', 'zone').annotate(
-        total_civil_power=Sum(F('actual_cost')),
-        total_civil_power_approved_amount=Sum(F('approved_amount'))
+        total_daily=Sum(F('requisition_amount')),
+        total_daily_CM_work=Sum(F('requisition_amount'),filter=Q(work_type = 'CM_work')),
+        total_daily_PM_work=Sum(F('requisition_amount'), filter=Q(work_type = 'PM_work')),
+        total_daily_disaster=Sum(F('requisition_amount'),filter=Q(work_type ='disaster')),
+        total_daily_Civil_power=Sum(F('requisition_amount'),filter=Q(work_type ='Civil_power')),
     )
 
+
+   
     tickets = tickets.values('region', 'zone').annotate(
-        total_TT=Count(F('internal_ticket_number')),
-        total_PGRH=Sum(F('internal_generator_running_hours'))
+        total_TT=Count(F('internal_ticket_number')),      
+        total_PGRH = ExpressionWrapper(
+            Sum(F('internal_generator_running_hours')) / timedelta(hours=1),
+            output_field=DecimalField(max_digits=10,decimal_places=2)
+        )
     )
-
     money_requisitions = money_requisitions.values('region', 'zone').annotate(
         total_approved_amount=Sum(F('approved_amount'), filter=Q(purpose='Operations')),
+        total_approved_amount_operation=Sum(F('approved_amount'), filter=Q(purpose='Operations')),
         total_approved_amount_adhoc_man=Sum(F('approved_amount'), filter=Q(purpose='Adhoc_man')),
-        total_approved_amount_adhoc_vehicle=Sum(F('approved_amount'), filter=Q(purpose='Adhoc_vehicle')),
+        total_approved_amount_adhoc_vehicle=Sum(F('approved_amount'), filter=Q(purpose='Adhoc_vehicle')),        
+        total_approved_amount_Civil_power=Sum(F('approved_amount'), filter=Q(purpose='Civil_power')),
+        total_approved_amount_disaster=Sum(F('approved_amount'), filter=Q(purpose='disaster')),
     )
 
-    # Merge the results based on region and zone
     summary_dict = {}
-
     def get_summary_dict_template():
         return {
             'total_adhoc_vehicle': 0,
             'total_adhoc_man': 0,
-            'total_daily': 0,
+
+
+            'total_daily_CM_work': 0,
+            'total_daily_PM_work': 0,
+            'total_daily_Civil_power': 0,
+            'total_daily_disaster': 0,
+            'sub_total_operational_cost':0,
+
+
             'total_civil_power': 0,
             'total_TT': 0,
             'total_PGRH': 0,
             'total_approved_amount': 0,
+
+            'total_approved_amount_operation': 0,
             'total_approved_amount_adhoc_man': 0,
             'total_approved_amount_adhoc_vehicle': 0,
-            'total_civil_power_approved_amount': 0,
+            'total_approved_amount_Civil_power': 0,
+            'total_approved_amount_disaster': 0,
+
+            'total_expense':0,
+            'total_approved':0
+          
+
+            
         }
 
     for item in adhoc_vehicle_expense:
@@ -703,35 +723,35 @@ def all_expenditure(request):
 
     for item in daily_expense:
         key = (item['region'], item['zone'])
-        summary_dict.setdefault(key, get_summary_dict_template())
-        summary_dict[key]['total_daily'] = item['total_daily'] or 0
-
-    for item in civil_power_expense:
-        key = (item['region'], item['zone'])
-        summary_dict.setdefault(key, get_summary_dict_template())
-        summary_dict[key]['total_civil_power'] = item['total_civil_power'] or 0
-        summary_dict[key]['total_civil_power_approved_amount'] = item['total_civil_power_approved_amount'] or 0
-
+        summary_dict.setdefault(key, get_summary_dict_template())  
+        summary_dict[key]['total_daily_CM_work'] = item['total_daily_CM_work'] or 0
+        summary_dict[key]['total_daily_PM_work'] = item['total_daily_PM_work'] or 0
+        summary_dict[key]['total_daily_Civil_power'] = item['total_daily_Civil_power'] or 0
+        summary_dict[key]['total_daily_disaster'] = item['total_daily_disaster'] or 0
+  
     for item in tickets:
         key = (item['region'], item['zone'])
         summary_dict.setdefault(key, get_summary_dict_template())
         summary_dict[key]['total_TT'] = item['total_TT'] or 0
         summary_dict[key]['total_PGRH'] = item['total_PGRH'] or 0
-
     for item in money_requisitions:
         key = (item['region'], item['zone'])
-        summary_dict.setdefault(key, get_summary_dict_template())
-        summary_dict[key]['total_approved_amount'] = item['total_approved_amount'] or 0
+        summary_dict.setdefault(key, get_summary_dict_template())      
+        summary_dict[key]['total_approved_amount_operation'] = item['total_approved_amount_operation'] or 0
         summary_dict[key]['total_approved_amount_adhoc_man'] = item['total_approved_amount_adhoc_man'] or 0
-        summary_dict[key]['total_approved_amount_adhoc_vehicle'] = item['total_approved_amount_adhoc_vehicle'] or 0
+        summary_dict[key]['total_approved_amount_adhoc_vehicle'] = item['total_approved_amount_adhoc_vehicle'] or 0        
+        summary_dict[key]['total_approved_amount_Civil_power'] = item['total_approved_amount_Civil_power'] or 0
+        summary_dict[key]['total_approved_amount_disaster'] = item['total_approved_amount_disaster'] or 0
 
-    # Calculate total expenses
+
     total_expense = 0
     total_approved = 0
     cash_in_hand = 0
     for key, value in summary_dict.items():
-        value['total_expense'] = value['total_adhoc_vehicle'] + value['total_adhoc_man'] + value['total_daily'] + value['total_civil_power']
-        value['total_approved'] = value['total_approved_amount'] + value['total_approved_amount_adhoc_man'] + value['total_approved_amount_adhoc_vehicle'] + value['total_civil_power_approved_amount']
+        value['sub_total_operational_cost'] = value['total_daily_CM_work'] + value['total_daily_PM_work'] + value['total_daily_disaster'] 
+
+        value['total_expense'] = value['total_adhoc_vehicle'] + value['total_adhoc_man'] + value['sub_total_operational_cost'] + value['total_daily_Civil_power']
+        value['total_approved'] = value['total_approved_amount_operation'] + value['total_approved_amount_adhoc_man'] + value['total_approved_amount_adhoc_vehicle'] + value['total_approved_amount_Civil_power']
         value['cash_in_hand'] = value['total_approved'] - value['total_expense']
         total_expense += value['total_expense']
         total_approved += value['total_approved']

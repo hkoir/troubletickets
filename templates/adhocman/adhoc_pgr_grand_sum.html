@@ -81,7 +81,9 @@
     
             <table>
 
-                <h4 class="text-center"><a href="{% url 'adhocman:pay_pgr_by_name' %}">Make payment</a>:
+                <h4 class="text-center">
+                    <a href="{% url 'adhocman:view_adhoc_attendance2' %}"> View details:</a>
+                    <a href="{% url 'adhocman:pay_pgr_by_name' %}">Make payment</a>:
                     <a href="{% url 'adhocman:create_adhoc_requisition' %}"> Apply for adhoc man</a>
                 </h4>
                 <thead>
@@ -106,6 +108,9 @@
                         <th  class="text-center p-2" style="white-space: nowrap;">Action</th>
                         <th  class="text-center p-2" >Total bill paid</th>
                         <th  class="text-center p-2">Net due bill</th>
+
+                        <th  class="text-center p-2">Fuel gap</th>
+                        
 
                       
                      
@@ -139,7 +144,12 @@
                         {% endif %}
 
                         <td class="text-center p-2" style="white-space: nowrap;">{{ summary.total_bill_paid }}</td>                      
-                        <td class="text-center p-2" style="white-space: nowrap;">{{ summary.adhoc_net_payment_due }}</td>                      
+                        <td class="text-center p-2" style="white-space: nowrap;">{{ summary.adhoc_net_payment_due }}</td>
+                        {% if summary.total_fuel_difference < 0 %}
+                        <td class="text-center p-2" style="white-space: nowrap; background-color: red;">{{ summary.total_fuel_difference}}</td> 
+                        {% else %} 
+                        <td class="text-center p-2" style="white-space: nowrap; background-color: rgb(180, 246, 160);">{{ summary.total_fuel_difference}}</td>  
+                        {% endif %}                                        
 
                        
                     </tr>

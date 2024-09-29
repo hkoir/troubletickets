@@ -44,9 +44,6 @@ white-space: normal;
 
 
 
-<h4>Region Summary Report</h4>
-
-
 <form method="get" action="{% url 'tickets:summary_report_view_region' %}">
 
     <div class="container-fluid" style="margin-bottom:30px">
@@ -69,7 +66,8 @@ white-space: normal;
 
 <div class="container-fluid"id='main-content'>
     <div class="row row-cols-1">
-        <h4 class="text-center" style="margin-top:20px">Report for
+        <h4 class="text-center" style="margin-top:20px">
+            Region Summary Report: Report for
             {% if days %}
                 the last {{ days }} days
             {% elif report_date %}

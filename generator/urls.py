@@ -29,6 +29,10 @@ urlpatterns = [
 
     path('vendorwise_pg_summary/', views.vendorwise_pg_summary, name='vendorwise_pg_summary'),
 
+    path('create_gen_service/', views.create_gen_service, name='create_gen_service'),
+    path('view_gen_service/', views.view_gen_service, name='view_gen_service'),
+  
+
             
 ]
 

@@ -8,7 +8,7 @@ class AddPgForm(forms.ModelForm):
     PG_hire_date  = forms.DateField(label='PG_hire_date ', required=False, widget=forms.DateInput(attrs={'type': 'date'}))
     class Meta:
         model = AddPGInfo
-        exclude = ['PG_add_requester','created_at','PG_code','updated_at'] 
+        exclude = ['PG_add_requester','created_at','updated_at','PG_code'] 
  
 
 class UpdatePgDataBaseForm(forms.ModelForm):
@@ -141,3 +141,25 @@ class PgDetailsForm(forms.Form):
         return cleaned_data
 
 
+
+
+
+from.models import GeneratorService
+
+class GeneratorServiceForm(forms.ModelForm):   
+    date_of_service = forms.DateField(label='Date of service', required=True, widget=forms.DateInput(attrs={'type': 'date'}))
+    class Meta:
+        model = GeneratorService
+        exclude=['created_at','service_requester']              
+       
+        widgets = {
+            'pgnumber': forms.Select(attrs={'class': 'form-control'}),
+        }
+
+
+    def clean_repair_date(self):
+        date_of_service = self.cleaned_data['date_of_service']
+        if not  date_of_service:
+            raise forms.ValidationError("date of service is required.")
+        return  date_of_service
+  

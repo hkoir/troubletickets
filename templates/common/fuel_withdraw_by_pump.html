@@ -35,7 +35,7 @@ table {
         }
         
         th {
-          background-color: rgb(177, 227, 187);
+          background-color: rgb(54, 240, 91);
            
         }
         
@@ -117,7 +117,14 @@ table {
                 <tbody>
                     {% for data in combined_fuel_data %}
                     <tr>
-                        <td class="text-center p-2" style="white-space: nowrap;"><a href="{% url 'common:view_pump_payment_history' data.pump_id %}">view payment details</a></td>
+                        <td class="text-center p-2" style="white-space: nowrap;">
+                            {% if data.pump_id %}
+                                <a href="{% url 'common:view_pump_payment_history' data.pump_id %}">view payment details</a>
+                            {% else %}
+                                No payment details
+                            {% endif %}
+                        </td>
+                        
                         <td class="text-center p-2" style="white-space: nowrap;"><a href="{% url 'common:datewise_fuel_withdraw' %}">view fuel withdraw details</a></td>
                         <td class="text-center p-2" style="white-space: nowrap;">{{ data.fuel_pump_name }}</td>
                         <td class="text-center p-2" style="white-space: nowrap;">{{ data.total_fuel }}</td>

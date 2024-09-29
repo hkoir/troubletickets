@@ -65,18 +65,15 @@
 
 
 <div style="left:0px; margin-left:0px">
-    <h4 style="margin-top:40px; margin-left:0px">Data for
-        {% if days %}
-            the last {{ days }} days
-        {% elif start_date and end_date %}
-            from: {{ start_date }} to {{ end_date }}
-        {% endif %}
-    </h4>
-    
+ 
 
-
-
-<h4 class="text-center p-2"> Vehicle OPS performance</h4>
+<h4 class="text-center p-2"> Vehicle OPS performance:Data for 
+    {% if days %}
+    the last {{ days }} days
+{% elif start_date and end_date %}
+    from: {{ start_date }} to {{ end_date }}
+{% endif %}
+</h4>
 
 <div class="container-fluid main-content">
 <table>

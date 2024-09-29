@@ -186,17 +186,19 @@
                          
 
                             <th class="text-center p-2">Assigned Vehicle Type</th>
+                            
+                            <th class="text-center p-2">Vehicle ops mode</th>
 
                             <th class="text-center p-2">Assigned Vehicle Reg.</th>
                             <th class="text-center p-2">Assigned PG number</th>
 
                               
-                            <th class="text-center p-2">Internal Generator running hour</th>
-                            <th class="text-center p-2">Internal calculated fuel (Litre)</th>
+                            <th class="text-center p-2" style="background-color: bisque;">PGR Running hours</th>
+                            <th class="text-center p-2">PGR calculated fuel (Litre)</th>
                                                
                            
-                            <th class="text-center p-2">Customer generator running hours</th>
-                            <th class="text-center p-2">Customer calculated fuel (Litre)</th>
+                            <th class="text-center p-2" style="background-color: bisque;">Valided running hour</th>
+                            <th class="text-center p-2">Validated calculated fuel (Litre)</th>
                        
 
                             <th class="text-center p-2">Fuel difference</th>                        
@@ -216,12 +218,20 @@
                         {% else %}
                         <tr style="background-color: rgb(9, 235, 92);">
                     
-                        {% endif %}
-                    
+                        {% endif %}                    
                             <td style="white-space: nowrap;"><a  href="{% url 'tickets:update_ticket_edotco' ticket.id %}" style="text-decoration:none;">Assign team</a></td>
                             <td style="white-space: nowrap;"><a  href="{% url 'tickets:parent_ticket_status_update' ticket.id %}" style="text-decoration:none;">Update TT</a></td>
                             <td style="white-space: nowrap; "><a  href="{% url 'tickets:delete_ticket_edotco' ticket.id %}" style="text-decoration:none;">Delete</a></td>
-                            <td style="white-space: nowrap; "><a  href="{% url 'tickets:chat' ticket.id %}"style="text-decoration:none;">Message</a></td>
+                            <td style="white-space: nowrap;">
+                                <a href="{% url 'tickets:chat' ticket.id %}" style="text-decoration:none;">
+                                    chat
+                                    {% if ticket.has_messages %}
+                                    <i class="fa fa-envelope"></i>
+                            
+                                    {% endif %}
+                                </a>
+                            </td>
+                            
                             <td style="white-space: nowrap; "><a  href="{% url 'tickets:create_child_ticket' ticket.id %}"  style="text-decoration:none;">PG start</a></td>
                             <td style="white-space: nowrap; "><a  href="{% url 'tickets:view_child_tickets' ticket.id %}" style="text-decoration: none;">PG stop </a></td>  
                             <td style="white-space: nowrap; "><a  href="{% url 'tickets:view_child_tickets_external' ticket.id %}" style="text-decoration:none;">Validation</a></td>                        
@@ -247,6 +257,7 @@
                             <td class="text-center" style="font-size: 14px; white-space: nowrap;color:black">{{ ticket.assigned_to.PGR_category }}</td> 
 
                             <td class="text-center" style="font-size: 14px; white-space: nowrap;color:black">{{ ticket.vehicle.vehicle_rental_type  }}</td>
+                            <td class="text-center" style="font-size: 14px; white-space: nowrap;color:black">{{ ticket.vehicle.vehicle_operational_mode  }}</td>
 
 
                             <td class="text-center" style="font-size: 14px; white-space: nowrap;color:black">{{ ticket.vehicle.vehicle_reg_number  }}</td>

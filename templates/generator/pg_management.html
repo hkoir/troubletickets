@@ -47,62 +47,77 @@
 
 
         
-        <div class="card" style="background-color: white;">
+        <div class="card m-1" style="background-color: white;border:2px solid green;border-radius: 10px;">
             <a class="text-center" style="text-decoration: none;" href="{% url 'generator:create_pg' %}">
-                <img class="rounded-pill" src="{% static 'images/generator.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
+                <i class="fa fa-cogs" aria-hidden="true"></i>
                 <br>Create PG database</a>
         </div>
-        <div class="card" style="background-color: white;">
+        <div class="card m-1" style="background-color: white;border:2px solid green;border-radius: 10px;">
             <a class="text-center" style="text-decoration: none;" href="{% url 'generator:view_pg_info' %}">
-                <img class="rounded-pill" src="{% static 'images/generator.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
+                <i class="fa fa-cogs" aria-hidden="true"></i>
                 <br>View PG database</a>
         </div>
 
-        <div class="card" style="background-color: white;">
+
+        <div class="card m-1" style="background-color: white;border:2px solid green;border-radius: 10px;">
+            <a class="text-center" style="text-decoration: none;" href="{% url 'generator:create_gen_service' %}">
+                <i class="fa fa-cogs" aria-hidden="true"></i>
+                <br>Create Generator service</a>
+        </div>
+
+        <div class="card m-1" style="background-color: white;border:2px solid green;border-radius: 10px;">
+            <a class="text-center" style="text-decoration: none;" href="{% url 'generator:view_gen_service' %}">
+                <i class="fa fa-cogs" aria-hidden="true"></i>
+                <br>View Generator service</a>
+        </div>
+
+
+
+        <div class="card m-1" style="background-color: white;border:2px solid green;border-radius: 10px;">
             <a class="text-center" style="text-decoration: none;" href="{% url 'generator:vendorwise_pg_summary' %}">
-                <img class="rounded-pill" src="{% static 'images/generator.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
+                <i class="fa fa-cogs" aria-hidden="true"></i>
                 <br>Vendorwise PG summary</a>
         </div>
 
 
-        <div class="card" style="background-color: white;">
+        <div class="card m-1 p-2" style="background-color: white;border:2px solid green;border-radius: 10px;">
             <a class="text-center" style="text-decoration: none;" href="{% url 'generator:add_pg_fuel' %}">
-                <img class="rounded-pill" src="{% static 'images/generator.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
+                <i class="fa fa-cogs" aria-hidden="true"></i>
                 <br>Add PG fuel</a>
         </div>
-        <div class="card" style="background-color: white;">
+        <div class="card m-1" style="background-color: white;border:2px solid green;border-radius: 10px;">
             <a class="text-center" style="text-decoration: none;" href="{% url 'generator:view_pg_fuel' %}">
-                <img class="rounded-pill" src="{% static 'images/generator.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
+                <i class="fa fa-cogs" aria-hidden="true"></i>
                 <br>View PG fuel</a>
         </div>
 
-        <div class="card" style="background-color: white;">
+        <div class="card m-1" style="background-color: white;border:2px solid green;border-radius: 10px;">
             <a class="text-center" style="text-decoration: none;" href="{% url 'generator:faulty_pg_report' %}">
-                <img class="rounded-pill" src="{% static 'images/generator.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
+                <i class="fa fa-cogs" aria-hidden="true"></i>
                 <br>PG Summary </a>
         </div>
 
 
-        <div class="card" style="background-color: white;">
+        <div class="card m-1" style="background-color: white;border:2px solid green;border-radius: 10px;">
             <a class="text-center" style="text-decoration: none;" href="{% url 'generator:create_pg_fault_record' %}">
-                <img class="rounded-pill" src="{% static 'images/generator.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
+                <i class="fa fa-cogs" aria-hidden="true"></i>
                 <br>Add PG fault</a>
         </div>
-        <div class="card" style="background-color: white;">
+        <div class="card m-1" style="background-color: white;border:2px solid green;border-radius: 10px;">
             <a class="text-center" style="text-decoration: none;" href="{% url 'generator:view_pg_fault' %}">
-                <img class="rounded-pill" src="{% static 'images/generator.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
+                <i class="fa fa-cogs" aria-hidden="true"></i>
                 <br>View PG fault</a>
         </div>
 
-        <div class="card" style="background-color: white;">
+        <div class="card m-1" style="background-color: white;border:2px solid green;border-radius: 10px;">
             <a class="text-center" style="text-decoration: none;" href="{% url 'generator:pg_summary_report_by_PG' %}">
-                <img class="rounded-pill" src="{% static 'images/generator.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
+                <i class="fa fa-cogs" aria-hidden="true"></i>
                 <br>View PG performance by PG</a>
         </div>
 
-        <div class="card" style="background-color: white;">
+        <div class="card m-1" style="background-color: white;border:2px solid green;border-radius: 10px;">
             <a class="text-center" style="text-decoration: none;" href="{% url 'generator:pg_summary_report_by_zone' %}">
-                <img class="rounded-pill" src="{% static 'images/generator.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
+                <i class="fa fa-cogs" aria-hidden="true"></i>
                 <br>View PG performance by zone</a>
         </div>
 

@@ -9,18 +9,11 @@ from account.models import Customer
 
 
 
-
-
-
 class ChatMessage(models.Model):
     ticket_id = models.CharField(max_length=100)
     sender = models.CharField(max_length=100)
     message = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
-
-
-
-
 
 class CivilPower(models.Model): 
     region = models.CharField(max_length=50,choices= REGION_CHOICES)

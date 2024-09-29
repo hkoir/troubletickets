@@ -1,26 +1,187 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<table>
-    <thead>
-        <tr>
-            <th>Date</th>
-            {% for zone in zones %}
-                <th>{{ zone }} (TT)</th>
-                <th>{{ zone }} (Internal Hours)</th>
-            {% endfor %}
-        </tr>
-    </thead>
-    <tbody>
-        {% for row in structured_data %}
-            <tr>
-                <td>{{ row.date }}</td>
-                {% for zone in zones %}
-                    <td>{{ row|getattr:zone|getattr:"total_tt" }}</td>
-                    <td>{{ row|getattr:zone|getattr:"total_internal_hours"|floatformat:2 }}</td>
-                {% endfor %}
-            </tr>
+
+
+<style>
+    
+
+  
+
+    table {
+            border-collapse: collapse;
+            width: 100%;
+      
+        }
+
+        th, td {
+            border: 1px solid rgb(227, 87, 7); /* Set border color for individual cells */
+            text-align: left;
+            padding: 0px;
+        }
+
+      th{
+        background-color: rgb(11, 243, 189);
+      }
+
+    table thead th {
+    white-space: normal;
+        }
+
+.main-content {   
+    overflow-y: auto;
+    margin-left:0px;
+    position: absolute;
+    width: 100%;
+    left: 0;
+  
+}
+
+</style>
+
+
+<form method="GET" action="{% url 'tickets:datewise_summary_edotco' %}" style="margin-bottom:30px">        
+    <div class="container-fluid" style="margin-bottom:20px">
+        <div class="row row-cols-2 row-cols-md-6">
+        
+            <div class="col" style="padding:5px;">  Start Date:  {{ form.start_date }} </div>
+            <div class="col" style="padding:5px;">  End Date:  {{ form.end_date }} </div>
+            <div class="col" style="padding:5px;" > days {{ form.days }} </div>
+            <div class="col" style="padding:5px;">  Region:{{ form.region }} </div>  
+            <div class="col" style="padding:5px;">  select Zone:{{ form.zone }} </div>    
+            <div class="col" style="padding:5px;">  select mp:{{ form.mp }} </div>   
+            <div class="col" style="padding:5px;"> <button type="submit" class='btn btn-primary'>Generate Data</button></div>
+        
+        </div>
+    </div>
+<form>
+
+    <div class="container-fluid" style="margin-bottom:20px">
+        <div class="row row-cols-1">           
+            <div class="col-6" style="margin-bottom:10px">
+                <h6>Grand summary</h6>
+                <table>
+                    <thead>
+                        <tr>
+                            <th class="text-center p-2">Total TT</th>
+                            <th class="text-center p-2">Total PGRH by PGR</th>
+                            <th class="text-center p-2">Total PGR fuel used</th>
+                            <th class="text-center p-2">Total Validate PGRH</th>
+                            <th class="text-center p-2">Total Valided fuel consumed</th>
+                            <th class="text-center p-2">Fuel Gap</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="text-center p-2">{{ grand_totals.grand_total_TT }}</td>
+                            <td class="text-center p-2">{{ grand_totals.grand_total_internal_generator_running_hours }}</td>
+                            <td class="text-center p-2">{{ grand_totals.grand_total_internal_calculated_fuel_litre|floatformat:2 }}</td>
+                            <td class="text-center p-2">{{ grand_totals.grand_total_customer_generator_running_hours}}</td>
+                            <td class="text-center p-2">{{ grand_totals.grand_total_customer_calculated_fuel_litre|floatformat:2 }}</td>
+
+                            {% if  grand_totals.grand_total_fuel_difference <= 0 %}                        
+                            <td class="text-center p-2" style="background-color:red">{{ grand_totals.grand_total_fuel_difference|floatformat:2 }}</td>
+                            {% else %}
+                            <td class="text-center p-2" style="background-color:rgb(165, 233, 77)">{{ grand_totals.grand_total_fuel_difference|floatformat:2 }}</td>
+                            {% endif %}
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="col">
+                <h6>Zone-wise Summary</h6>
+                <table style="margin-bottom:20px">
+                    <thead>
+                        <tr>
+                            <th class="text-center p-2">Zone</th>
+                            <th class="text-center p-2">No of Tickets</th>
+                            <th class="text-center p-2">PGRH by PGR</th>
+                            <th class="text-center p-2">PGR fuel used</th>
+                            <th class="text-center p-2">Validate PGRH</th>
+                            <th class="text-center p-2">Valided fuel consumed</th>
+                            <th class="text-center p-2">Fuel gap</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for ticket in zonewise_tickets %}
+                        <tr>
+                            <td class="text-center p-2" style="white-space: nowrap;">{{ ticket.zone }}</td>
+                            <td class="text-center p-2" style="white-space: nowrap;">{{ ticket.num_of_tickets }}</td>
+                            <td class="text-center p-2" style="white-space: nowrap;">{{ ticket.total_internal_generator_running_hours}}</td>
+                            <td class="text-center p-2" style="white-space: nowrap;">{{ ticket.total_internal_calculated_fuel_litre|floatformat:'2' }}</td>
+                            <td class="text-center p-2" style="white-space: nowrap;">{{ ticket.total_customer_generator_running_hours }}</td>
+                            <td class="text-center p-2" style="white-space: nowrap;">{{ ticket.total_customer_calculated_fuel_litre|floatformat:'2' }}</td>
+                            {% if ticket.fuel_difference <= 0 %}
+                            <td class="text-center p-2" style="white-space:nowrap; background-color:red">{{ ticket.fuel_difference|floatformat:'2' }}</td>
+                            {% else %}
+                            <td class="text-center p-2" style="white-space:nowrap; background-color:rgb(68, 255, 0)">{{ ticket.fuel_difference|floatformat:'2' }}</td>
+                            {% endif %}
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+    </div>
+</div>
+
+
+
+
+
+
+<div class="container-fluid main-content">
+    <div class="row row-cols-1 row-cols-md-2">  
+        {% for date, tickets in grouped_tickets.items %}
+        <div class="col" style="margin-bottom:10px">  
+        
+            <h6 class="text-center">Date: {{ date }}</h6>
+            <table>
+                <thead>
+                    <tr>
+                        <th class="text-center p-2">Zone</th>
+                        <!-- <th class="text-center p-2">Date</th> -->
+                        <th class="text-center p-2">No of Tickets</th>
+                        <th class="text-center p-2">PGRH by PGR</th>
+                        <th class="text-center p-2">PGR fuel used</th>
+                        <th class="text-center p-2">Validate PGRH</th>
+                        <th class="text-center p-2">Validated fuel</th>
+                        <th class="text-center p-2">Fuel gap</th>
+                      
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ticket in tickets %}
+                    <tr>
+                        <td class="text-center p-2" style="white-space: nowrap;">{{ ticket.zone }}</td>
+                        <!-- <td class="text-center p-2" style="white-space: nowrap;">{{ ticket.created_at__date }}</td> -->
+                        <td class="text-center p-2" style="white-space: nowrap;">{{ ticket.num_of_tickets}}</td>
+                        <td class="text-center" style="white-space: nowrap;">{{ ticket.total_internal_generator_running_hours|floatformat:'2'}}</td>
+                        <td class="text-center" style="white-space: nowrap;">{{ ticket.total_internal_calculated_fuel_litre|floatformat:'2' }}</td>
+                        <td class="text-center" style="white-space: nowrap;">{{ ticket.total_customer_generator_running_hours }}</td>
+                        <td class="text-center" style="white-space: nowrap;">{{ ticket.total_customer_calculated_fuel_litre|floatformat:'2' }}</td>
+
+                        {% if ticket.total_fuel_difference <= 0 %}
+                        <td class="text-center" style="white-space:nowrap; background-color:red">{{ ticket.total_fuel_difference|floatformat:'2'}}</td>
+                        {% else %}
+                        <td class="text-center" style="white-space:nowrap; background-color:rgb(68, 255, 0)">{{ ticket.total_fuel_difference|floatformat:'2' }}</td>
+                        {% endif %}
+                    </tr>
+                
+                    {% endfor %}
+                </tbody>
+            </table>
+
+  
+        </div>
         {% endfor %}
-    </tbody>
-</table>
+
+
+        
+
+          </div>
+    </div>
+
+    <div style="height:600px"></div>
+
 {% endblock %}

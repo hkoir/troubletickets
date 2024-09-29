@@ -59,7 +59,7 @@ table {
     <div class="row">
 
         <div class="col-12">       
-            <form method="GET" action="{% url 'vehicle:view_adhoc_attendance' %}" style="margin-bottom:30px">        
+            <form method="GET" action="{% url 'vehicle:view_adhoc_attendance2' %}" style="margin-bottom:30px">        
             <div class="container-fluid">
                 <div class="row row-cols-2 row-cols-md-6">        
                     <div class="col" style="padding:5px;">  Start Date:  {{ form.start_date }} </div>
@@ -100,12 +100,12 @@ table {
                         <th class="text-center p-2">Owner phone</th>                     
                         <th class="text-center p-2">In date</th>
                         <th class="text-center p-2">In Time</th>
-                        <th class="text-center p-2">Enter Out time</th>
+                        <th class="text-center p-2" style="background-color: bisque;">Enter Out time</th>
                         <th class="text-center p-2">Out date</th>
                         <th class="text-center p-2">Out Time</th>
                         <th class="text-center p-2">Total working hours</th>
                         <th class="text-center p-2">Total km run</th>
-                        <th class="text-center p-2" style="background-color: rgb(246, 64, 64);">Total fault Duration</th>
+                        <th class="text-center p-2" style="background-color: rgb(249, 148, 16);">Total fault Duration</th>
                       
                         <th class="text-center p-2">Vehicle base body rent</th>
                         <th class="text-center p-2">vehicle overtime rent</th>                  
@@ -118,9 +118,10 @@ table {
                         <th class="text-center p-2" style="background-color: gold;">Grand Total bill amount</th>
 
                         <th class="text-center p-2">Pay bill to this adhoc</th>
-                        <th class="text-center p-2">Payment amount</th>
+                        <th class="text-center p-2">Paid amount</th>
                         <th class="text-center p-2" style="white-space: normal;">Transaction ID</th>
                         <th class="text-center p-2">Payment Docs</th>
+                        <th class="text-center p-2">Due amount</th>
                       
                                         
                                 
@@ -168,10 +169,9 @@ table {
                                 {{ adhoc.adhoc_out_time }}
                             {% endif %}
                         </td>
-                            
-                 
+                                             
                          <td class="text-center p-2">{{ adhoc.adhoc_working_hours|floatformat:'2'}}</td>
-                         <td class="text-center p-2">{{ adhoc.vehicle_running_data.day_end_kilometer_run}}</td>
+                         <td class="text-center p-2">{{ adhoc.vehicle_running_data.total_kilometer_run}}</td>
                          <td class="text-center p-2">{{ adhoc.vehicle_fault.fault_duration_hours|floatformat:'2'}}</td>
 
                          <td class="text-center p-2">{{ adhoc.adhoc_vehicle_base_bill_amount}}</td>
@@ -186,7 +186,11 @@ table {
                     
 
                          {% if adhoc.adhoc_out_time %}
+                         {% if adhoc.adhoc_due_amount <= 50 %}
+                         <td class="text-center p-2" style="background-color:yellow"><i class="fas fa-check" style="color:green"></i>Paid</td>
+                         {% else %}
                          <td class="text-center p-2" style="white-space: nowrap;"><a href="{% url 'vehicle:create_adhoc_payment' adhoc.id %}">Make/update payment</a></td>
+                         {% endif %}
                          {% else %}
                          <td class="text-center p-2" style="white-space: nowrap;background-color: red;">Out time is pending</td>
                          {% endif %}
@@ -206,12 +210,13 @@ table {
                                 <img 
                                     src="{{ adhoc.adhoc_payment.payment_supporting_document.url }}" 
                                     alt="Adhoc Payment documents" 
-                                    style="cursor: pointer; width:50px;height:50px">
+                                    style="cursor: pointer; width:40px;height:20px">
                             </a>
                             {% else %}
                             No file available
                             {% endif %}
                         </td>
+                        <td class="text-center p-2">{{ adhoc.adhoc_due_amount}}</td>
                     </tr>
                     {% endfor %}
                 </tbody> 
@@ -260,7 +265,7 @@ table {
         var attendanceId = $(this).data('attendance-id');
 
         $.ajax({
-            url: "{% url 'vehicle:adhoc_outtime2' 0 %}".replace('0', attendanceId),
+            url: "{% url 'vehicle:adhoc_outtime_ajax' 0 %}".replace('0', attendanceId),
             type: 'POST',
             data: {
                 'adhoc_out_date': adhoc_out_date,

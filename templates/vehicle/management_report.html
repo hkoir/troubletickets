@@ -62,29 +62,42 @@
 
 
 
-<div style="left:0px; margin-left:0px">
-    <h4 style="margin-top:40px; margin-left:0px">Data for
+
+    
+<div class="container_fluid main-content ">
+    <div class="row">
+        <div class="col-12">
+
+        <h4 class="text-center">Vehicle OPS performance Summary:Data for
         {% if days %}
-            the last {{ days }} days
-        {% elif start_date and end_date %}
-            from: {{ start_date }} to {{ end_date }}
-        {% endif %}
+        the last {{ days }} days
+    {% elif start_date and end_date %}
+        from: {{ start_date }} to {{ end_date }}
+    {% endif %}
     </h4>
-    
-    
-
-
-    <h4 class="text-center">Vehicle OPS performance Summary</h4>
     <table>
         <tr>
             <th class="text-center p-2">Region</th>
             <th class="text-center p-2">Zone</th>
+            <th class="text-center p-2">Total Refill pump</th>
+            <th class="text-center p-2">Total Refill local purchase</th>
             <th class="text-center p-2">Total Refill Amount</th>
             <th class="text-center p-2">Total fuel cash advance</th>
+            <th class="text-center p-2">Total Kilometer Run</th>
             <th class="text-center p-2">Total Fuel Consumed Run</th>
             <th class="text-center p-2">Total Fuel Consumed refill</th>
-            <th class="text-center p-2">Total Kilometer Run</th>
-            <th class="text-center p-2">Total TT</th>
+         
+         
+            <th class="text-center p-2" style="background-color: blanchedalmond;">Net Fuel balance</th>
+            <th class="text-center p-2" style="background-color: aqua;">Total TT</th>
+            <th class="text-center p-2"  style="background-color: aqua;">Total PGRH</th>
+            <th class="text-center p-2">Total kilometer cost CNG</th>
+            <th class="text-center p-2">Total kilometer cost gasoline</th>
+            <th class="text-center p-2">Total kilometer cost</th>
+            <th class="text-center p-2">Num of travel days</th>
+            <th class="text-center p-2">Vehicle body base rent</th>
+            <th class="text-center p-2" style="background-color: bisque;">Total vehicle cost</th>
+            <th class="text-center p-2">Total fault duration</th>
             <th class="text-center p-2">Fuel consumed/TT</th>
             <th class="text-center p-2">Vehicle kilometer/litre</th>
         
@@ -94,24 +107,37 @@
         <tr>
             <td class="text-center p-2">{{ data.region }}</td>
             <td class="text-center p-2">{{ data.zone }}</td>
+            <td class="text-center p-2">{{ data.total_refill_amount_pump }}</td>
+            <td class="text-center p-2">{{ data.total_refill_amount_local_purchase }}</td>
             <td class="text-center p-2">{{ data.total_refill_amount }}</td>
             <td class="text-center p-2">{{ data.total_requisition_amount }}</td>
+            <td class="text-center p-2">{{ data.total_kilometer_run }}</td>
             <td class="text-center p-2">{{ data.total_fuel_consumed|floatformat:'2' }}</td>
             <td class="text-center p-2">{{ data.total_fuel_consumed_refill|floatformat:'2' }}</td>
-            <td class="text-center p-2">{{ data.total_kilometer_run }}</td>
+      
+          
+            <td class="text-center p-2">{{ data.net_fuel_balance|floatformat:'2' }}</td>
+
             <td class="text-center p-2">{{ data.total_ticket }}</td> 
+            <td class="text-center p-2">{{ data.total_PGRH }}</td> 
+           
+            <td class="text-center p-2">{{ data.day_end_kilometer_cost_CNG|floatformat:'2' }}</td>
+            <td class="text-center p-2">{{ data.day_end_kilometer_cost_gasoline|floatformat:'2' }}</td>
+            <td class="text-center p-2">{{ data.total_kilometer_cost|floatformat:'2' }}</td>
+            <td class="text-center p-2">{{ data.total_travel_days }}</td>
+
+            <td class="text-center p-2">{{ data.total_vehicle_base_rent|floatformat:'2'}}</td>
+            <td class="text-center p-2">{{ data.total_vehicle_cost|floatformat:'2'}}</td>
+            
+            <td class="text-center p-2">{{ data.fault_duration|floatformat:'2' }}</td> 
             <td class="text-center p-2">{{ data.fuel_consumed_per_ticket|floatformat:'2' }}</td> 
-            <td class="text-center p-2">{{ data.kilometer_run_per_litre|floatformat:'2' }}</td> 
+            <td class="text-center p-2">{{ data.kilometer_run_per_litre|floatformat:'2' }}</td>  
          
         </tr>
         {% endfor %}
     </table>
 
-
-
-
-
-
+        </div> 
 
     <!-- Pagination -->
     <div class="pagination" style="padding: 10px;">
@@ -133,6 +159,16 @@
     </div>
 
 </div>
+
+    </div>
+</div>
+
+
+
+
+
+
+
 
 <div class="col" style="height:1200px"></div>
 

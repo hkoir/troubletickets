@@ -18,15 +18,6 @@ def get_current_time():
     return timezone.now().time()
 
 
-
-class ChatMessage(models.Model):
-    ticket_id = models.CharField(max_length=100)
-    sender = models.CharField(max_length=100)
-    message = models.TextField()
-    timestamp = models.DateTimeField(auto_now_add=True)
-
-
-
 class eTicket(models.Model):
     created_at = models.DateTimeField(default=timezone.now)
     region = models.CharField(max_length=100,choices=REGION_CHOICES,null=True,blank=True,default=None)
@@ -108,6 +99,12 @@ class eTicket(models.Model):
         return self.internal_ticket_number
   
 
+class ChatMessage(models.Model):    
+    ticket_id = models.CharField(max_length=100)
+    ticket_number = models.CharField(max_length=50, null=True, blank=True)  # Ensure length matches eTicket's internal_ticket_number
+    sender = models.CharField(max_length=100)
+    message = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)
 
 
 

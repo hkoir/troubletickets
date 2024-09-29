@@ -25,7 +25,7 @@ urlpatterns = [
     path('vehicle_detail/<int:vehicle_id>/', views.vehicle_detail, name='vehicle_detail'),
     path('vehicle_run_details/<str:vehicle_reg_number>/', views.vehicle_run_details, name='vehicle_run_details'),
     
-    path('vehicle_summary_report/', views.vehicle_summary_report, name='vehicle_summary_report'),        
+    # path('vehicle_summary_report/', views.vehicle_summary_report, name='vehicle_summary_report'),        
     path('management_summary_report/', views.management_summary_report, name='management_summary_report'),
    
     path('vehicle_overtime_calc/', views.vehicle_overtime_calc, name='vehicle_overtime_calc'),   
@@ -37,6 +37,7 @@ urlpatterns = [
     path('adhoc_management_dashboard/', views.adhoc_management_dashboard, name='adhoc_management_dashboard'),  
     
     path('create_adhoc_requisition/', views.create_adhoc_requisition, name='create_adhoc_requisition'),
+     path('edit_adhocvehicle_requisition/<int:requisition_id>/', views.edit_adhocvehicle_requisition, name='edit_adhocvehicle_requisition'),
     path('adhoc_approval_status/', views.adhoc_approval_status, name='adhoc_approval_status'), 
 
      path('adhoc_approval_status2/', views.adhoc_approval_status2, name='adhoc_approval_status2'), 
@@ -47,8 +48,10 @@ urlpatterns = [
 
     path('download_adhoc_requisition_data/', views.download_adhoc_requisition_data, name='download_adhoc_requisition_data'), 
     path('adhoc_intime/', views.adhoc_intime, name='adhoc_intime'),  
+     path('adhoc_intime2/<int:requisition_id>/', views.adhoc_intime2, name='adhoc_intime2'), 
     path('adhoc_outtime/<int:attendance_id>/', views.adhoc_outtime, name='adhoc_outtime'),  
-    path('adhoc_outtime2/<int:attendance_id>/', views.adhoc_outtime2, name='adhoc_outtime2'),  
+    path('adhoc_outtime2/<int:requisition_id>/', views.adhoc_outtime2, name='adhoc_outtime2'), 
+    path('adhoc_outtime_ajax/<int:attendance_id>/', views.adhoc_outtime_ajax, name='adhoc_outtime_ajax'),   
     path('view_adhoc_attendance/', views.view_adhoc_attendance, name='view_adhoc_attendance'),
     path('view_adhoc_attendance2/', views.view_adhoc_attendance2, name='view_adhoc_attendance2'),
     path('create_adhoc_payment/<int:adhoc_attendance_id>/', views.create_adhoc_payment, name='create_adhoc_payment'),  

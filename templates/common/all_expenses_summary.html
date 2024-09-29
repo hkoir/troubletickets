@@ -61,8 +61,7 @@
                         <div class="col" style="padding:5px;">  No of days {{ form.days }} </div>
                         <div class="col" style="padding:5px; margin-left:20px">  Region:{{ form.region }} </div>  
                         <div class="col" style="padding:5px; ">  Zone:{{ form.zone }} </div>    
-                      
-                        
+                                              
                         <div class="col" style="padding:5px; margin-left:20px;margin-top:20px"> 
                             <button type="submit" class='btn btn-primary'>Generate Data</button>
                         </div>
@@ -76,7 +75,7 @@
 
         <div style="left:0px; margin-left:0px">
 
-            <h4 class="text-center" style="margin-top:40px; margin-left:0px">
+            <h4 class="text-center" style="margin-left:0px">
                 All Expenses and approval Summary: 
                 {% if days %}
                 Data for the last {{ days }} days 
@@ -102,17 +101,27 @@
         <tr>
             <th class="text-center p-2">Region</th>
             <th class="text-center p-2">Zone</th>
-            <th class="text-center p-2"><a href="{% url 'vehicle:adhoc_summary_view' %}">Adhoc Vehicle Expenses</a></th>
-            <th class="text-center p-2"><a href="{% url 'adhocman:adhoc_pgr_grand_summary' %}">Adhoc Manpower Expenses</a></th>
-            <th class="text-center p-2"><a href="{% url 'dailyexpense:daily_expense_summary' %}">Operational expenses</a></th>
-            <th class="text-center p-2"><a href="{% url 'billable:civil_power_approval_status' %}">Civil & Power Expenses</a></th>
-            <th class="text-center p-2">Total Expense</th>
-            <th class="text-center p-2"><a href="{% url 'dailyexpense:all_approval_status' %}">Ops expenses approved amount</a></th>
-            <th class="text-center p-2"><a href="{% url 'adhocman:adhoc_approval_status2' %}">Adhoc man expenses approved amount</a></th>
-            <th class="text-center p-2"><a href="{% url 'vehicle:adhoc_approval_status2' %}">Adhoc vehicle expenses approved amount</a></th>
-            <th class="text-center p-2"><a href="{% url 'billable:civil_power_approval_status2' %}">Civil & Power approved amount</a></th>
-            <th class="text-center p-2">Total approved amount</th>
-            <th class="text-center p-2">Cash in hand</th>
+            <th class="text-center p-2" style="background-color: aliceblue;"><a href="{% url 'vehicle:adhoc_vehicle_grand_summary' %}">Adhoc Vehicle Expenses</a></th>
+            <th class="text-center p-2" style="background-color: aliceblue;"><a href="{% url 'adhocman:adhoc_pgr_grand_summary' %}">Adhoc Manpower Expenses</a></th>            
+            <th class="text-center p-2" style="background-color: rgb(241, 215, 181);">Total CM work expenses</th>
+            <th class="text-center p-2" style="background-color: rgb(241, 215, 181);">Total PM work expenses</th>
+            <th class="text-center p-2" style="background-color: rgb(241, 215, 181);">Total disaster expenses</th>
+            <th class="text-center p-2" style="background-color: aliceblue;">Sub Total operational cost</th>
+            <th class="text-center p-2" style="background-color: aliceblue;">Total Civil Power expenses</th>         
+            <th class="text-center p-2" style="background-color: rgb(138, 244, 7);">Grand Total Expense</th>   
+            <th style="background-color: black;">..</th>     
+            
+            
+
+            <th class="text-center p-2">Total approved Operations </th>
+            <th class="text-center p-2"><a href="{% url 'adhocman:adhoc_approval_status2' %}">Total approved adhoc man</a></th>
+            <th class="text-center p-2"><a href="{% url 'vehicle:adhoc_approval_status2' %}">Total approved adhoc vehicle</a></th>
+            <th class="text-center p-2">Total approved disaster</th>
+            <th class="text-center p-2">Total approved Civil Power</th>           
+            <th class="text-center p-2" style="background-color: blanchedalmond;">Grand Total approved amount</th>
+
+
+            <th class="text-center p-2" style="background-color: burlywood;">Cash in hand</th>
             <th class="text-center p-2">Total TT</th>
             <th class="text-center p-2">Total PGRH</th>
         </tr>
@@ -124,16 +133,23 @@
             <td class="text-center p-2">{{ key.0 }}</td>
             <td class="text-center p-2">{{ key.1 }}</td>
             <td class="text-center p-2">{{ value.total_adhoc_vehicle|format_currency }}</td>
-            <td class="text-center p-2">{{ value.total_adhoc_man|format_currency }}</td>
-            <td class="text-center p-2">{{ value.total_daily|format_currency }}</td>
-            <td class="text-center p-2">{{ value.total_civil_power|format_currency}}</td>
+            <td class="text-center p-2">{{ value.total_adhoc_man|format_currency }}</td>            
 
+            <td class="text-center p-2">{{ value.total_daily_CM_work|format_currency }}</td>
+            <td class="text-center p-2">{{ value.total_daily_PM_work|format_currency }}</td>
+            <td class="text-center p-2">{{ value.total_daily_disaster|format_currency }}</td>
+            <td class="text-center p-2">{{ value.total_daily_Civil_power|format_currency }}</td>
+            <td class="text-center p-2">{{ value.sub_total_operational_cost|format_currency }}</td>         
+          
             <td class="text-center p-2">{{ value.total_expense|format_currency}}</td>
+            <td style="background-color: black;">..</td>
 
-            <td class="text-center p-2">{{ value.total_approved_amount|format_currency}}</td>
+         
+            <td class="text-center p-2">{{ value.total_approved_amount_operation|format_currency}}</td>
             <td class="text-center p-2">{{ value.total_approved_amount_adhoc_man|format_currency}}</td>
             <td class="text-center p-2">{{ value.total_approved_amount_adhoc_vehicle|format_currency}}</td>
-            <td class="text-center p-2">{{ value.total_civil_power_approved_amount|format_currency}}</td>
+            <td class="text-center p-2">{{ value.total_approved_amount_disaster|format_currency}}</td>
+            <td class="text-center p-2">{{ value.total_approved_amount_Civil_power|format_currency}}</td>           
            
             <td class="text-center p-2">{{ value.total_approved|format_currency}}</td>
 

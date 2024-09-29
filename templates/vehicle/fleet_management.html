@@ -48,80 +48,80 @@
 
         <!-- Vehicle data -->
 
-    <div class="card" style="background-color: rgb(134, 231, 15);">
+    <div class="card m-1" style="background-color: white;border:2px solid green;border-radius: 10px;">
         <a class="text-center" style="text-decoration: none;" href="{% url 'vehicle:create_vehicle'%}">
-            <img class="rounded-pill" src="{% static 'images/pickup.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
+            <i class="fas fa-truck-pickup"></i>
             <br>Create Vehicle</a>
     </div>
            
 
-    <div class="card" style="background-color: rgb(134, 231, 15);">
+    <div class="card m-1" style="background-color: white;border:2px solid green;border-radius: 10px;">
         <a class="text-center" style="text-decoration: none;" href="{% url 'vehicle:view_vehicle_info' %}">
-            <img class="rounded-pill" src="{% static 'images/pickup.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
+            <i class="fas fa-truck-pickup"></i>
             <br>View Vehicle database</a>
     </div>
 
-    <div class="card" style="background-color: rgb(134, 231, 15);">
+    <div class="card m-1" style="background-color: white;border:2px solid green;border-radius: 10px;">
         <a class="text-center" style="text-decoration: none;" href="{% url 'vehicle:zonewise_vehicle' %}">
-            <img class="rounded-pill" src="{% static 'images/pickup.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
+            <i class="fas fa-truck-pickup"></i>
             <br>Zonewise Vehicle distribution</a>
     </div>
 
-    <div class="card" style="background-color: cyan;">
+    <div class="card m-1" style="background-color: white;border:2px solid green;border-radius: 10px;">
         <a class="text-center" style="text-decoration: none;" href="{% url 'vehicle:create_vehicle_expenses' %}">
-            <img class="rounded-pill" src="{% static 'images/pickup.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
+            <i class="fas fa-truck-pickup"></i>
             <br>Add vehicle running Mileage</a>
     </div>
 
     
-    <div class="card" style="background-color: cyan;">
+    <div class="card m-1" style="background-color: white;border:2px solid green;border-radius: 10px;">
         <a class="text-center" style="text-decoration: none;" href="{% url 'vehicle:view_vehicle_travel_data' %}">
-            <img class="rounded-pill" src="{% static 'images/pickup.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
+            <i class="fas fa-truck-pickup"></i>
             <br>View vehicle travel data</a>
     </div>
 
-    <div class="card" style="background-color: yellow;">
+    <div class="card m-1" style="background-color: white;border:2px solid green;border-radius: 10px;">
         <a class="text-center" style="text-decoration: none;" href="{% url 'vehicle:create_fuel_refill' %}">
-            <img class="rounded-pill" src="{% static 'images/pickup.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
-            <br>Create refill fuel</a>
+            <i class="fas fa-truck-pickup"></i>
+        <br> Add fuel</a>
     </div>
 
     
-    <div class="card" style="background-color: yellow;">
+    <div class="card m-1" style="background-color: white;border:2px solid green;border-radius: 10px;">
         <a class="text-center" style="text-decoration: none;" href="{% url 'vehicle:view_fuel_refill' %}">
-            <img class="rounded-pill" src="{% static 'images/pickup.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
-            <br>View refill fuel</a>
+            <i class="fas fa-truck-pickup"></i>
+            <br>View fuel refill</a>
     </div>
 
      
     
 
-    <div class="card" style="background-color: rgb(233, 141, 30);">
-        <a class="text-center" style="text-decoration: none;color:white" href="{% url 'vehicle:create_vehicle_fault' %}">
-            <img class="rounded-pill" src="{% static 'images/pickup.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
+    <div class="card m-1" style="background-color: white;border:2px solid green;border-radius: 10px;">
+        <a class="text-center" style="text-decoration: none;color:rgb(9, 58, 235)" href="{% url 'vehicle:create_vehicle_fault' %}">
+            <i class="fas fa-truck-pickup"></i>
             <br> Add Vehicle incident </a>
     </div>
 
-    <div class="card" style="background-color: rgb(233, 141, 30);">
-        <a class="text-center" style="text-decoration: none;color:white" href="{% url 'vehicle:view_vehicle_fault' %}">
-            <img class="rounded-pill" src="{% static 'images/pickup.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
+    <div class="card m-1 p-2" style="background-color: white;border:2px solid green;border-radius: 10px;">
+        <a class="text-center" style="text-decoration: none;color:rgb(10, 81, 234)" href="{% url 'vehicle:view_vehicle_fault' %}">
+            <i class="fas fa-truck-pickup"></i>
             <br>View vehicle incident</a>
     </div>
 
-    <div class="card" style="background-color: greenyellow;">
+    <div class="card m-1" style="background-color: white;border:2px solid green;border-radius: 10px;">
         <a class="text-center" style="text-decoration: none;" href="{% url 'vehicle:create_vehicle_payment' %}">
-            <img class="rounded-pill" src="{% static 'images/pickup.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
+            <i class="fas fa-truck-pickup"></i>
             <br> Add Vehicle payment </a>
     </div>
 
-    <div class="card" style="background-color: greenyellow;">
+    <div class="card m-1" style="background-color: white;border:2px solid green;border-radius: 10px;">
         <a class="text-center" style="text-decoration: none;" href="{% url 'vehicle:view_vehicle_payment' %}">
-            <img class="rounded-pill" src="{% static 'images/pickup.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
+            <i class="fas fa-truck-pickup"></i>
             <br>View vehicle payment</a>
     </div>
 
 
-    <div class="card" style="background-color: rgb(23, 239, 16);">
+    <div class="card m-1" style="background-color: cyan;border:2px solid rgb(53, 241, 244);border-radius: 10px;">
         <a class="text-center" style="text-decoration: none;" href="{% url 'vehicle:adhoc_management_dashboard' %}">
             <i class="fas fa-truck-pickup"></i>
             <br>Adhoc Vehicle requisition process</a>
@@ -129,32 +129,24 @@
 
   
 
-    <div class="card" style="background-color: rgb(13, 235, 212);">
+    <div class="card m-1" style="background-color: white;border:2px solid green;border-radius: 10px;">
         <a class="text-center" style="text-decoration: none;" href="{% url 'vehicle:vehicle_overtime_calc' %}">
-            <img class="rounded-pill" src="{% static 'images/pickup.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
-            <br>Cost performance by Vehicle Datewise</a>
+            <i class="fas fa-truck-pickup"></i>
+            <br>Vehicle daily bill account</a>
     </div>
 
 
-    <div class="card" style="background-color: rgb(13, 235, 212);">
+    <div class="card m-1" style="background-color: white;border:2px solid green;border-radius: 10px;">
         <a class="text-center" style="text-decoration: none;" href="{% url 'vehicle:vehicle_grand_summary' %}">
-            <img class="rounded-pill" src="{% static 'images/pickup.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
-            <br>Cost performance summary</a>
+            <i class="fas fa-truck-pickup"></i>
+            <br>Grand Cost performance summary</a>
     </div>
 
- 
-     
-    <div class="card" style="background-color: rgb(13, 235, 212);">
-        <a class="text-center" style="text-decoration: none;" href="{% url 'vehicle:vehicle_summary_report' %}">
-            <img class="rounded-pill" src="{% static 'images/pickup.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
-            <br>OPS performance by vehicle </a>
-    </div>
-   
     
-    <div class="card" style="background-color: rgb(13, 235, 212);">
+    <div class="card m-1" style="background-color: white;border:2px solid green;border-radius: 10px;">
         <a class="text-center" style="text-decoration: none;" href="{% url 'vehicle:management_summary_report' %}">
-            <img class="rounded-pill" src="{% static 'images/pickup.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
-            <br>OPS performance Summary</a>
+            <i class="fas fa-truck-pickup"></i>
+            <br>Vehicle zonewise performance</a>
     </div>
 
  

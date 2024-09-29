@@ -1,0 +1,228 @@
+{% extends "base.html" %}
+{% load static %}
+
+
+{% block content %}
+
+
+    <title>Adhoc intime form</title>
+
+    <style>
+
+   
+
+table {
+            border-collapse: collapse;
+            width: 100%;
+      
+        }
+
+        th, td {
+            border: 1px solid rgb(227, 87, 7); /* Set border color for individual cells */
+            text-align: left;
+            padding: 0px;
+        }
+        th{
+        background-color: rgb(52, 232, 100);
+      }
+      
+
+    table thead th {
+    white-space: normal;
+        }
+
+    .main-content {   
+    overflow-y: auto;
+    margin-left:0px;
+    position: absolute;
+    width: 100%;
+    left: 0;
+  
+}
+
+.main-content {   
+    overflow-y: auto;
+    margin-left:0px;
+ 
+    width: 100%;
+    left: 0;
+  
+}
+
+  #selected-pgrs {
+            list-style-type: none;
+        }
+        #selected-pgrs li {
+            margin-bottom: 5px;
+        }
+
+    </style>
+
+                   
+
+    {% if messages %}
+    <div>
+        <ul class="messages">
+            {% for message in messages %}
+                <li style="font-size: 20px; background-color: orange;";{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endif %}
+
+
+
+
+<div class="container-fluid" id="main-content">
+    <div class="row row-cols-2  p-2">    
+        <div class="col">
+            <div class="card form-group" style="background-color: bisque;">
+                <div class="card-body">
+                    <h4 class="card-title" style="margin-bottom:20px">attendance form</h4>
+                    <form method="post" enctype="multipart/form-data" id="expense-requisition-form">
+                        {% csrf_token %}
+
+                        {{ form.as_p }}
+                        
+                        <div><button type="submit" class="btn btn-primary">Submit</button></div>
+                    </form>
+                </div>
+            </div>
+        </div>                 
+
+        
+    </div>
+</div>
+
+
+
+
+<div class="col" style="height:1200px"></div>
+
+<script>
+   document.addEventListener('DOMContentLoaded', function() {
+    const pgrField = document.getElementById('id_pgr');
+    const adhocRequisitionField = document.getElementById('id_adhoc_requisition');
+
+    pgrField.addEventListener('change', function() {
+        const pgrId = pgrField.value;
+
+        fetch(`/adhocman/fetch_requisitions/${pgrId}/`)
+            .then(response => response.json())
+            .then(data => {
+                while (adhocRequisitionField.firstChild) {
+                    adhocRequisitionField.removeChild(adhocRequisitionField.firstChild);
+                }
+                if (data.length > 0) {
+                    data.forEach(requisition => {
+                        const option = document.createElement('option');
+                        option.value = requisition.id;
+                        option.text = requisition.name;
+                        adhocRequisitionField.appendChild(option);
+                    });
+                } else {
+                    const option = document.createElement('option');
+                    option.text = "No active requisition found";
+                    adhocRequisitionField.appendChild(option);
+                }
+            });
+    });
+});
+
+
+</script>
+   
+<script>
+    $(document).ready(function() {
+     $('#id_pgr,#id_adhoc_ticket,#id_adhoc_requisition').select2({
+         width: '100%',
+         ajax: {
+             url: "{% url 'dailyexpense:common_search' %}",
+             dataType: 'json',
+             delay: 250,
+             data: function(params) {
+                 return {
+                     q: params.term
+                 };
+             },
+             processResults: function(data) {
+                 return {
+                     results: $.map(data.results, function(item) {
+                         return {
+                             id: item.id,
+                             text: item.text
+                         };
+                     })
+                 };
+             },
+             cache: true
+         },
+         minimumInputLength: 1,
+         placeholder: 'Search',
+         allowClear: true
+     });
+ });
+ 
+ </script>
+    
+
+    <script>
+        $(document).ready(function(){      
+            var regionZoneMapping = {
+                'Sylhet': ['','Sylhet', 'Moulovibazar','Mymensingh','Kisorganj','Tangail'], 
+                'Rangpur': ['','Rangpur', 'Dinajpur','Bagura','Rajshahi'] ,                          
+                
+            };
+         
+            $('#id_region').change(function(){
+                var selectedRegion = $(this).val();
+                var zoneChoices = regionZoneMapping[selectedRegion];
+                $('#id_zone').empty();
+                $.each(zoneChoices, function(index, value){
+                    $('#id_zone').append($('<option>').text(value).attr('value', value));
+                });
+            });
+                  
+            var zoneMpMapping = {              
+                'Sylhet': ['','Sylhet','Taherpur','Sunamganj','Bianibazar','Dorbhost','Dherai','Chatak'], // Add more MPs for Sylhet zone
+                'Moulovibazar': ['','Moulovibazar', 'Saestaganj','Juri','Baniachong'],
+                'Mymensingh': ['','Mymensingh', 'Fulpur','Valuka'] ,
+                'Kisorganj': ['','Kisorganj','Katiadi','Netrokona','Mohonpur','Austogram'],
+                'Tangail': ['','Tangail','Madhupur','Jamalpur','Sherpur','Bakshihanj','Rowmari'],
+               
+                'Rangpur':['','Rangpur','Hatibandha','Gaibandha','Ulipur','Boropar','Polasbari'],
+                'Dinajpur':['','Dinajpur','Panchghor','Jaldhaka','Thakurgaon'],
+                'Rajshahi':['','Rajshahi','Bagura','Nachole','Natore','Chapai'],
+                'Bagura':['','Bagura'],
+                '': ['']
+               
+            };
+    
+       
+            $('#id_zone').change(function(){
+                $('#id_mp').val('');
+                var selectedZone = $(this).val();
+                var mpChoices = zoneMpMapping[selectedZone];
+    
+                $('#id_mp').empty();
+                $.each(mpChoices, function(index, value){
+                    $('#id_mp').append($('<option>').text(value).attr('value', value));
+                });
+            });
+    
+    
+    
+    });          
+    
+    </script>
+    
+
+
+
+    <div class="col" style="height:1200px"></div>
+
+
+{% endblock %}
+
+
+

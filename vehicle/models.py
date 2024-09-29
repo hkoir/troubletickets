@@ -79,10 +79,11 @@ class AddVehicleInfo(models.Model):
     ]
     vehicle_rental_type = models.CharField(max_length=50, choices=vehicle_rental_type_choices,null=True,blank=True, default='None')
     vehicle_rent = models.DecimalField(max_digits=10, decimal_places=2,null=True, blank=True)
+    vehicle_rent_per_day = models.DecimalField(max_digits=10, decimal_places=2,null=True, blank=True)
 
     vehicle_operational_mode_choices =[
-        ('corrective_maintenance','corrective_maintenance'),
-        ('preventive_maintenance','preventive_maintenance'),
+        ('CM_vehicle','CM_vehicle'),
+        ('PM_vehicle','PM_vehicle'),
         ('others','others')
         ]
     vehicle_operational_mode = models.CharField(max_length=50,choices=vehicle_operational_mode_choices, default='None')
@@ -94,8 +95,23 @@ class AddVehicleInfo(models.Model):
     vehicle_status = models.CharField(max_length=50, choices=vehicle_status_choice,default='None')
     created_at = models.DateField(default=timezone.now)
 
+    def save(self, *args, **kwargs):
+        if self.vehicle_rental_category == 'daily':
+            self.vehicle_rental_type ='adhoc'
+        else:
+            self.vehicle_rental_type ='permanent'
+
+        if self.vehicle_rental_category == 'monthly':
+            self.vehicle_rent_per_day =self.vehicle_rent / 30
+        else:
+            self.vehicle_rent_per_day = self.vehicle_rent
+        
+           
+        super().save(*args, **kwargs)
+
+
     def __str__(self):
-            return self.vehicle_reg_number
+        return self.vehicle_reg_number
     
 
 
@@ -178,33 +194,27 @@ class VehicleRuniningData(models.Model):
     vehicle = models.ForeignKey(AddVehicleInfo, related_name='vehicle_expense', on_delete=models.CASCADE)
     fuel_refill = models.ForeignKey(FuelRefill, related_name='fuelexpenses', on_delete=models.CASCADE, null=True, blank=True)
     vehicle_expense_add_requester = models.ForeignKey(Customer, related_name='vehicle_expense_user', on_delete=models.CASCADE, null=True, blank=True)
-    
     vehicle_start_reading = models.DecimalField(max_digits=30, decimal_places=2, null=True, blank=True)
     vehicle_stop_reading = models.DecimalField(max_digits=30, decimal_places=2, null=True, blank=True)
     total_kilometer_run = models.DecimalField(max_digits=20, decimal_places=2, null=True, blank=True)
-    
     vehicle_start_location = models.CharField(max_length=255, default='None')
     vehicle_end_location = models.CharField(max_length=255, default='None')
-
     start_time = models.DateTimeField(default=timezone.now)
     stop_time = models.DateTimeField(default=timezone.now)
     running_hours = models.FloatField(default=None, null=True, blank=True)
     overtime_hours = models.FloatField(default=None, null=True, blank=True)
     travel_date = models.DateField(default=timezone.now)
-    travel_purpose = models.TextField(null=True, blank=True)
-   
+    travel_purpose = models.TextField(null=True, blank=True)   
     overtime_cost = models.FloatField(default=None, null=True, blank=True)
-
     day_end_kilometer_run = models.DecimalField(max_digits=20, decimal_places=2, null=True, blank=True)    
-    
     day_end_kilometer_cost_CNG = models.DecimalField(max_digits=20, decimal_places=2, null=True, blank=True)
     day_end_kilometer_cost_gasoline = models.DecimalField(max_digits=20, decimal_places=2, null=True, blank=True)
     total_kilometer_cost = models.DecimalField(max_digits=20, decimal_places=2, null=True, blank=True)
-   
     total_fuel_consumed = models.DecimalField(max_digits=20, decimal_places=2, null=True, blank=True)
     fuel_balance = models.DecimalField(max_digits=20, decimal_places=2, null=True, blank=True)
     total_fuel_cost = models.DecimalField(max_digits=20, decimal_places=2, null=True, blank=True)
-    
+    vehicle_rent_per_day = models.DecimalField(max_digits=20, decimal_places=2, null=True, blank=True)
+    weekend_status = models.CharField(max_length=50,null=True,blank=True)  
     comments = models.TextField(max_length=50, null=True, blank=True)
     created_at = models.DateField(default=timezone.now)
 
@@ -239,7 +249,15 @@ class VehicleRuniningData(models.Model):
                 raise ValueError("Start time and stop time must be on the same day.")
             running_hours_timedelta = self.stop_time - self.start_time
             self.running_hours = running_hours_timedelta.total_seconds() / 3600
+            
+        if self.travel_date.weekday() in [4, 5]:
+            self.weekend_status = 'weekend'
+        else:
+            self.weekend_status = 'weekday'
         
+        if self.vehicle.vehicle_rental_category == 'monthly':                  
+            self.vehicle_rent_per_day = self.vehicle.vehicle_rent / 30
+
         super(VehicleRuniningData, self).save(*args, **kwargs)
 
     def __str__(self):
@@ -288,12 +306,24 @@ class VehicleRentalCost(models.Model):
     mp = models.CharField(max_length=100,choices=MP_CHOICES,null=True,blank=True)
     vehicle_rent_paid_id = models.CharField(max_length=50, default='None')     
 
-    vehicle_rent_paid = models.CharField(max_length=50, default='None',null=True,blank=True) 
-    vehicle_body_overtime_paid = models.CharField(max_length=50, default='None',null=True,blank=True) 
-    vehicle_driver_overtime_paid = models.CharField(max_length=50, default='None',null=True,blank=True)         
+    vehicle_rent_paid = models.FloatField(default=0.0, null=True, blank=True)
+    vehicle_body_overtime_paid = models.FloatField(default=0.0, null=True, blank=True)
+    vehicle_driver_overtime_paid =models.FloatField(default=0.0, null=True, blank=True)
+    
+    vehicle_kilometer_paid =models.FloatField(default=0.0, null=True, blank=True)
+    vehicle_total_paid = models.FloatField(default=0.0, null=True, blank=True)
+   
     vehicle = models.ForeignKey(AddVehicleInfo, related_name='vehiclerent_info', on_delete=models.CASCADE) 
     comments = models.TextField(max_length=50, default='None',null=True,blank=True)   
     created_at = models.DateField(default=timezone.now)
+   
+    def save(self, *args, **kwargs):
+        if self.vehicle_rent_paid is not None and self.vehicle_kilometer_paid is not None  and self.vehicle_body_overtime_paid is not None and self.vehicle_driver_overtime_paid is not None:
+            self.vehicle_total_paid = self.vehicle_rent_paid + self.vehicle_body_overtime_paid + self.vehicle_driver_overtime_paid + self.vehicle_kilometer_paid
+        
+        
+        super().save(*args, **kwargs)  # Ensure the changes are saved
+
     
     def __str__(self):
         return self.vehicle.vehicle_reg_number
@@ -343,9 +373,9 @@ class AdhocVehicleRequisition(models.Model):
     def save(self, *args, **kwargs):
         if self.start_date and self.end_date:
             if self.start_date == self.end_date:
-                self.num_of_days_applied =1
+                self.num_of_days_applied = 1
             else:
-                self.num_of_days_applied = (self.end_date - self.start_date).days
+                self.num_of_days_applied = (self.end_date - self.start_date).days + 1
 
         level1_approved = self.level1_approval_status and self.level1_approval_status.lower() == 'approved'
         level2_approved = self.level2_approval_status and self.level2_approval_status.lower() == 'approved'
@@ -359,7 +389,7 @@ class AdhocVehicleRequisition(models.Model):
         super().save(*args, **kwargs)  # Ensure the changes are saved
 
     def __str__(self):
-        return f"Requisition for {self.vehicle.vehicle_reg_number} on {self.requisition_date}"
+        return f"Requisition for {self.vehicle.vehicle_reg_number} requisition_ID {self.requisition_id}"
   
 
 
@@ -400,7 +430,8 @@ class AdhocVehicleAttendance(models.Model):
     adhoc_vehicle_total_bill_amount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     
     adhoc_payment = models.ForeignKey(AdhocVehiclePayment, related_name='adhoc_vehicle_payment_ref', on_delete=models.CASCADE, null=True, blank=True)
-    adhoc_requisition = models.ForeignKey(AdhocVehicleRequisition, related_name='adhoc_vehicle_requisition_ref', on_delete=models.CASCADE, null=True, blank=True)
+    adhoc_due_amount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    adhoc_requisition_vehicle = models.ForeignKey(AdhocVehicleRequisition, related_name='adhoc_vehicle_requisition_ref', on_delete=models.CASCADE, null=True, blank=True)
     created_at = models.DateField(default=timezone.now)
 
     def save(self, *args, **kwargs):      
@@ -443,6 +474,11 @@ class AdhocVehicleAttendance(models.Model):
 
         if self.adhoc_vehicle_base_bill_amount is not None and self.adhoc_vehicle_overtime_bill_amount is not None:
             self.adhoc_vehicle_total_bill_amount = self.adhoc_vehicle_base_bill_amount + self.adhoc_vehicle_overtime_bill_amount
+
+        # self.adhoc_due_amount = float(self.adhoc_vehicle_total_bill_amount) + float(self.vehicle_running_data.total_kilometer_cost) - float(self.adhoc_payment.adhoc_paid_amount)
+       
+        if self.adhoc_payment is not None and self.adhoc_payment.adhoc_paid_amount is not None and self.adhoc_vehicle_total_bill_amount is not None:
+            self.adhoc_due_amount = float(self.adhoc_vehicle_total_bill_amount) - float(self.adhoc_payment.adhoc_paid_amount)
        
         super(AdhocVehicleAttendance, self).save(*args, **kwargs)
 

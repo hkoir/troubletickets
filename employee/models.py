@@ -177,59 +177,59 @@ class MonthlySalaryReport(models.Model):
 
 
 
-
+from common.models import OperationalUser
 class Resource(models.Model):
     region = models.CharField(max_length=100,choices=REGION_CHOICES,null=True,blank=True)
-    zone = models.CharField(max_length=100,choices=MP_CHOICES,null=True,blank=True)
-    mp = models.CharField(max_length=100,choices=REGION_CHOICES,null=True,blank=True)
+    zone = models.CharField(max_length=100,choices=ZONE_CHOICES,null=True,blank=True)
+    mp = models.CharField(max_length=100,choices=MP_CHOICES,null=True,blank=True)
     total_site = models.IntegerField(null=True, blank=True)
     no_of_KPI_site = models.IntegerField(null=True, blank=True)
+
     num_of_PGTL = models.IntegerField(null=True, blank=True)
     num_of_PGR = models.IntegerField(null=True, blank=True)
     num_of_adhoc_PGR = models.IntegerField(null=True, blank=True)
+
     num_of_vehicle = models.IntegerField(null=True, blank=True)
     num_of_good_PG = models.IntegerField(null=True, blank=True)
     num_of_faulty_PG = models.IntegerField(null=True, blank=True)
     num_of_adhoc_vehicle = models.IntegerField(null=True, blank=True)
+
     num_of_PG_repair_technician = models.IntegerField(null=True, blank=True)
-    num_of_DG_repair_technician = models.IntegerField(null=True, blank=True)
-    num_of_operational_executive = models.IntegerField(null=True, blank=True)
-    num_of_admin_account_executive = models.IntegerField(null=True, blank=True)
-    num_of_manager = models.IntegerField(null=True, blank=True)
-    num_of_other_staff = models.IntegerField(null=True, blank=True)
+    num_of_DG_repair_technician = models.IntegerField(null=True, blank=True)   
+    num_of_admin_executive = models.IntegerField(null=True, blank=True)
+    num_of_account_executive = models.IntegerField(null=True, blank=True)
+  
+
+    num_of_RM = models.IntegerField(null=True, blank=True)
+    num_of_ZM = models.IntegerField(null=True, blank=True)
+    num_of_AZM = models.IntegerField(null=True, blank=True)
+
+    num_of_ebill = models.IntegerField(null=True, blank=True)
+    num_of_reporter = models.IntegerField(null=True, blank=True)
+    num_of_PM_engineer = models.IntegerField(null=True, blank=True)
+
+    num_of_riger = models.IntegerField(null=True, blank=True)
+    num_of_RMS_technician = models.IntegerField(null=True, blank=True)
+    num_of_solar_expert = models.IntegerField(null=True, blank=True)
+
+    num_of_rectifier_expert = models.IntegerField(null=True, blank=True)
+    num_of_DGOW_runner = models.IntegerField(null=True, blank=True)
+    num_of_petroller = models.IntegerField(null=True, blank=True)
+
+    num_of_AC_IBS = models.IntegerField(null=True, blank=True)
+   
     total_human_resource = models.IntegerField(null=True, blank=True)
     faulty_PG_percentage = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     created_at = models.DateTimeField(default=timezone.now)
 
-    def save(self, *args, **kwargs):
-        # Default num_of_other_staff to 0 if not set
-        if self.num_of_other_staff is None:
-            self.num_of_other_staff = 0
-     
+    def save(self, *args, **kwargs):     
 
-        # Calculate num_of_PGR based on PGRdatabase entries
-        self.num_of_PGR = PGRdatabase.objects.filter(
-            region=self.region,
-            zone=self.zone,
-            mp=self.mp,         
-        ).count()
-
-         
-        # Calculate num_of_PGTL based on PGRdatabase entries
-        self.num_of_PGTL = PGTLdatabase.objects.filter(
-            region=self.region,
-            zone=self.zone,
-            mp=self.mp,          
-        ).count()
-    
-
-        # Calculate num_of_vehicle based on AddVehicleInfo entries
         self.num_of_vehicle = AddVehicleInfo.objects.filter(
             region=self.region,
             zone=self.zone,
             mp=self.mp
-        ).count()
-
+        ).count()  
+       
         self.num_of_adhoc_vehicle = AddVehicleInfo.objects.filter(
             region=self.region,
             zone=self.zone,
@@ -237,35 +237,158 @@ class Resource(models.Model):
             vehicle_rental_type ='adhoc'
 
         ).count()
-  
 
-        # Calculate num_of_good_PG based on AddPGInfo entries
         self.num_of_good_PG = AddPGInfo.objects.filter(
             region=self.region,
             zone=self.zone,
             mp=self.mp,
             PG_status='good'
         ).count()
- 
 
-        # Calculate num_of_faulty_PG based on AddPGInfo entries
         self.num_of_faulty_PG = AddPGInfo.objects.filter(
             region=self.region,
             zone=self.zone,
             mp=self.mp,
             PG_status='faulty'
         ).count()
-   
+       
+       ####################################################       
+        self.num_of_RM = OperationalUser.objects.filter(
+                    region=self.region,
+                    zone=self.zone,
+                    mp=self.mp,
+                    user_designation='RM'
+                ).count()
 
-        # Calculate total_human_resource
-        self.total_human_resource = sum(filter(None, [
-            self.num_of_PGTL, self.num_of_PGR, self.num_of_PG_repair_technician,
-            self.num_of_DG_repair_technician, self.num_of_operational_executive,
-            self.num_of_admin_account_executive, self.num_of_manager, self.num_of_other_staff
-        ]))
+        self.num_of_ZM = OperationalUser.objects.filter(
+                    region=self.region,
+                    zone=self.zone,
+                    mp=self.mp,
+                    user_designation='ZM'
+                ).count()
+        self.num_of_AZM = OperationalUser.objects.filter(
+                    region=self.region,
+                    zone=self.zone,
+                    mp=self.mp,
+                    user_designation='AZM'
+                ).count()
+        
+        self.num_of_PGR = PGRdatabase.objects.filter(
+            region=self.region,
+            zone=self.zone,
+            mp=self.mp,    
+            PGR_category ='permanent'     
+        ).count()
+
+        
+        self.num_of_adhoc_PGR = PGRdatabase.objects.filter(
+            region=self.region,
+            zone=self.zone,
+            mp=self.mp,    
+            PGR_category ='adhoc'     
+        ).count()
+
+        self.num_of_PGTL = PGTLdatabase.objects.filter(
+            region=self.region,
+            zone=self.zone,
+            mp=self.mp,          
+        ).count()
      
 
-        # Calculate faulty_PG_percentage
+        self.num_of_ebill = OperationalUser.objects.filter(
+                    region=self.region,
+                    zone=self.zone,
+                    mp=self.mp,
+                    user_designation='ebill'
+                ).count()
+        self.num_of_reporter = OperationalUser.objects.filter(
+                    region=self.region,
+                    zone=self.zone,
+                    mp=self.mp,
+                    user_designation='reporter'
+                ).count()
+        self.num_of_PM_engineer = OperationalUser.objects.filter(
+                    region=self.region,
+                    zone=self.zone,
+                    mp=self.mp,
+                    user_designation='PM_engineer'
+                ).count()
+        self.num_of_riger = OperationalUser.objects.filter(
+                    region=self.region,
+                    zone=self.zone,
+                    mp=self.mp,
+                    user_designation='riger'
+                ).count()
+        self.num_of_RMS_technician = OperationalUser.objects.filter(
+                    region=self.region,
+                    zone=self.zone,
+                    mp=self.mp,
+                    user_designation='RMS_expert'
+                ).count()
+        self.num_of_solar_expert = OperationalUser.objects.filter(
+                    region=self.region,
+                    zone=self.zone,
+                    mp=self.mp,
+                    user_designation='solar_expert'
+                ).count()
+        self.num_of_rectifier_expert = OperationalUser.objects.filter(
+                    region=self.region,
+                    zone=self.zone,
+                    mp=self.mp,
+                    user_designation='rectifier_expert'
+                ).count()
+        self.num_of_DGOW_runner = OperationalUser.objects.filter(
+                    region=self.region,
+                    zone=self.zone,
+                    mp=self.mp,
+                    user_designation='DGOW_runner'
+                ).count()
+        self.num_of_petroller = OperationalUser.objects.filter(
+                    region=self.region,
+                    zone=self.zone,
+                    mp=self.mp,
+                    user_designation='patroller'
+                ).count()
+        self.num_of_AC_IBS = OperationalUser.objects.filter(
+                    region=self.region,
+                    zone=self.zone,
+                    mp=self.mp,
+                    user_designation='AC_IBS'
+                ).count()
+        self.num_of_PG_repair_technician = OperationalUser.objects.filter(
+                    region=self.region,
+                    zone=self.zone,
+                    mp=self.mp,
+                    user_designation='PG_technician'
+                ).count()
+        self.num_of_DG_repair_technician = OperationalUser.objects.filter(
+                    region=self.region,
+                    zone=self.zone,
+                    mp=self.mp,
+                    user_designation='DG_technician'
+                ).count()
+        self.num_of_account_executive = OperationalUser.objects.filter(
+                    region=self.region,
+                    zone=self.zone,
+                    mp=self.mp,
+                    user_designation='Account_executive'
+                ).count()
+        self.num_of_admin_executive= OperationalUser.objects.filter(
+                    region=self.region,
+                    zone=self.zone,
+                    mp=self.mp,
+                    user_designation='Admin_executive'
+                ).count()    
+
+        self.total_human_resource = sum(filter(None, [
+            self.num_of_PGTL,self.num_of_PGR,self.num_of_PG_repair_technician,
+            self.num_of_DG_repair_technician,self.num_of_admin_executive,self.num_of_account_executive,
+            self.num_of_ebill,self.num_of_reporter,self.num_of_PM_engineer,
+            self.num_of_riger,self.num_of_RMS_technician,self.num_of_solar_expert,
+            self.num_of_rectifier_expert,self.num_of_DGOW_runner,self.num_of_petroller,
+            self.num_of_AC_IBS,self.num_of_RM,self.num_of_ZM,self.num_of_AZM
+        ]))
+
         total_PG = self.num_of_good_PG + self.num_of_faulty_PG
         if total_PG:
             self.faulty_PG_percentage = self.num_of_faulty_PG / total_PG * 100

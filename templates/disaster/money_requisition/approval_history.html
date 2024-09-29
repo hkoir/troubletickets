@@ -54,8 +54,6 @@
         {% endif %}
 
 
-<h2 class="text-center" style="margin-top:10px">Financial Approval Status</h2>
- <p class="text-center">select date range/ or no of days but not both</p>
         
 <div class="container-fluid main-content">
      <div class="row">  
@@ -75,48 +73,57 @@
             </div>                
             </form>
         </div>  
-        <div class="col-12" style="margin-bottom:10px">                  
-            <!-- Region-wise summary -->                 
-            <table>
-                <thead>
-                    <tr>
-                        <th class="text-center p-2">Region</th>
-                        <th class="text-center p-2">Total Requisition Amount</th>
-                        <th class="text-center p-2">Total Approved Amount</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for region in region_approvals %}
-                    <tr>
-                        <td class="text-center p-2">{{ region.region }}</td>
-                        <td class="text-center p-2">{{ region.total_requisition|floatformat:"2" }}</td>
-                        <td class="text-center p-2">{{ region.total_approved|floatformat:"2" }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>        
-        </div>            
-        <div class="col-12">                        
-         <!-- Zone-wise summary -->               
-            <table>
-                <thead>
-                    <tr>
-                        <th class="text-center p-2">Zone</th>
-                        <th class="text-center p-2">Total Requisition Amount</th>
-                        <th class="text-center p-2">Total Approved Amount</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for zone in zone_approvals %}
-                    <tr>
-                        <td class="text-center p-2">{{ zone.zone }}</td>
-                        <td class="text-center p-2">{{ zone.total_requisition|floatformat:"2" }}</td>
-                        <td class="text-center p-2">{{ zone.total_approved|floatformat:"2" }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+
+        <div class="col">
+            <div class="container_fluid">
+                <div class="row row-cols-1 row-cols-md-2">
+                    <div class="col-12" style="margin-bottom:10px">                  
+                        <!-- Region-wise summary -->                 
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th class="text-center p-2">Region</th>
+                                    <th class="text-center p-2">Total Requisition Amount</th>
+                                    <th class="text-center p-2">Total Approved Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for region in region_approvals %}
+                                <tr>
+                                    <td class="text-center p-2">{{ region.region }}</td>
+                                    <td class="text-center p-2">{{ region.total_requisition|floatformat:"2" }}</td>
+                                    <td class="text-center p-2">{{ region.total_approved|floatformat:"2" }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>        
+                    </div>            
+                    <div class="col-12">                        
+                     <!-- Zone-wise summary -->               
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th class="text-center p-2">Zone</th>
+                                    <th class="text-center p-2">Total Requisition Amount</th>
+                                    <th class="text-center p-2">Total Approved Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for zone in zone_approvals %}
+                                <tr>
+                                    <td class="text-center p-2">{{ zone.zone }}</td>
+                                    <td class="text-center p-2">{{ zone.total_requisition|floatformat:"2" }}</td>
+                                    <td class="text-center p-2">{{ zone.total_approved|floatformat:"2" }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
         </div>
+       
         <div class="col-12">            
              <h4 style="margin-top:20px; margin-bottom:10px"> Details requisition and approval 
             <a href="{% url 'disaster:download_money_requisition_data' %}">Download</a></h4>    

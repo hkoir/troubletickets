@@ -33,5 +33,9 @@ urlpatterns = [
  
       path('all_expenditure/', views.all_expenditure, name='all_expenditure'),  
 
+      path('create_operational_user/', views.create_operational_user, name='create_operational_user'),
+      path('view_operational_user/', views.view_operational_user, name='view_operational_user'),
+      path('update_operational_user/<int:user_id>/', views.update_operational_user, name='update_operational_user'),
+
 ]
 

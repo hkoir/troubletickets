@@ -53,7 +53,7 @@ white-space: normal;
 
 
 
-<h4 class="text-center">Region wise resource Summary</h4>
+<h4 class="text-center">Region wise resource Summary: <a  href="{% url 'employee:view_resource' %}">View MPWise resource</a></h4>
 
 
 <div class="col" style="height:20px"></div>
@@ -64,8 +64,7 @@ white-space: normal;
 
             {% if total_site %}
 
-            <h4> Summary at a galance</h4>
-
+     
             <table>
                 <thead>
                     <tr>
@@ -73,19 +72,77 @@ white-space: normal;
                         <th class="text-center p-2">Total KPI site</th>
                         <th class="text-center p-2">Total good PG</th>
                         <th class="text-center p-2">Total faulty PG</th>
-                        <th class="text-center p-2">Total PGR</th>     
-                        <th class="text-center p-2">Total operational Head Count</th>                     
+                        <th class="text-center p-2">Total PGTL</th> 
+                        <th class="text-center p-2">Total PGR</th>    
+                        <th class="text-center p-2">Total adhoc PGR</th>
+                        <th class="text-center p-2">Total permanent vehicle</th>    
+                       
+                        
+                        
+                        <th class="text-center p-2">PG tech</th>
+                        <th class="text-center p-2">DG tech</th>    
+                        <th class="text-center p-2">Admin executive</th> 
+                        <th class="text-center p-2">Account executive</th> 
+
+                        <th class="text-center p-2">RM</th>
+                        <th class="text-center p-2">ZM</th>    
+                        <th class="text-center p-2">AZM</th> 
+
+                        <th class="text-center p-2">Ebill</th>
+                        <th class="text-center p-2">Reporter</th>    
+                        <th class="text-center p-2">PM Engineer</th> 
+
+                        <th class="text-center p-2">Riger</th>
+                        <th class="text-center p-2">RMS</th>    
+                        <th class="text-center p-2">Solar</th> 
+
+                        <th class="text-center p-2">Rectifier</th>
+                        <th class="text-center p-2">DGOW runner</th>    
+                        <th class="text-center p-2">Petroller</th> 
+                        <th class="text-center p-2">AC IBS </th> 
+
+                        <th class="text-center p-2">Total Head Count</th>   
+
                     </tr>
                 </thead>
             <tbody>
 
                 <tr>
-                    <td class="text-center p-2">{{ total_site }}</td>
-                    <td class="text-center p-2">{{ total_KPI_site }}</td>
-                    <td class="text-center p-2">{{ total_good_PG }}</td>
-                    <td class="text-center p-2">{{ total_faulty_PG }}</td>
-                    <td class="text-center p-2">{{ total_PG_ranar }}</td>
-                    <td class="text-center p-2">{{ total_head_count }}</td>
+                    <td class="text-center">{{ total_site }}</td>
+                    <td class="text-center">{{ total_KPI_site }}</td>
+                    <td class="text-center">{{ total_good_PG }}</td>
+                    <td class="text-center">{{ total_faulty_PG }}</td>
+                    <td class="text-center">{{ total_PGTL}}</td>
+                    <td class="text-center">{{ total_PG_ranar }}</td>
+                    <td class="text-center">{{ total_adhoc_PGR }}</td>
+                    <td class="text-center">{{ total_vehicle }}</td>
+                
+                    <td class="text-center">{{ num_of_PG_repair_technician }}</td>
+                    <td class="text-center">{{ num_of_DG_repair_technician }}</td>
+                    <td class="text-center">{{ num_of_admin_executive }}</td>
+                    <td class="text-center">{{ num_of_account_executive }}</td>
+
+                    <td class="text-center">{{ num_of_RM }}</td>
+                    <td class="text-center">{{ num_of_ZM }}</td>
+                    <td class="text-center">{{ num_of_AZM }}</td>
+
+                    <td class="text-center">{{ num_of_ebill}}</td>
+                    <td class="text-center">{{ num_of_reporter }}</td>
+                    <td class="text-center">{{ num_of_PM_engineer }}</td>
+
+                    <td class="text-center">{{ num_of_riger }}</td>
+                    <td class="text-center">{{ num_of_RMS_technician }}</td>
+                    <td class="text-center">{{ num_of_solar_expert }}</td>
+
+                    <td class="text-center">{{ num_of_rectifier_expert }}</td>
+                    <td class="text-center">{{ num_of_DGOW_runner }}</td>
+                    <td class="text-center">{{ num_of_petroller }}</td>
+                    <td class="text-center">{{ num_of_AC_IBS }}</td>
+
+                    <td class="text-center">{{ total_head_count }}</td>
+
+                      
+
                 </tr>
             </tbody>
             </table>
@@ -103,77 +160,104 @@ white-space: normal;
             <table border="1">
                 <thead>
                     <tr>
+                  
                         <th class="text-center p-2">Region</th>
                         <th class="text-center p-2">Zone</th>
-
                         <th class="text-center p-2">Total site</th>
-                        <th class="text-center p-2">no of KPI site</th>
+                        <th class="text-center p-2"> KPI site</th>
                         <th class="text-center p-2">KPI site %</th>
 
-                        <th class="text-center p-2">no of PGTL</th>                   
-                        <th class="text-center p-2">no of PGR</th>
-                        <th class="text-center p-2">no of Adhoc PGR</th>
+                        <th class="text-center p-2">PGTL</th>                   
+                        <th class="text-center p-2">PGR</th>
+                        <th class="text-center p-2">Adhoc PGR</th>
 
-                        <th class="text-center p-2">no of good PG</th>
-                        <th class="text-center p-2">no of faulty PG</th>
+                        <th class="text-center p-2">good PG</th>
+                        <th class="text-center p-2">faulty PG</th>
                         <th class="text-center p-2">Faulty PG %</th>
                    
-                        <th class="text-center p-2">no of vehicle</th>                   
-                        <th class="text-center p-2">no of adhoc vehicle</th>
-                        <th class="text-center p-2">no of PG repairman</th>
+                        <th class="text-center p-2">vehicle</th>                   
+                        <th class="text-center p-2">adhoc vehicle</th>
 
-                        <th class="text-center p-2">no of DG repairman</th>
+                        <th class="text-center p-2">PG tech</th>
+                        <th class="text-center p-2">DG tech</th>                    
+                        <th class="text-center p-2">admin executive</th>
+                        <th class="text-center p-2">account executive</th>
 
-                        <th class="text-center p-2">no of of operational Executive</th>
-                        <th class="text-center p-2">no of admin account executive</th>
-                        <th class="text-center p-2">no of manager</th>                   
-                        <th class="text-center p-2">no of other staff</th>
+                        <th class="text-center p-2">RM</th>
+                        <th class="text-center p-2">ZM</th>
+                        <th class="text-center p-2">AZM</th>
+                        
+                        <th class="text-center p-2">ebill</th>
+                        <th class="text-center p-2">reporter</th>
+                        <th class="text-center p-2">PM Engineer</th>
+                        
+                        <th class="text-center p-2">riger</th>
+                        <th class="text-center p-2">RMS tech</th>
+                        <th class="text-center p-2">solar expert</th>
+                         
+                        <th class="text-center p-2">rectifier expert</th>
+                        <th class="text-center p-2">DGOW runner</th>
+                        <th class="text-center p-2">petroller</th>
+                        <th class="text-center p-2">AC IBS</th>                                     
                         <th class="text-center p-2">Total head count</th>
-
-
-
                        
                     </tr>
                 </thead>
                 <tbody>
                     {% for item in zone_data %}
                     <tr>
-                        <td class="text-center p-2">{{ item.region }}</td>
-                        <td class="text-center p-2">{{ item.zone }}</td>
-                        <td class="text-center p-2">{{ item.total_site }}</td>
-                        <td class="text-center p-2">{{ item.no_of_KPI_site }}</td>
+                       
+                        <td class="text-center">{{ item.region }}</td>
+                        <td class="text-center">{{ item.zone }}</td>
+                        <td class="text-center">{{ item.total_site }}</td>
+                        <td class="text-center">{{ item.no_of_KPI_site }}</td>
 
-                        {% if item.KPI_site_percentage > 30 %}
-                        <td class="text-center p-2" style="background-color: red;" >{{ item.KPI_site_percentage|floatformat:'2' }}%</td>
+                        {% if item.KPI_site_percentage > 40 %}
+                        <td class="text-center" style="background-color: red;" >{{ item.KPI_site_percentage|floatformat:'2' }}%</td>
                         {% else %}
-                        <td class="text-center p-2" >{{ item.KPI_site_percentage|floatformat:'2' }}%</td>
+                        <td class="text-center" style="background-color:rgb(187, 236, 149)" >{{ item.KPI_site_percentage|floatformat:'2' }}%</td>
                         {% endif %}
 
-                        <td class="text-center p-2">{{ item.num_of_PGTL }}</td>
-                        <td class="text-center p-2">{{ item.num_of_PGR }}</td>
-                        <td class="text-center p-2">{{ item.num_of_adhoc_PGR }}</td>
 
-                        <td class="text-center p-2">{{ item.num_of_good_PG }}</td>
-                        <td class="text-center p-2">{{ item.num_of_faulty_PG }}</td>  
+                        <td class="text-center">{{ item.num_of_PGTL }}</td>
+                        <td class="text-center">{{ item.num_of_PGR }}</td>
+                        <td class="text-center">{{ item.num_of_adhoc_PGR }}</td>
+
+                        <td class="text-center">{{ item.num_of_good_PG }}</td>
+                        <td class="text-center">{{ item.num_of_faulty_PG }}</td>  
                        
                        {% if item.faulty_PG_percentage > 20 %}     
-                        <td class="text-center p-2" style="background-color: red;">{{ item.faulty_PG_percentage|floatformat:'2' }}%</td>                   
+                        <td class="text-center" style="background-color: red;">{{ item.faulty_PG_percentage|floatformat:'2' }}%</td>                   
                        {% else %}
-                       <td class="text-center p-2" style="background-color: rgb(80, 246, 3);">{{ item.faulty_PG_percentage|floatformat:'2' }}%</td>                   
+                       <td class="text-center" style="background-color: rgb(80, 246, 3);">{{ item.faulty_PG_percentage|floatformat:'2' }}%</td>                   
                        {% endif %}
-                       <td class="text-center p-2">{{ item.num_of_vehicle }}</td>
-                        <td class="text-center p-2">{{ item.num_of_adhoc_vehicle }}</td>
-                        <td class="text-center p-2">{{ item.num_of_PG_repair_technician }}</td>
 
-                        <td class="text-center p-2">{{ item.num_of_DG_repair_technician }}</td>
+                       <td class="text-center">{{ item.num_of_vehicle }}</td>
+                        <td class="text-center">{{ item.num_of_adhoc_vehicle }}</td>
 
-                        
-                        <td class="text-center p-2">{{ item.num_of_operational_executive }}</td>
-                        <td class="text-center p-2">{{ item.num_of_admin_account_executive }}</td>
-                        <td class="text-center p-2">{{ item.num_of_manager }}</td>
-                        <td class="text-center p-2">{{ item.num_of_other_staff }}</td>
-                        <td class="text-center p-2">{{ item.total_human_resource }}</td>
-                      
+                        <td class="text-center">{{ item.num_of_PG_repair_technician }}</td>
+                        <td class="text-center">{{ item.num_of_DG_repair_technician }}</td>                                              
+                        <td class="text-center">{{ item.num_of_admin_executive }}</td>
+                        <td class="text-center">{{ item.num_of_account_executive }}</td>
+
+                        <td class="text-center">{{ item.num_of_RM }}</td>
+                        <td class="text-center">{{ item.num_of_ZM }}</td>
+                        <td class="text-center">{{ item.num_of_AZM}}</td>
+
+                        <td class="text-center">{{ item.num_of_ebill }}</td>
+                        <td class="text-center">{{ item.num_of_reporter }}</td>
+                        <td class="text-center">{{ item.num_of_PM_engineer}}</td>
+
+                        <td class="text-center">{{ item.num_of_riger }}</td>
+                        <td class="text-center">{{ item.num_of_RMS_technician }}</td>
+                        <td class="text-center">{{ item.num_of_solar_expert}}</td>
+
+                        <td class="text-center">{{ item.num_of_rectifier_expert }}</td>
+                        <td class="text-center">{{ item.num_of_DGOW_runner }}</td>
+                        <td class="text-center">{{ item.num_of_petroller}}</td>
+                        <td class="text-center">{{ item.num_of_AC_IBS}}</td>
+                  
+                        <td class="text-center">{{ item.total_human_resource }}</td>                      
                         
                     </tr>
                     {% endfor %}

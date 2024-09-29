@@ -27,13 +27,11 @@ from .forms import AddEmployeeForm,AttendanceForm,EditAttendanceForm,AddEmployee
 
 from generator.models import AddPGInfo
 from tickets.forms import SummaryReportChartForm
-
-
+from tickets.views import generate_unique_finance_requisition_number
 
 
 def human_resource_management(request):
     return render(request,'employee/human_resource_management.html')
-
 
 
 @login_required
@@ -50,13 +48,11 @@ def add_employee2(request):
     return render(request, 'employee/add_employee_form.html', {'form': form})
 
 
-from tickets.views import generate_unique_finance_requisition_number
 
 def add_employee(request):
     if request.method == 'POST':   
         form = AddEmployeeForm(request.POST, request.FILES)
-        if form.is_valid():        
-       
+        if form.is_valid():      
             form.instance.employee_code = generate_unique_finance_requisition_number()
             form.save()
             return redirect('employee:view_employee')
@@ -69,19 +65,15 @@ def add_employee(request):
 @login_required
 def view_employee(request):
     employee_records = EmployeeModel.objects.all()
-
     paginator = Paginator(employee_records, 10) 
     page_number = request.GET.get('page')
-
     try:
         employee_records = paginator.page(page_number)
     except PageNotAnInteger:
         employee_records = paginator.page(1)
     except EmptyPage:
        employee_records = paginator.page(paginator.num_pages)
-
     return render(request, 'employee/view_employee.html', {'employee_records': employee_records})
-
 
 
 
@@ -93,7 +85,7 @@ def update_employee(request, employee_id):
         form = AddEmployeeForm(request.POST, request.FILES, instance=employee)
         if form.is_valid():
             form.save()
-            return redirect('employee:view_employee')  # Redirect to the view employee page
+            return redirect('employee:view_employee') 
     else:
         form = AddEmployeeForm(instance=employee)
     return render(request, 'employee/add_employee_form.html', {'form': form})
@@ -109,9 +101,7 @@ def delete_employee(request, employee_id):
             return redirect('employee:view_employee')  
         else:
             return redirect('employee:view_employee')
-
     return render(request, 'employee/delete_record.html', {'employee': employee})
-
 
 
 
@@ -147,8 +137,6 @@ def view_employee_changes_single(request, employee_id):
     return render(request, 'employee/employee_change_record.html', {'changes_single': changes_single})
 
 
-
-
 @login_required
 def download_employee_changes(request): 
     employee_changes = EmployeeRecordChange.objects.all()
@@ -156,21 +144,17 @@ def download_employee_changes(request):
     worksheet = workbook.active
     headers = ['Employee ID', 'Field Name', 'Old Value', 'New Value']
     worksheet.append(headers)
-
     for change in employee_changes:
         row = [change.employee_id, change.field_name, change.old_value, change.new_value]
         worksheet.append(row)
-
     excel_file = BytesIO()
     workbook.save(excel_file)
     excel_file.seek(0)
-
     response = HttpResponse(
         excel_file.getvalue(),
         content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     )
     response['Content-Disposition'] = 'attachment; filename=employee_changes.xlsx'
-
     return response
 
 
@@ -181,12 +165,10 @@ def attendance_input(request):
             form.save()         
             return redirect('employee:view_attendance')
         else:
-            print(form.errors)  # Print form errors for debugging
+            print(form.errors)  
     else:
         form = AttendanceForm()    
     return render(request, 'employee/attendance_form.html', {'form': form})
-
-
 
 
 @login_required
@@ -214,14 +196,11 @@ month =None
 year = None
 @login_required
 def create_salary(request):
-    global month, year  
-    
+    global month, year      
     if 'month' in request.GET:
-        month = int(request.GET['month'])     
-
+        month = int(request.GET['month'])    
     if 'year' in request.GET:
         year = int(request.GET['year']) 
-
         employees = EmployeeModel.objects.all()
         for employee in employees:
             total_salary = (
@@ -239,8 +218,7 @@ def create_salary(request):
             )         
         return redirect('employee:create_salary')
     else:
-        form = MonthYearForm()   
-   
+        form = MonthYearForm()      
     salary = MonthlySalaryReport.objects.filter(month = month, year =year)
     context = {'form': form, 'salary': salary,'month':month, 'year':year}
     return render(request, 'employee/create_monthly_salary.html', context)
@@ -254,7 +232,6 @@ def generate_salary_sheet(month, year):
         employee = report.employee
         total_salary = report.total_salary
         salary_sheet.append({'employee': employee, 'total_salary': total_salary})
-
     return salary_sheet
 
 
@@ -262,39 +239,30 @@ def generate_salary_sheet(month, year):
 def download_salary(request):
     global month,year
     salary_sheet = generate_salary_sheet(month, year)  
-
     workbook = Workbook()
     worksheet = workbook.active
-    worksheet.title = 'Salary Report'
-  
+    worksheet.title = 'Salary Report'  
     headers = ['Employee ID', 'Name', 'Total Salary']
     worksheet.append(headers)
-
     for entry in salary_sheet:
         row = [entry['employee'].employee_code, entry['employee'].name, entry['total_salary']]
         worksheet.append(row)
-
     excel_file = BytesIO()
     workbook.save(excel_file)
     excel_file.seek(0)
-
     response = HttpResponse(
         excel_file.getvalue(),
         content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     )
     response['Content-Disposition'] = 'attachment; filename=salary_report.xlsx'
-
     return response
-
 
 
 @login_required
 def generate_pay_slip(request, employee_id): 
     employee = EmployeeModel.objects.get(id=employee_id)   
-    envelope_size = (3.625 * 72, 5.5 * 72) # x 261 x 396
-
-    employee = EmployeeModel.objects.get(id=employee_id)    
-
+    envelope_size = (3.625 * 72, 5.5 * 72) 
+    employee = EmployeeModel.objects.get(id=employee_id)  
     if employee.gender == 'Male':
             prefix = 'Mr.'
             prefix2 = 'his'
@@ -303,37 +271,28 @@ def generate_pay_slip(request, employee_id):
             prefix2 = 'her'
     else:
             prefix = '' 
-            prefix2 =''
-   
+            prefix2 =''   
     response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = f'attachment; filename="pay_slip_{employee_id}.pdf"'
-    
-    pdf_canvas = canvas.Canvas(response, pagesize=envelope_size)   
-    
+    response['Content-Disposition'] = f'attachment; filename="pay_slip_{employee_id}.pdf"'    
+    pdf_canvas = canvas.Canvas(response, pagesize=envelope_size)  
     pdf_canvas.setFont("Helvetica", 10)
     pdf_canvas.setFillColor('blue')
     pdf_canvas.drawString(50, 360, f" Mymeplus Technology Limited")
-
     pdf_canvas.setFont("Helvetica-Bold", 10)
     pdf_canvas.setFillColor('black')
     pdf_canvas.drawString(50, 330, f"Date: {timezone.now().date()}")
-
     pdf_canvas.setFont("Helvetica", 10)
     pdf_canvas.drawString(50, 300, f"Employee Code: {employee.employee_code}")
     pdf_canvas.drawString(50, 280, f"Name: {employee.name}")
     pdf_canvas.drawString(50, 260, f"Position: {employee.position}")
     pdf_canvas.drawString(50, 240, f"Department: {employee.department}")
-    pdf_canvas.drawString(50, 220, f"Employee Level: {employee.employe_level}")
-    
-
+    pdf_canvas.drawString(50, 220, f"Employee Level: {employee.employe_level}")   
     pdf_canvas.drawString(50, 200, f"Basic Salary: {employee.basic_salary}")
     pdf_canvas.drawString(50, 180, f"House Allowance: {employee.house_allowance}")
     pdf_canvas.drawString(50, 160, f"Medical Allowance: {employee.medical_allowance}")
     pdf_canvas.drawString(50, 140, f"Transportation Allowance: {employee.transportation_allowance}")
-    
     pdf_canvas.setFont("Helvetica-Bold", 12)
     pdf_canvas.drawString(50, 110, f"Pay Slip for {prefix} {employee.first_name} {employee.last_name}")  
-
     pdf_canvas.setFont("Helvetica", 10)
     cfo_employee = EmployeeModel.objects.filter(position='CFO').first()
     if cfo_employee:
@@ -343,18 +302,14 @@ def generate_pay_slip(request, employee_id):
     else:
         pdf_canvas.drawString(50, 70, f"Autorized Signature________________")  
         pdf_canvas.drawString(80, 50, f"Name:........") 
-        pdf_canvas.drawString(80, 30, f"Designation:.....")  
-       
+        pdf_canvas.drawString(80, 30, f"Designation:.....") 
     pdf_canvas.setFont("Helvetica-Bold", 7)
     pdf_canvas.setFillColor('green')
     pdf_canvas.drawString(30, 15, f"Signature is not required due to computerized authorization")  
-    
     pdf_canvas.setFillColor('yellow') 
     pdf_canvas.rect(5, 5, 250,385)
-
     pdf_canvas.showPage()
-    pdf_canvas.save()
-    
+    pdf_canvas.save()    
     return response
 
 
@@ -363,7 +318,6 @@ def generate_pay_slip(request, employee_id):
 def generate_salary_certificate(request, employee_id):  
     a4_size = A4    
     employee = EmployeeModel.objects.get(id=employee_id)   
-
     if employee.gender == 'Male':
             prefix = 'Mr.'
             prefix2 = 'his'
@@ -372,24 +326,18 @@ def generate_salary_certificate(request, employee_id):
             prefix2 = 'her'
     else:
             prefix = '' 
-            prefix2 =''
-   
+            prefix2 =''   
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = f'attachment; filename="salary_certificate_{employee_id}.pdf"'
-    
     pdf_canvas = canvas.Canvas(response, pagesize=a4_size)
-
-    logo_path = os.path.join(settings.BASE_DIR, 'static/images/Logo.png')
-  
+    logo_path = os.path.join(settings.BASE_DIR, 'static/images/Logo.png')  
     try:      
         logo = ImageReader(logo_path)
         pdf_canvas.drawImage(logo, 50, 750, width=50, height=50)
     except Exception as e: 
-        print(f"Error loading logo image: {e}")
-    
+        print(f"Error loading logo image: {e}")    
     spacing1 = 15
-    y_space = 750
- 
+    y_space = 750 
     pdf_canvas.setFont("Helvetica", 12) 
     y_space -= spacing1
     pdf_canvas.drawString(50,  y_space, "mymeplus Technology Limited")
@@ -401,27 +349,19 @@ def generate_salary_certificate(request, employee_id):
     pdf_canvas.drawString(50,  y_space, "email: hkobir@mymeplus.com")
     y_space -= spacing1
     pdf_canvas.drawString(50,  y_space, "website: www.mymeplus.com")
-
-
     current_date = datetime.now().strftime("%Y-%m-%d")
     pdf_canvas.drawString(50, 650, f"Date: {current_date}") 
-
     pdf_canvas.drawString(50, 620, f"Salary Certificate for {prefix} {employee.first_name} {employee.last_name}")
-
     pdf_canvas.setFont("Helvetica-Bold", 12)
-    pdf_canvas.drawString(200, 560, "To Whom It May Concern")
- 
-    
+    pdf_canvas.drawString(200, 560, "To Whom It May Concern")     
     pdf_canvas.setFont("Helvetica", 10)
     text_y = 500
     text_y2 = 470
     text_y3 = 400
-    line_spacing = 15 
-    
+    line_spacing = 15     
     pdf_canvas.drawString(50, text_y, f"This is to certify that {prefix} {employee.name} is working in the {employee.department} department since {employee.joining_date}, {prefix2} monthly")
     text_y -= line_spacing 
-    pdf_canvas.drawString(50, text_y, f" remuneration is as follows:")
-       
+    pdf_canvas.drawString(50, text_y, f" remuneration is as follows:")       
     pdf_canvas.drawString(150, text_y2, f"Basic Salary: {employee.basic_salary}")
     text_y2 -= line_spacing
     pdf_canvas.drawString(150, text_y2, f"House Allowance: {employee.house_allowance}")
@@ -430,19 +370,14 @@ def generate_salary_certificate(request, employee_id):
     text_y2 -= line_spacing
     pdf_canvas.drawString(150, text_y2, f"Transportation Allowance: {employee.transportation_allowance}")
     text_y2 -= line_spacing
-    pdf_canvas.drawString(150, text_y2, f"Festival Bonus: {employee.bonus}")
-    
-    
+    pdf_canvas.drawString(150, text_y2, f"Festival Bonus: {employee.bonus}")   
     text_y3 -= line_spacing   
     pdf_canvas.drawString(50, text_y3, f"The total monthly remuneration of {employee.name} amounts to {employee.gross_monthly_salary}")
     text_y3 -= line_spacing
     pdf_canvas.drawString(50, text_y3, f"This certificate is issued upon request of {employee.name} for {prefix2} intended purpose. Please do not hesitate to contact us")
     text_y3 -= line_spacing
     pdf_canvas.drawString(50, text_y3, f"if further clarification is required.")
-
     pdf_canvas.drawString(50, 250, f"Sincerely,")
-
-
     cfo_employee = EmployeeModel.objects.filter(position='CFO').first()
     if cfo_employee:
         pdf_canvas.drawString(50, 150, f"Autorized Signature________________")  
@@ -452,26 +387,20 @@ def generate_salary_certificate(request, employee_id):
         pdf_canvas.drawString(50, 150, f"Autorized Signature________________")  
         pdf_canvas.drawString(50, 135, f"Name:........") 
         pdf_canvas.drawString(50, 120, f"Designation:.....")  
-
     pdf_canvas.setFont("Helvetica-Bold", 10)
     pdf_canvas.setFillColor('green')
-    pdf_canvas.drawString(50,80, f"Signature is not mandatory due to computerized authorization")  
-      
+    pdf_canvas.drawString(50,80, f"Signature is not mandatory due to computerized authorization")
     pdf_canvas.showPage()
-    pdf_canvas.save()
-    
+    pdf_canvas.save()    
     return response
-
 
 
 
 def generate_experience_certificate(request, employee_id):  
     a4_size = A4    
-    employee = EmployeeModel.objects.get(id=employee_id)    
-   
+    employee = EmployeeModel.objects.get(id=employee_id)       
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = f'attachment; filename="experience_certificate_{employee_id}.pdf"'
-    
     pdf_canvas = canvas.Canvas(response, pagesize=a4_size)
     if employee.gender == 'Male':
             prefix = 'Mr.'
@@ -485,20 +414,14 @@ def generate_experience_certificate(request, employee_id):
             prefix = '' 
             prefix2 =''
             prefix3 =''
-
-
-
-    logo_path = os.path.join(settings.BASE_DIR, 'static/images/Logo.png')
-  
+    logo_path = os.path.join(settings.BASE_DIR, 'static/images/Logo.png')  
     try:      
         logo = ImageReader(logo_path)
         pdf_canvas.drawImage(logo, 50, 750, width=50, height=50)
     except Exception as e: 
-        print(f"Error loading logo image: {e}")
-    
+        print(f"Error loading logo image: {e}")    
     spacing1 = 15
-    y_space = 750
- 
+    y_space = 750 
     pdf_canvas.setFont("Helvetica", 12) 
     y_space -= spacing1
     pdf_canvas.drawString(50,  y_space, "mymeplus Technology Limited")
@@ -510,23 +433,13 @@ def generate_experience_certificate(request, employee_id):
     pdf_canvas.drawString(50,  y_space, "email: hkobir@mymeplus.com")
     y_space -= spacing1
     pdf_canvas.drawString(50,  y_space, "website: www.mymeplus.com")
-
-
-
-
-
     pdf_canvas.setFont("Helvetica", 12)
     pdf_canvas.drawString(50, 570, f"Experience Certificate for {prefix} {employee.first_name} {employee.last_name}")
-    
     current_date = datetime.now().strftime("%Y-%m-%d")
     pdf_canvas.drawString(50, 535, f"Date: {current_date}")
-
-
     pdf_canvas.drawString(50, 500, f"This is to certify that {prefix} {employee.first_name}  {employee.last_name} was employed at from {employee.joining_date} to {employee.resignation_date}.")
     pdf_canvas.drawString(50, 485, f"During {prefix2} tenure, {employee.name} held the position of {employee.position} as {prefix2} last designation and performed {prefix2}")
-    pdf_canvas.drawString(50, 470, f"duties with dedication and professionalism. We wish {prefix3} all the best for {prefix2} future endeavors.")
-   
-   
+    pdf_canvas.drawString(50, 470, f"duties with dedication and professionalism. We wish {prefix3} all the best for {prefix2} future endeavors.")     
     cfo_employee = EmployeeModel.objects.filter(position='CFO').first()
     if cfo_employee:
         pdf_canvas.drawString(50, 350, f"Autorized Signature________________")  
@@ -536,14 +449,11 @@ def generate_experience_certificate(request, employee_id):
         pdf_canvas.drawString(50, 350, f"Autorized Signature________________")  
         pdf_canvas.drawString(50, 335, f"Name:........") 
         pdf_canvas.drawString(50, 320, f"Designation:.....")  
-
     pdf_canvas.setFont("Helvetica-Bold", 10)
     pdf_canvas.setFillColor('green')
     pdf_canvas.drawString(50,280, f"Signature is not mandatory due to computerized authorization")  
-  
     pdf_canvas.showPage()
-    pdf_canvas.save()
-    
+    pdf_canvas.save()    
     return response
 
 
@@ -580,13 +490,9 @@ def update_resource(request, resource_id):
     return render(request, 'employee/resource/update_resource.html', {'form': form})
 
 
-
 def view_resource2(request): 
     resources = Resource.objects.all()
     return render(request, 'employee/resource/view_resource.html', {'resources': resources})
-
-
-
 
 
 @login_required
@@ -594,15 +500,12 @@ def view_resource2(request):
     region = None
     zone = None
     mp = None
-
     form = SummaryReportChartForm(request.GET or {'days': 20})
     resources = Resource.objects.all()
-
     if form.is_valid():       
         region = form.cleaned_data.get('region')
         zone = form.cleaned_data.get('zone')
-        mp = form.cleaned_data.get('mp')        
-
+        mp = form.cleaned_data.get('mp')       
         if region:
             resources = resources.filter(region=region)
         if zone:
@@ -610,20 +513,17 @@ def view_resource2(request):
         if mp:
             resources = resources.filter(mp=mp)
 
-    # Pagination logic
     resource_data = []
     page_obj = None
     resource_per_page = 10
     paginator = Paginator(resources, resource_per_page)
     page_number = request.GET.get('page', 1)
-
     try:
         page_obj = paginator.page(page_number)
     except PageNotAnInteger:
         page_obj = paginator.page(1)
     except EmptyPage:
         page_obj = paginator.page(paginator.num_pages)
-
     for resource in page_obj:       
         resource_dict = {}
         resource_fields = Resource._meta.get_fields()
@@ -631,10 +531,7 @@ def view_resource2(request):
             field_name = field.name
             field_value = getattr(resource, field_name)
             resource_dict[field_name] = field_value
-
         resource_data.append(resource_dict)
-
-    # Exclude empty fields from the form
     cleared_form = SummaryReportChartForm() 
     return render(request, 'employee/resource/view_resource.html', {
         'resource_data': resource_data,
@@ -653,55 +550,43 @@ def view_resource2(request):
     region = None
     zone = None
     mp = None
-
     form = SummaryReportChartForm(request.GET or {'days': 20})
     resources = Resource.objects.all()
-
     if form.is_valid():       
         region = form.cleaned_data.get('region')
         zone = form.cleaned_data.get('zone')
-        mp = form.cleaned_data.get('mp')        
-
+        mp = form.cleaned_data.get('mp')       
         if region:
             resources = resources.filter(region=region)
         if zone:
             resources = resources.filter(zone=zone)
         if mp:
             resources = resources.filter(mp=mp)
-
-    # Subqueries for counting good and faulty PGs
     good_pg_subquery = AddPGInfo.objects.filter(
         region=OuterRef('region'),
         zone=OuterRef('zone'),
         PG_status='good'
     ).values('region').annotate(good_count=Count('id')).values('good_count')
-
     faulty_pg_subquery = AddPGInfo.objects.filter(
         region=OuterRef('region'),
         zone=OuterRef('zone'),
         PG_status='faulty'
     ).values('region').annotate(faulty_count=Count('id')).values('faulty_count')
-
-    # Annotate resources with the counts of good and faulty PGs
     resources = resources.annotate(
         num_of_good_PG=Subquery(good_pg_subquery, output_field=FloatField()),
         num_of_faulty_PG=Subquery(faulty_pg_subquery, output_field=FloatField())
     )
-
-    # Pagination logic
     resource_data = []
     page_obj = None
     resource_per_page = 10
     paginator = Paginator(resources, resource_per_page)
     page_number = request.GET.get('page', 1)
-
     try:
         page_obj = paginator.page(page_number)
     except PageNotAnInteger:
         page_obj = paginator.page(1)
     except EmptyPage:
         page_obj = paginator.page(paginator.num_pages)
-
     for resource in page_obj:       
         resource_dict = {}
         resource_fields = Resource._meta.get_fields()
@@ -709,10 +594,7 @@ def view_resource2(request):
             field_name = field.name
             field_value = getattr(resource, field_name)
             resource_dict[field_name] = field_value
-
         resource_data.append(resource_dict)
-
-    # Exclude empty fields from the form
     cleared_form = SummaryReportChartForm() 
     return render(request, 'employee/resource/view_resource.html', {
         'resource_data': resource_data,
@@ -731,67 +613,58 @@ def view_resource(request):
     region = None
     zone = None
     mp = None
-
     form = SummaryReportChartForm(request.GET or {'days': 20})
     resources = Resource.objects.all()
-
     if form.is_valid():       
         region = form.cleaned_data.get('region')
         zone = form.cleaned_data.get('zone')
-        mp = form.cleaned_data.get('mp')        
-
+        mp = form.cleaned_data.get('mp')      
         if region:
             resources = resources.filter(region=region)
         if zone:
             resources = resources.filter(zone=zone)
         if mp:
             resources = resources.filter(mp=mp)
-
-    # Subqueries for counting good and faulty PGs
     good_pg_subquery = AddPGInfo.objects.filter(
         region=OuterRef('region'),
         zone=OuterRef('zone'),
         mp=OuterRef('mp'),
         PG_status='good'
     ).values('region').annotate(good_count=Count('id')).values('good_count')
-
     faulty_pg_subquery = AddPGInfo.objects.filter(
         region=OuterRef('region'),
         zone=OuterRef('zone'),
         mp=OuterRef('mp'),
         PG_status='faulty'
     ).values('region').annotate(faulty_count=Count('id')).values('faulty_count')
-
-    # Annotate resources with the counts of good and faulty PGs
     resources = resources.annotate(
         dynamic_num_of_good_PG=Subquery(good_pg_subquery, output_field=FloatField()),
         dynamic_num_of_faulty_PG=Subquery(faulty_pg_subquery, output_field=FloatField())
     )
-
     resources = resources.annotate(
         total_PG_count=F('dynamic_num_of_good_PG') + F('dynamic_num_of_faulty_PG')
     )
-
     for resource in resources:
         if resource.total_PG_count and resource.dynamic_num_of_faulty_PG and resource.total_PG_count != 0:
             resource.faulty_PG_percentage = (resource.dynamic_num_of_faulty_PG / resource.total_PG_count) * 100
         else:
             resource.faulty_PG_percentage = 0
+        if resource.total_site > 0:
+            resource.kpi_site_percentage = (resource.no_of_KPI_site / resource.total_site) * 100
+        else:
+            resource.kpi_site_percentage = 0 
 
-    # Pagination logic
     resource_data = []
     page_obj = None
     resource_per_page = 5
     paginator = Paginator(resources, resource_per_page)
     page_number = request.GET.get('page', 1)
-
     try:
         page_obj = paginator.page(page_number)
     except PageNotAnInteger:
         page_obj = paginator.page(1)
     except EmptyPage:
         page_obj = paginator.page(paginator.num_pages)
-
     for resource in page_obj:       
         resource_dict = {}
         resource_fields = Resource._meta.get_fields()
@@ -799,14 +672,10 @@ def view_resource(request):
             field_name = field.name
             field_value = getattr(resource, field_name)
             resource_dict[field_name] = field_value
-
-        # Add the dynamic good and faulty PG counts
         resource_dict['dynamic_num_of_good_PG'] = resource.dynamic_num_of_good_PG
         resource_dict['dynamic_num_of_faulty_PG'] = resource.dynamic_num_of_faulty_PG
-
+        resource_dict['kpi_site_percentage'] = resource.kpi_site_percentage
         resource_data.append(resource_dict)
-
-    # Exclude empty fields from the form
     cleared_form = SummaryReportChartForm() 
     return render(request, 'employee/resource/view_resource.html', {
         'resource_data': resource_data,
@@ -815,7 +684,9 @@ def view_resource(request):
         'region': region,
         'zone': zone,
         'mp': mp,
-        'form': cleared_form
+        'form': cleared_form,
+        'resources':resources
+    
     })
 
 
@@ -829,39 +700,71 @@ def view_resource_summary(request):
     total_faulty_PG_count = None
     total_PG_ranar_count = None
     total_head_count = None
-
-    # Aggregate overall counts
     data = Resource.objects.all().aggregate(
         total_site=Sum('total_site'),
         total_KPI_site=Sum('no_of_KPI_site'),
-        total_PG_ranar=Sum(F('num_of_PGTL') + F('num_of_PGR')),
-        total_head=Sum(F('num_of_PGTL') + F('num_of_PGR') + F('num_of_operational_executive') + F('num_of_admin_account_executive')
-                       + F('num_of_PG_repair_technician') + F('num_of_DG_repair_technician') + F('num_of_manager'))
+        total_PG_ranar=Sum('num_of_PGR'),
+        total_PGTL=Sum('num_of_PGTL'),
+        total_adhoc_PGR=Sum('num_of_adhoc_PGR'),
+        total_vehicle=Sum('num_of_vehicle'),
+        total_head=Sum('total_human_resource'),
+        num_of_PG_repair_technician=Sum(F('num_of_PG_repair_technician')),
+        num_of_DG_repair_technician=Sum('num_of_DG_repair_technician'),           
+        num_of_admin_executive=Sum('num_of_admin_executive'),     
+        num_of_account_executive=Sum('num_of_account_executive'),       
+        num_of_RM=Sum('num_of_RM'),
+        num_of_ZM=Sum('num_of_ZM'),
+        num_of_AZM=Sum('num_of_AZM'),
+        num_of_ebill=Sum('num_of_ebill'),
+        num_of_reporter=Sum('num_of_reporter'),
+        num_of_PM_engineer=Sum('num_of_PM_engineer'),        
+        num_of_riger=Sum('num_of_riger'),
+        num_of_RMS_technician=Sum('num_of_RMS_technician'),
+        num_of_solar_expert=Sum('num_of_solar_expert'),        
+        num_of_rectifier_expert=Sum('num_of_rectifier_expert'),
+        num_of_DGOW_runner=Sum('num_of_DGOW_runner'),
+        num_of_petroller=Sum('num_of_petroller'),
+        num_of_AC_IBS=Sum('num_of_AC_IBS'),
     )
-
-    # Count total good and faulty PGs
     total_good_PG_count = AddPGInfo.objects.filter(PG_status='good').count()
     total_faulty_PG_count = AddPGInfo.objects.filter(PG_status='faulty').count()
-
     total_site_count = data.get('total_site', 0)
     total_KPI_site_count = data.get('total_KPI_site', 0)
     total_PG_ranar_count = data.get('total_PG_ranar', 0)
+    total_PGTL_count = data.get('total_PGTL', 0)
+    total_adhoc_PGR_count = data.get('total_adhoc_PGR', 0)
+    total_vehicle_count = data.get('total_vehicle', 0)
     total_head_count = data.get('total_head', 0)
-
-    # Subqueries for counting good and faulty PGs
+    num_of_PG_repair_technician_count=data.get('num_of_PG_repair_technician')
+    num_of_DG_repair_technician_count=data.get('num_of_DG_repair_technician')
+    num_of_admin_executive_count=data.get('num_of_admin_executive')
+    num_of_account_executive_count=data.get('num_of_account_executive')
+    num_of_RM_count=data.get('num_of_RM')
+    num_of_ZM_count=data.get('num_of_ZM')
+    num_of_AZM_count=data.get('num_of_AZM')
+    num_of_RM_count=data.get('num_of_RM')
+    num_of_ZM_count=data.get('num_of_ZM')
+    num_of_AZM_count=data.get('num_of_AZM')
+    num_of_ebill_count=data.get('num_of_ebill')
+    num_of_reporter_count=data.get('num_of_reporter]')
+    num_of_PM_engineer_count=data.get('num_of_PM_engineer')
+    num_of_riger_count=data.get('num_of_riger')
+    num_of_RMS_technician_count=data.get('num_of_RMS_technician')
+    num_of_solar_expert_count=data.get('num_of_solar_expert')
+    num_of_rectifier_expert_count=data.get('num_of_rectifier_expert')
+    num_of_DGOW_runner_count=data.get('num_of_DGOW_runner')
+    num_of_petroller_count=data.get('num_of_petroller')
+    num_of_AC_IBS_count=data.get('num_of_AC_IBS')
     good_pg_subquery = AddPGInfo.objects.filter(
         region=OuterRef('region'),
         zone=OuterRef('zone'),
         PG_status='good'
     ).values('region').annotate(good_count=Count('id')).values('good_count')
-
     faulty_pg_subquery = AddPGInfo.objects.filter(
         region=OuterRef('region'),
         zone=OuterRef('zone'),
         PG_status='faulty'
     ).values('region').annotate(faulty_count=Count('id')).values('faulty_count')
-
-    # Aggregate summary data
     summary = Resource.objects.all() \
         .values('region', 'zone') \
         .annotate(
@@ -873,13 +776,23 @@ def view_resource_summary(request):
             num_of_vehicle=Sum('num_of_vehicle'),
             num_of_adhoc_vehicle=Sum('num_of_adhoc_vehicle'),
             num_of_PG_repair_technician=Sum('num_of_PG_repair_technician'),
-            num_of_DG_repair_technician=Sum('num_of_DG_repair_technician'),
-            num_of_operational_executive=Sum('num_of_operational_executive'),
-            num_of_admin_account_executive=Sum('num_of_admin_account_executive'),
-            num_of_manager=Sum('num_of_manager'),
-            num_of_other_staff=Sum('num_of_other_staff'),
+            num_of_DG_repair_technician=Sum('num_of_DG_repair_technician'),           
+            num_of_admin_executive=Sum('num_of_admin_executive'),  
+            num_of_account_executive=Sum('num_of_account_executive'),        
+            num_of_RM=Sum('num_of_RM'),
+            num_of_ZM=Sum('num_of_ZM'),
+            num_of_AZM=Sum('num_of_AZM'),
+            num_of_ebill=Sum('num_of_ebill'),
+            num_of_reporter=Sum('num_of_reporter'),
+            num_of_PM_engineer=Sum('num_of_PM_engineer'),            
+            num_of_riger=Sum('num_of_riger'),
+            num_of_RMS_technician=Sum('num_of_RMS_technician'),
+            num_of_solar_expert=Sum('num_of_solar_expert'),            
+            num_of_rectifier_expert=Sum('num_of_rectifier_expert'),
+            num_of_DGOW_runner=Sum('num_of_DGOW_runner'),
+            num_of_petroller=Sum('num_of_petroller'),
+            num_of_AC_IBS=Sum('num_of_AC_IBS'),
             total_human_resource=Sum('total_human_resource'),
-            # Use subqueries to count good and faulty PGs dynamically
             num_of_good_PG=Subquery(good_pg_subquery, output_field=FloatField()),
             num_of_faulty_PG=Subquery(faulty_pg_subquery, output_field=FloatField()),
             faulty_PG_percentage=ExpressionWrapper(
@@ -892,9 +805,6 @@ def view_resource_summary(request):
             )
         ) \
         .order_by('region', 'zone')
-
-    # Debug: Print intermediate data
-    print("Summary Data:", summary)
 
     for data in summary:
         region = data['region']
@@ -909,5 +819,26 @@ def view_resource_summary(request):
         'total_good_PG': total_good_PG_count,
         'total_faulty_PG': total_faulty_PG_count,
         'total_PG_ranar': total_PG_ranar_count,
-        'total_head_count': total_head_count
+        'total_PGTL': total_PGTL_count,
+        'total_head_count': total_head_count,
+        'total_adhoc_PGR':total_adhoc_PGR_count,
+        'total_vehicle':total_vehicle_count,
+        'num_of_PG_repair_technician':num_of_PG_repair_technician_count,
+        'num_of_DG_repair_technician':num_of_DG_repair_technician_count,
+        'num_of_admin_executive':num_of_admin_executive_count,    
+        'num_of_account_executive':num_of_account_executive_count,    
+        'num_of_RM':num_of_RM_count,
+        'num_of_ZM':num_of_ZM_count,
+        'num_of_AZM':num_of_AZM_count,
+        'num_of_ebill':num_of_ebill_count,
+        'num_of_reporter':num_of_reporter_count,
+        'num_of_PM_engineer':num_of_PM_engineer_count,
+        'num_of_riger_count':num_of_riger_count,
+        'num_of_RMS_technician':num_of_RMS_technician_count,
+        'num_of_solar_expert':num_of_solar_expert_count,
+        'num_of_rectifier_expert':num_of_rectifier_expert_count,
+        'num_of_DGOW_runner':num_of_DGOW_runner_count,
+        'num_of_petroller':num_of_petroller_count,
+        'num_of_AC_IBS':num_of_AC_IBS_count
+
     })

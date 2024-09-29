@@ -44,14 +44,6 @@ white-space: normal;
 
 
 
-<h4>Summary Report hourly</h4>
-
-<!-- 
-<form method="get" action="{% url 'tickets:summary_report_view_hourly' %}">
-    {{ form.as_p }}  
-    <button class="btn btn-primary" type="submit">Generate Report</button>
-</form> -->
-
 
 
 
@@ -79,7 +71,7 @@ white-space: normal;
 
 <div class="container-fluid"id='main-content'>
     <div class="row row-cols-1">
-        <h4 style="margin-top:40px">Report for
+        <h4 style="margin-top:40px">Hourly Summary Report:Report for
             {% if hours %}
                 the last {{ hours }} hours            
             {% endif %}

@@ -73,9 +73,15 @@
                             <th class="text-center p-2">Vehicle used for</th>
                             <th class="text-center p-2">Payment date</th>
                             <th class="text-center p-2">Payment ID</th>
+
                             <th class="text-center p-2">Rent payment amount</th>
                             <th class="text-center p-2">Body overtime payment</th>
-                            <th class="text-center p-2">Driver overtime payment </th>                       
+                            <th class="text-center p-2">Driver overtime payment </th> 
+
+ 
+                            <th class="text-center p-2">Total Kilometer paid </th>  
+
+                            <th class="text-center p-2">Grand Total paid </th>  
                              
                                     
                         </tr>
@@ -91,9 +97,16 @@
                             
                             <td class="text-center p-2" style="white-space: nowrap;">{{ payment.created_at}}</td>
                             <td class="text-center p-2" style="white-space: nowrap;">{{ payment.vehicle_rent_paid_id }}</td>
+
                             <td class="text-center p-2" style="white-space: nowrap;">{{ payment.vehicle_rent_paid }}</td>
                             <td class="text-center p-2" style="white-space: nowrap;">{{ payment.vehicle_body_overtime_paid  }}</td>
                             <td class="text-center p-2" style="white-space: nowrap;">{{ payment.vehicle_driver_overtime_paid}}</td>
+
+                            <td class="text-center p-2" style="white-space: nowrap;">{{ payment.vehicle_kilometer_paid}}</td>
+                            <td class="text-center p-2" style="white-space: nowrap;">{{ payment.vehicle_total_paid}}</td>
+                          
+
+                         
                             
     
                         </tr>

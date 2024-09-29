@@ -74,12 +74,11 @@ table {
 
 
 <div class="container-fluid" id="main-content">
-    <div class="row row-cols-1 row-cols-md-2 p-2">
-    
+    <div class="row row-cols-2  p-2">    
         <div class="col">
             <div class="card form-group" style="background-color: bisque;">
                 <div class="card-body">
-                    <h4 class="card-title" style="margin-bottom:20px">Adhoc in time out time</h4>
+                    <h4 class="card-title" style="margin-bottom:20px">attendance form</h4>
                     <form method="post" enctype="multipart/form-data" id="expense-requisition-form">
                         {% csrf_token %}
 
@@ -89,20 +88,21 @@ table {
                     </form>
                 </div>
             </div>
-        </div>     
-            
+        </div>                 
 
         <div class="col">
             <h4> Adhoc attendance
             <table>  
                 <thead>
                     <tr>
-                        <th class="text-center p-2">Date</th>
+                        <th class="text-center p-2">Date</th>          
+                        <th class="text-center p-2">Requisition status</th>
                         <th class="text-center p-2">Adhoc name</th> 
                         <th class="text-center p-2">Adhoc Phone</th>   
                         <th class="text-center p-2">Region</th> 
                         <th class="text-center p-2">Zone</th> 
-                        <th class="text-center p-2">MP</th>                  
+                        <th class="text-center p-2">MP</th>       
+                        <th class="text-center p-2">Assigned Ticket</th>               
                         <th class="text-center p-2">In date</th>
                         <th class="text-center p-2">In Time</th>
                         <th class="text-center p-2">Out date</th>
@@ -116,23 +116,30 @@ table {
                 <tbody>
                     {% for adhoc in  adhoc_attendance %}
                     <tr>
-                        <td class="text-center p-2" style="white-space: nowrap;">{{ adhoc.created_at}}</td>
-                        <td class="text-center p-2" style="white-space:nowrap;">{{ adhoc.pgr.name}}</td>
-                        <td class="text-center p-2" style="white-space:nowrap;">{{ adhoc.pgr.phone}}</td>
+                        <td class="text-center p-2" style="white-space: nowrap;font-size: 14px;">{{ adhoc.created_at}}</td>
+                       
+                        {% if adhoc.adhoc_requisition.active_status %}
+                        <td class="text-center p-2" style="white-space: nowrap;background-color: greenyellow;font-size: 14px;">Active</td>
+                        {% else %}
+                        <td class="text-center p-2" style="white-space: nowrap;background-color: rgb(208, 231, 113);font-size: 14px;">Inactive</td>
+                        {% endif %}
+                        <td class="text-center p-2" style="white-space:nowrap;font-size: 14px;">{{ adhoc.pgr.name}}</td>
+                        <td class="text-center p-2" style="white-space:nowrap;font-size: 14px;">{{ adhoc.pgr.phone}}</td>
 
-                        <td class="text-center p-2" style="white-space:nowrap;">{{ adhoc.pgr.region}}</td>
-                        <td class="text-center p-2" style="white-space:nowrap;">{{ adhoc.pgr.zone}}</td>
-                        <td class="text-center p-2" style="white-space:nowrap;">{{ adhoc.pgr.mp}}</td>
+                        <td class="text-center p-2" style="white-space:nowrap;font-size: 14px;">{{ adhoc.pgr.region}}</td>
+                        <td class="text-center p-2" style="white-space:nowrap;font-size: 14px;">{{ adhoc.pgr.zone}}</td>
+                        <td class="text-center p-2" style="white-space:nowrap;font-size: 14px;">{{ adhoc.pgr.mp}}</td>
+                        <td class="text-center p-2" style="white-space:nowrap;font-size: 14px;">{{ adhoc.adhoc_ticket.internal_ticket_number}}</td>
 
-                         <td class="text-center p-2" style="white-space: nowrap;">{{ adhoc.adhoc_in_date }}</td>
-                         <td class="text-center p-2"style="white-space: nowrap;">{{ adhoc.adhoc_in_time}}</td>
-                         <td class="text-center p-2"style="white-space: nowrap;">{{ adhoc.adhoc_out_date}}</td>
-                         <td class="text-center p-2"style="white-space: nowrap;">{{ adhoc.adhoc_out_time}}</td>
+                         <td class="text-center p-2" style="white-space: nowrap;font-size: 14px;">{{ adhoc.adhoc_in_date }}</td>
+                         <td class="text-center p-2"style="white-space: nowrap;font-size: 14px;">{{ adhoc.adhoc_in_time}}</td>
+                         <td class="text-center p-2"style="white-space: nowrap;font-size: 14px;">{{ adhoc.adhoc_out_date}}</td>
+                         <td class="text-center p-2"style="white-space: nowrap;font-size: 14px;">{{ adhoc.adhoc_out_time}}</td>
                  
-                         <td class="text-center p-2">{{ adhoc.adhoc_working_hours|floatformat:'2'}}</td>
-                         <td class="text-center p-2">{{ adhoc.adhoc_pay_rate }}</td>
-                         <td class="text-center p-2">{{ adhoc.adhoc_bill_amount}}</td>                                                  
-                        
+                         <td class="text-center p-2" style="white-space: nowrap;font-size: 14px;">{{ adhoc.adhoc_working_hours|floatformat:'2'}}</td>
+                         <td class="text-center p-2" style="white-space: nowrap;font-size: 14px;">{{ adhoc.pgr.PGR_pay_rate }}</td>
+                         <td class="text-center p-2" style="white-space: nowrap;font-size: 14px;">{{ adhoc.adhoc_bill_amount}}</td>                                                  
+                         
                     </tr>
                     {% endfor %}
                 </tbody>                
@@ -184,7 +191,7 @@ table {
    
 <script>
     $(document).ready(function() {
-     $('#id_pgr,#id_adhoc_ticket').select2({
+     $('#id_pgr,#id_adhoc_ticket,#id_adhoc_requisition').select2({
          width: '100%',
          ajax: {
              url: "{% url 'dailyexpense:common_search' %}",

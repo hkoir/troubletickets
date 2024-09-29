@@ -3,6 +3,9 @@ from account.models import Customer
 from django.utils import timezone
 from tickets.mp_list import REGION_CHOICES,ZONE_CHOICES,MP_CHOICES
 
+
+
+
 class DisasterMoneyRequisition(models.Model):
     requisition_number = models.CharField(max_length=50,null=True, blank=True, default='None')
     requester = models.ForeignKey(Customer, on_delete=models.CASCADE)

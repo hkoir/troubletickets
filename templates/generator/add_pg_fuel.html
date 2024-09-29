@@ -98,16 +98,16 @@
             if (refillType === 'pump') {
                 $('#id_fuel_pump').closest('.form-group').show();
                 $('#id_fuel_pump').prop('disabled', false);
-                $('#id_fuel_supplier_name, #id_fuel_supplier_phone, #id_fuel_supplier_address, #id_fuel_rate').closest('.form-group').hide();
-                $('#id_fuel_supplier_name, #id_fuel_supplier_phone, #id_fuel_supplier_address, #id_fuel_rate').prop('disabled', true);
+                $('#id_fuel_supplier_name, #id_fuel_supplier_phone, #id_fuel_supplier_address').closest('.form-group').hide();
+                $('#id_fuel_supplier_name, #id_fuel_supplier_phone, #id_fuel_supplier_address').prop('disabled', true);
             } else if (refillType === 'local_purchase') {
                 $('#id_fuel_pump').closest('.form-group').hide();
                 $('#id_fuel_pump').prop('disabled', true);
-                $('#id_fuel_supplier_name, #id_fuel_supplier_phone, #id_fuel_supplier_address, #id_fuel_rate').closest('.form-group').show();
-                $('#id_fuel_supplier_name, #id_fuel_supplier_phone, #id_fuel_supplier_address, #id_fuel_rate').prop('disabled', false);
+                $('#id_fuel_supplier_name, #id_fuel_supplier_phone, #id_fuel_supplier_address').closest('.form-group').show();
+                $('#id_fuel_supplier_name, #id_fuel_supplier_phone, #id_fuel_supplier_address').prop('disabled', false);
             } else {
-                $('#id_fuel_pump, #id_fuel_supplier_name, #id_fuel_supplier_phone, #id_fuel_supplier_address, #id_fuel_rate').closest('.form-group').hide();
-                $('#id_fuel_pump, #id_fuel_supplier_name, #id_fuel_supplier_phone, #id_fuel_supplier_address, #id_fuel_rate').prop('disabled', true);
+                $('#id_fuel_pump, #id_fuel_supplier_name, #id_fuel_supplier_phone, #id_fuel_supplier_address').closest('.form-group').hide();
+                $('#id_fuel_pump, #id_fuel_supplier_name, #id_fuel_supplier_phone, #id_fuel_supplier_address').prop('disabled', true);
             }
 
             console.log('Fields Toggled'); // Debugging line

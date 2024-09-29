@@ -15,7 +15,7 @@ class AdVehicleForm(forms.ModelForm):
          
     class Meta:
         model = AddVehicleInfo
-        exclude = ['vehicle_id','vehicle_add_requester','created_at','vehicle_cancel_date'] 
+        exclude = ['vehicle_id','vehicle_add_requester','created_at','vehicle_cancel_date','vehicle_rental_type'] 
  
    
 class AddVehicleExpensesForm(forms.ModelForm):
@@ -163,7 +163,7 @@ class RentalPeriodForm(forms.Form):
 class VehiclePaymentForm(forms.ModelForm):   
     class Meta:
         model = VehicleRentalCost
-        fields = ['region', 'zone', 'mp', 'vehicle', 'vehicle_rent_paid','vehicle_body_overtime_paid']
+        fields = ['region', 'zone', 'mp', 'vehicle', 'vehicle_rent_paid','vehicle_kilometer_paid']
 
 
 
@@ -232,8 +232,8 @@ class AdhocRequisitionForm(forms.ModelForm):
         fields = ['vehicle','start_date','end_date','purpose']
 
         widgets = {
-                'start_date': forms.TimeInput(attrs={'type': 'date'}),
-                'end_date': forms.TimeInput(attrs={'type': 'date'}),
+                'start_date': forms.DateInput(attrs={'type': 'date'}),
+                'end_date': forms.DateInput(attrs={'type': 'date'}),
                            
                      }
 
@@ -280,7 +280,7 @@ class AdhocRequisitionStatusForm(forms.Form):
 class AdhocAttendanceIntimeForm(forms.ModelForm):
     class Meta:
         model = AdhocVehicleAttendance
-        fields = ['vehicle', 'adhoc_in_date', 'adhoc_in_time','adhoc_requisition']
+        fields = ['vehicle', 'adhoc_in_date', 'adhoc_in_time','adhoc_requisition_vehicle']
         widgets = {
             'adhoc_in_date': forms.DateInput(attrs={'type': 'date'}),
             'adhoc_in_time': forms.TimeInput(attrs={'type': 'time'}),

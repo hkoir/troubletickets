@@ -99,13 +99,12 @@ class PGRdatabase(models.Model):
     
     pgr_payment_type_choices=[
         ('monthly','monthly'),
-        ('hourly','hourly')
+        ('hourly','hourly'),
+        ('12hours','12hours'),
+        ('24hours','24hours')
     ]
     PGR_payment_type = models.CharField(max_length=100,choices=pgr_payment_type_choices, null=True,blank=True)
-
-    PGR_01hour_rate = models.DecimalField(max_digits=10,decimal_places=2,null=True,blank=True)
-    PGR_12hour_rate = models.DecimalField(max_digits=10,decimal_places=2,null=True,blank=True)
-    PGR_24hour_rate = models.DecimalField(max_digits=10,decimal_places=2,null=True,blank=True)
+   
     PGR_pay_rate = models.DecimalField(max_digits=10,decimal_places=2,null=True,blank=True)
     phone = models.CharField(max_length=100)
     payment_number= models.CharField(max_length=100,null=True,blank=True)
@@ -120,11 +119,59 @@ class PGRdatabase(models.Model):
     PGR_photo = models.ImageField(upload_to='PGR_photo', blank=True, null=True)
     PGR_birth_certificate = models.FileField(upload_to='PGR_birth_certificate', blank=True, null=True)
     joining_date = models.DateField(null=True, blank=True)
-    PGR_salary = models.DecimalField(max_digits=15, decimal_places=2, null=True, blank=True)
     reference_person_name = models.CharField(max_length=100, null=True, blank=True)
     reference_person_phone = models.CharField(max_length=100, null=True, blank=True)
     created_at = models.DateField(default=timezone.now)
 
     def __str__(self):
         return self.name
+    
+
+
+
+class OperationalUser(models.Model):
+    region = models.CharField(max_length=100, choices=REGION_CHOICES, null=True, blank=True)
+    zone = models.CharField(max_length=100, choices=ZONE_CHOICES, null=True, blank=True)
+    mp = models.CharField(max_length=100, choices=MP_CHOICES, null=True, blank=True)
+    user_name = models.CharField(max_length=100,null=True)
+    user_type_choices=[
+        ('CM_user','CM_user'),
+        ('PM_user','PM_user'),
+        ('others','others'),
+    ]
+    user_type = models.CharField(max_length=50,choices= user_type_choices,null=True)
+    designation_choices=[
+        ('RM','RM'),
+        ('ZM','ZM'),
+        ('AZM','AZM'),
+        ('rectifer_expert','rectifier_expert'),
+        ('DGOW_runner','DGOW_runner'),
+        ('patroller','patroller'),
+        ('AC_IBS','AC_IBS'),
+        ('riger','riger'),
+        ('RMS_expert','RMS_expert'),
+        ('solar_expert','solar_expert'),
+        ('ebill','ebill'),
+        ('reporter','reporter'),
+        ('PM_engineer','PM_engineer'),
+        ('PG_technician','PG_technician'),
+        ('DG_technician','DG_technician'),
+        ('Admin_executive','Admin_executive'),
+        ('Account_executive','Account_executive'),
+        ('General_staff','General_staff')
+
+    ]
+    user_designation =models.CharField(max_length=50,choices=designation_choices,null=True)
+    phone = models.CharField(max_length=100)
+    email = models.EmailField()
+    address = models.TextField()
+    user_photo = models.ImageField(upload_to='user_photo', blank=True, null=True)
+    user_birth_certificate = models.FileField(upload_to='user_birth_certificate', blank=True, null=True)
+    joining_date = models.DateField(null=True, blank=True)
+    reference_person_name = models.CharField(max_length=100, null=True, blank=True)
+    reference_person_phone = models.CharField(max_length=100, null=True, blank=True)
+    created_at = models.DateField(default=timezone.now)
+
+    def __str__(self):
+        return self.user_name
 

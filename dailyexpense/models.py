@@ -16,10 +16,6 @@ from account.models import Customer
 
 
 
-
-
-
-
 class MoneyRequisition(models.Model):
     requisition_number = models.CharField(max_length=50,null=True, blank=True, default='None')
     requester = models.ForeignKey(Customer, on_delete=models.CASCADE)
@@ -34,6 +30,8 @@ class MoneyRequisition(models.Model):
         ('Operations','Operations'),
         ('Adhoc_man','Adhoc_man'),
         ('Adhoc_vehicle','Adhoc_vehicle'),
+        ('Civil_power','Civil_power'),
+        ('disaster','disaster'),
       
     ]
     purpose = models.CharField(max_length=100,choices=purpose_choices, default="None",null=True, blank=True)
@@ -68,10 +66,6 @@ class MoneyRequisition(models.Model):
     level1_approval_date = models.DateTimeField(null=True, blank=True)
     level2_approval_date = models.DateTimeField(null=True, blank=True)
     level3_approval_date = models.DateTimeField(null=True, blank=True)
-
-
-
-
 
 
 
@@ -146,7 +140,7 @@ class SummaryExpenses(models.Model):
             next_record.save(update_fields=['balance_from_previous_month'])
 
 
-
+from common.models import PGTLdatabase,OperationalUser
 
 class DailyExpenseRequisition(models.Model):
     expense_requisition_number = models.CharField(max_length=50, default='None')
@@ -161,8 +155,28 @@ class DailyExpenseRequisition(models.Model):
     zone = models.CharField(max_length=100,choices=ZONE_CHOICES,null=True, blank=True)
     mp = models.CharField(max_length=100,choices=MP_CHOICES,null=True, blank=True)
 
+    pgtl = models.ForeignKey(PGTLdatabase,related_name='pgtl_expense',on_delete=models.CASCADE,null=True,blank=True)
+    user = models.ForeignKey(OperationalUser,related_name='operational_user_ref',on_delete=models.CASCADE,null=True,blank=True)
+
+    user_type_choices=[
+        ('CM_user','CM_user'),
+        ('PM_user','PM_user'),
+        ('general_user','general_user'),
+        ('team_leader','team_leader'),
+    ]
+    user_type = models.CharField(max_length=50,choices=user_type_choices,null=True,blank=True)
+
+    work_type_choices=[
+        ('CM_work','CM_work'),
+        ('PM_work','PM_work'),
+        ('Civil_power','Civil_power'),
+        ('disaster_support','disaster_support'),
+    ]
+    work_type=models.CharField(max_length=50,choices=work_type_choices, null=True,blank=True)
+
     expense_requisition_choices=[
         ('local_conveyance','local_conveyance'),
+        ('long_distance_transport','long_distance_transport'),
         ('pg_carrying_cost','pg_carrying-cost'),
         ('night_bill','night_bill'),
         ('pg_local_fuel_purchase','pg_local_fuel_purchase'),
@@ -171,11 +185,27 @@ class DailyExpenseRequisition(models.Model):
         ('food','food'),
         ('item_purchase','item_purchase'),
         ('field_advance','field_advance'),
-        ('others','others')   
+        ('DA','DA'),
+        ('hotel_bill','hotel_bill'),
+        ('others','others'),
 
     ]
 
-    purpose = models.CharField(max_length=100,choices=expense_requisition_choices)
+    purpose = models.CharField(max_length=100,choices=expense_requisition_choices,null=True,blank=True)
+    civil_power_choices=[
+        ('single_phase_meter','single_phase_meter'),
+        ('three_phase_meter','three_phase_meter'),     
+        ('5kva_transformer','5kva_transformer'),      
+        ('10kva_transformer','10kva_transformer'),
+        ('security_protection','security_protection'),
+        ('conveyance','conveyance'),
+        ('food','food'),      
+        ('DA','DA'),
+        ('hotel_bill','hotel_bill'),
+        ('others','others'),
+
+    ]
+    purpose_civil_power = models.CharField(max_length=100,choices=civil_power_choices,null=True,blank=True)
     pgnumber = models.ForeignKey(AddPGInfo,related_name='pg_daily_expense',null=True,blank=True, on_delete=models.CASCADE)
     vehicle = models.ForeignKey(AddVehicleInfo,related_name="vehicle_daily_expense",null=True,blank=True, on_delete=models.CASCADE)
     approved_amount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)  # New field for the approved amount
@@ -212,9 +242,9 @@ class DailyExpenseRequisition(models.Model):
     level2_approval_status = models.CharField(max_length=20, choices=APPROVAL_STATUS_CHOICES, default='PENDING')
     level3_approval_status = models.CharField(max_length=20, choices=APPROVAL_STATUS_CHOICES, default='PENDING')
     
-    level1_comments = models.TextField(blank=True)
-    level2_comments = models.TextField(blank=True)
-    level3_comments = models.TextField(blank=True) 
+    level1_comments = models.TextField(null=True,blank=True)
+    level2_comments = models.TextField(null=True,blank=True)
+    level3_comments = models.TextField(null=True,blank=True) 
 
     level1_approval_date = models.DateTimeField(null=True, blank=True)
     level2_approval_date = models.DateTimeField(null=True, blank=True)

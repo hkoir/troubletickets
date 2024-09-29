@@ -110,38 +110,62 @@ table {
                         <th class="text-center p-2">Out date</th>
                         <th class="text-center p-2">Out Time</th>
                         <th class="text-center p-2">Total working hours</th>
-                        <th class="text-center p-2">Pay rate</th>
+                        <th class="text-center p-2">Body rent</th>    
+                        <th class="text-center p-2">Service type</th>    
+                        <th class="text-center p-2">Contact hours</th>                 
                         <th class="text-center p-2">Total bill amount </th>              
                                 
                     </tr>
                 </thead>
                 <tbody>
-                    {% for adhoc in  adhoc_attendance %}
+                    {% for adhoc in  page_obj %}
                     <tr>
-                        <td class="text-center p-2" style="white-space: nowrap;">{{ adhoc.created_at}}</td>
-                        <td class="text-center p-2" style="white-space:nowrap;">{{ adhoc.vehicle.vehicle_reg_number}}</td>
-                        <td class="text-center p-2" style="white-space:nowrap;">{{ adhoc.vehicle.vehicle_owner_name}}</td>
-                        <td class="text-center p-2" style="white-space:nowrap;">{{ adhoc.vehicle.vehilce_owner_mobile_number}}</td>
-                        <td class="text-center p-2" style="white-space:nowrap;">{{ adhoc.vehicle.region}}</td>
-                        <td class="text-center p-2" style="white-space:nowrap;">{{ adhoc.vehicle.zone}}</td>
-                        <td class="text-center p-2" style="white-space:nowrap;">{{ adhoc.vehicle.mp}}</td>
+                        <td class="text-center p-2" style="white-space: nowrap;font-size: 14px;">{{ adhoc.created_at}}</td>
+                        <td class="text-center p-2" style="white-space:nowrap;font-size: 14px;">{{ adhoc.vehicle.vehicle_reg_number}}</td>
+                        <td class="text-center p-2" style="white-space:nowrap;font-size: 14px;">{{ adhoc.vehicle.vehicle_owner_name}}</td>
+                        <td class="text-center p-2" style="white-space:nowrap;font-size: 14px;">{{ adhoc.vehicle.vehilce_owner_mobile_number}}</td>
+                        <td class="text-center p-2" style="white-space:nowrap;font-size: 14px;">{{ adhoc.vehicle.region}}</td>
+                        <td class="text-center p-2" style="white-space:nowrap;font-size: 14px;">{{ adhoc.vehicle.zone}}</td>
+                        <td class="text-center p-2" style="white-space:nowrap;font-size: 14px;">{{ adhoc.vehicle.mp}}</td>
 
-                         <td class="text-center p-2" style="white-space: nowrap;">{{ adhoc.adhoc_in_date }}</td>
-                         <td class="text-center p-2"style="white-space: nowrap;">{{ adhoc.adhoc_in_time}}</td>
-                         <td class="text-center p-2"style="white-space: nowrap;">{{ adhoc.adhoc_out_date}}</td>
-                         <td class="text-center p-2"style="white-space: nowrap;">{{ adhoc.adhoc_out_time}}</td>
+                         <td class="text-center p-2" style="white-space: nowrap;font-size: 14px;">{{ adhoc.adhoc_in_date }}</td>
+                         <td class="text-center p-2"style="white-space: nowrap;font-size: 14px;">{{ adhoc.adhoc_in_time}}</td>
+                         <td class="text-center p-2"style="white-space: nowrap;font-size: 14px;">{{ adhoc.adhoc_out_date}}</td>
+                         <td class="text-center p-2"style="white-space: nowrap;font-size: 14px;">{{ adhoc.adhoc_out_time}}</td>
                  
-                         <td class="text-center p-2">{{ adhoc.adhoc_working_hours|floatformat:'2'}}</td>
-                         <td class="text-center p-2">{{ adhoc.adhoc_pay_rate }}</td>
-                         <td class="text-center p-2">{{ adhoc.adhoc_bill_amount}}</td>                                                  
+                         <td class="text-center p-2"style="white-space: nowrap;font-size: 14px;">{{ adhoc.adhoc_working_hours|floatformat:'2'}}</td>
+                         <td class="text-center p-2"style="white-space: nowrap;font-size: 14px;">{{ adhoc.vehicle.vehicle_rent|floatformat:'2'}}</td>
+                         <td class="text-center p-2"style="white-space: nowrap;font-size: 14px;">{{ adhoc.vehicle.vehicle_rental_category}}</td>  
+                         <td class="text-center p-2"style="white-space: nowrap;font-size: 14px;">{{ adhoc.vehicle.vehicle_hour_contact}}</td>   
+                                               
+                         <td class="text-center p-2"style="white-space: nowrap;font-size: 14px;">{{ adhoc.adhoc_vehicle_total_bill_amount}}</td>                                                  
                         
                     </tr>
                     {% endfor %}
                 </tbody>                
                 
             </table>
-        </div>   
 
+            
+<div class="pagination" style="padding:10px">
+    {% if page_obj.has_previous %}
+        <a style="margin:10px; font-size: 14px;" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+    {% endif %}
+    
+    {% for num in page_obj.paginator.page_range %}
+        {% if page_obj.number == num %}
+            <span style="margin:10px; font-size:14px">{{ num }}</span>
+        {% else %}
+            <a style="margin:10px; font-size:14px" href="?page={{ num }}">{{ num }}</a>
+        {% endif %}
+    {% endfor %}
+    
+    {% if page_obj.has_next %}
+        <a style="margin:10px; font-size:14px" href="?page={{ page_obj.next_page_number }}">Next</a>
+    {% endif %}
+</div>
+
+        </div>           
         
     </div>
 </div>
@@ -152,9 +176,10 @@ table {
 <div class="col" style="height:1200px"></div>
 
    
+
 <script>
     $(document).ready(function() {
-     $('#id_pgr').select2({
+     $('#id_vehicle,#id_adhoc_requisition_vehicle').select2({
          width: '100%',
          ajax: {
              url: "{% url 'dailyexpense:common_search' %}",
@@ -184,7 +209,6 @@ table {
  });
  
  </script>
-    
 
     <script>
         $(document).ready(function(){      

@@ -23,7 +23,7 @@ urlpatterns = [
    
     path('summary_expenses_form_view/', views.summary_expenses_form_view, name='summary_expenses_form_view'),
     path('zone_wise_expenses_view/', views.zone_wise_expenses_view, name='zone_wise_expenses_view'),
-   path('zone_wise_expenses_view2/', views.zone_wise_expenses_view2, name='zone_wise_expenses_view2'),
+  
     path('update_summary_expenses/<int:summary_expenses_id>/', views.update_summary_expenses, name='update_summary_expenses'),
     path('expense_advance_management/', views.expense_advance_management, name='expense_advance_management'),
   

@@ -61,25 +61,23 @@
                         
         </div>
 
-        <div class="col-12">            
-            <h4 style="margin-top:40px; margin-left:0px">Data for
-                {% if days %}
-                    the last {{ days }} days
-                {% elif start_date and end_date %}
-                    from: {{ start_date }} to {{ end_date }}
-                {% endif %}
-            </h4>           
-
-        </div>
-
+    
         <div class="col-12">                    
-            <h2 class="text-center p-2"> 
+            <h4 class="text-center p-2"> 
+                Data for    {% if days %}
+                the last {{ days }} days
+            {% elif start_date and end_date %}
+                from: {{ start_date }} to {{ end_date }}
+            {% endif %} :
                 <a href="{% url 'generator:view_pg_details_fuel'%}">Fuel details:</a>  
-                PG run Summary report:
+               <a href="{% url 'generator:pg_summary_report_by_zone'%}"> PG Summary report by zone:</a>  
                 <a href="{% url 'generator:view_pg_details_fault'%}">Fault details:</a>
                
-            </h2>
+            </h4>
             <table>
+                <div class="text-center p-2" style="background-color: burlywood">
+                    <strong>Grand Total Required Fuel Cost as on now:</strong> {{ grand_total_required_fuel_cost }}
+                </div>
                 <thead>
                     <tr>
                         <th class="text-center p-2">PG Region</th>
@@ -90,14 +88,14 @@
                         <th class="text-center p-2">PG deployed site code</th>
                         <th class="text-center p-2">Total Refill Amount</th>
                         <th class="text-center p-2">Total pump refill</th>
-                        <th class="text-center p-2">Total fuel local Purchase</th>
-                        <th class="text-center p-2">Total fuel cash advance taken</th>
+                        <th class="text-center p-2">Fuel local Purchase</th>
+                        <th class="text-center p-2">Fuel cash advance taken</th>
                         <th class="text-center p-2">Total fuel cost</th>
                         <th class="text-center p-2">Total Tickets Handled</th>
                         <th class="text-center p-2">Total Run Hours</th>
                         <th class="text-center p-2">Total fuel consumed</th>
                         <th class="text-center p-2">Total fuel balance</th>
-                        <th class="text-center p-2">Total fuel refill cost need</th>
+                        <th class="text-center p-2">Fuel refill cost needed</th>
                         <th class="text-center p-2">Total fault duration</th>
                     </tr>
                 </thead>
@@ -123,10 +121,10 @@
                         <td class="text-center p-2">{{ item.3.total_tt_handle }}</td>
                         <td class="text-center p-2">{{ item.3.total_run_hour|floatformat:'2' }}</td>
                         <td class="text-center p-2">{{ item.3.total_fuel_consumed|floatformat:'2' }}</td>
-                        {% if item.3.fuel_balance <= 5 %}
+                        {% if item.3.fuel_balance <= 10 %}
                         <td class="text-center p-2" style="background-color:red">{{ item.3.fuel_balance|floatformat:'2' }}</td>
                         {% else %}
-                        <td class="text-center p-2">{{ item.3.fuel_balance|floatformat:'2' }}</td>
+                        <td class="text-center p-2" style="background-color:rgb(175, 236, 100)">{{ item.3.fuel_balance|floatformat:'2' }}</td>
                         {% endif %}
                         <td class="text-center p-2">{{ item.3.total_required_fuel_cost }}</td>
                         <td class="text-center p-2">{{ item.3.total_pg_fault_hours }}</td>
@@ -134,6 +132,7 @@
                     {% endfor %}
                 </tbody>
             </table>
+            
         </div>
 
 

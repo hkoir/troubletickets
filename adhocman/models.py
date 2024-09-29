@@ -8,9 +8,9 @@ from account.models import Customer
 from django.contrib import messages
 
 from django.db.models import Sum, Avg,Count,Q,Case, When, IntegerField,F,Max,DurationField, DecimalField
+from django.core.exceptions import ValidationError
 
-
-class AdhocRequisition(models.Model): 
+class AdhocManRequisition(models.Model): 
     pgr = models.ForeignKey(PGRdatabase, on_delete=models.CASCADE,blank=True,null=True)
     start_date = models.DateField(null=True,blank=True)
     end_date = models.DateField(null=True,blank=True)
@@ -58,7 +58,7 @@ class AdhocRequisition(models.Model):
             if self.start_date == self.end_date:
                 self.num_of_days_applied = 1
             else:
-                self.num_of_days_applied = (self.end_date - self.start_date).days
+                self.num_of_days_applied = (self.end_date - self.start_date).days + 1
 
         level1_approved = self.level1_approval_status and self.level1_approval_status.lower() == 'approved'
         level2_approved = self.level2_approval_status and self.level2_approval_status.lower() == 'approved'
@@ -72,13 +72,9 @@ class AdhocRequisition(models.Model):
         super().save(*args, **kwargs)  # Ensure the changes are saved
 
     def __str__(self):
-        return f"Requisition for {self.pgr.name} on {self.requisition_date}"
+        return f"Requisition for {self.pgr.name} Req.ID {self.requisition_id}"
   
 
-
-
-
-from django.core.exceptions import ValidationError
 
 class AdhocPayment(models.Model):   
     payment_id = models.CharField(max_length=150, null=True, blank=True)
@@ -115,8 +111,8 @@ class AdhocAttendance(models.Model):
     adhoc_pay_rate = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     adhoc_bill_amount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)    
     adhoc_payment = models.ForeignKey(AdhocPayment, related_name='adhoc_man_payment_ref', on_delete=models.CASCADE, null=True, blank=True)
-   
-    adhoc_requisition = models.ForeignKey(AdhocRequisition, related_name='adhoc_man_requisition_ref', on_delete=models.CASCADE, null=True, blank=True)
+    adhoc_due_amount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    adhoc_requisition = models.ForeignKey(AdhocManRequisition, related_name='adhoc_man_requisition_ref', on_delete=models.CASCADE, null=True, blank=True)
 
     created_at = models.DateField(default=timezone.now)
 
@@ -131,15 +127,30 @@ class AdhocAttendance(models.Model):
                 total_seconds = (out_datetime - in_datetime).total_seconds()
                 self.adhoc_working_hours = total_seconds / 3600
                 
-                self.adhoc_bill_amount = self.adhoc_working_hours * float(self.adhoc_pay_rate)
-        
+                if self.pgr.PGR_payment_type =='monthly':
+                    self.adhoc_bill_amount = self.adhoc_working_hours * float(self.pgr.PGR_pay_rate / 720)
+
+                if self.pgr.PGR_payment_type =='hourly':
+                    self.adhoc_bill_amount = self.adhoc_working_hours * float(self.pgr.PGR_pay_rate)
+
+                if self.pgr.PGR_payment_type =='12hours':
+                    self.adhoc_bill_amount = self.adhoc_working_hours * float(self.pgr.PGR_pay_rate / 12)
+
+                if self.pgr.PGR_payment_type =='24hours':
+                    self.adhoc_bill_amount = self.adhoc_working_hours * float(self.pgr.PGR_pay_rate / 24)
+
+                if self.adhoc_payment is not None and self.adhoc_payment.adhoc_paid_amount is not None:
+                    self.adhoc_due_amount = float(self.adhoc_bill_amount) - float(self.adhoc_payment.adhoc_paid_amount)
+                else:
+                    self.adhoc_due_amount = float(self.adhoc_bill_amount)  # Assuming full amount is due if no payment
+            
         super(AdhocAttendance, self).save(*args, **kwargs)
        
     def get_active_requisition(self):
         if not self.adhoc_in_date:
             return None
         try:
-            requisition = AdhocRequisition.objects.get(
+            requisition = AdhocManRequisition.objects.get(
                 pgr=self.pgr,
                 active_status = True,              
                 start_date__lte=self.adhoc_in_date,
@@ -147,7 +158,7 @@ class AdhocAttendance(models.Model):
                 level1_approval_status='Approved'
             )
             return requisition
-        except AdhocRequisition.DoesNotExist:
+        except AdhocManRequisition.DoesNotExist:
             return None
 
     def __str__(self):

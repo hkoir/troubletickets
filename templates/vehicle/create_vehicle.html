@@ -54,14 +54,11 @@
     <div class="col" style="height:1200px"></div>
 
     
-
-
-
     <script>
         $(document).ready(function(){      
             var regionZoneMapping = {
                 'Sylhet': ['','Sylhet', 'Moulovibazar','Mymensingh','Kisorganj','Tangail'], 
-                'Rangpur': ['','Rangpur', 'Dinajpur','Bagura','Rajshahi'] ,                          
+                'Rangpur': ['','Rangpur', 'Dinajpur','Bagura','Rajshahi'] ,                       
                 
             };
          
@@ -85,21 +82,38 @@
                 'Dinajpur':['','Dinajpur','Panchghor','Jaldhaka','Thakurgaon'],
                 'Rajshahi':['','Rajshahi','Bagura','Nachole','Natore','Chapai'],
                 'Bagura':['','Bagura'],
-                '': ['']
-               
+                '': ['']               
             };
     
        
             $('#id_zone').change(function(){
                 $('#id_mp').val('');
                 var selectedZone = $(this).val();
-                var mpChoices = zoneMpMapping[selectedZone];
-    
+                var mpChoices = zoneMpMapping[selectedZone];    
                 $('#id_mp').empty();
                 $.each(mpChoices, function(index, value){
                     $('#id_mp').append($('<option>').text(value).attr('value', value));
                 });
             });
+
+
+
+
+
+            // toggle function
+            function toggleFields() {
+            var vehicle_rental_category  = $('#id_vehicle_rental_category').val();
+            if (vehicle_rental_category  === 'monthly') {
+                $('#id_vehicle_hour_contact').closest('.form-group').hide();                
+            } else{
+                $('#id_vehicle_hour_contact').closest('.form-group').show();                
+                 }
+            }
+        
+        toggleFields();
+        $('#id_vehicle_rental_category').change(function() {
+            toggleFields();
+        });
     
     
     

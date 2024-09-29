@@ -71,13 +71,13 @@
             the last {{ days }} days 
         {% elif start_date and end_date %}
             from: {{ start_date }} to {{ end_date }}
-        {% endif %}
+        {% endif %} :Vehicle summary
     </h4>
         
 </div>
 
 
-<h4 class="text-center">Vehicle cost performance summary</h4>
+
 
 <div class="container-fluid main-content" >
     <div class="row">
@@ -88,7 +88,10 @@
                 <thead>
                     <tr>
                         <th  class="text-center p-2">view details</th>
+                        <th  class="text-center p-2">view overtime</th>
+                    
                         <th class="text-center p-2">Vehicle Registration Number</th>
+                        <th class="text-center p-2">Vehicle mode of use</th>
                         <th class="text-center p-2">Zone</th>
                         <th class="text-center p-2">No of travel days</th>
                         <th class="text-center p-2">Vehicle Rent rate</th>
@@ -99,15 +102,15 @@
                         <th class="text-center p-2">Body Over Time Rate</th>
 
                     
-                        <th class="text-center p-2">Total vehicle running Hours</th>
-                        <th class="text-center p-2">Total kilometer run from running data</th>
-                        <th class="text-center p-2">Total kilometer run from refill data</th>
-                        <th class="text-center p-2">Total fuel refill</th>
-                        <th class="text-center p-2">Total fuel consumed</th>
-                        <th class="text-center p-2">Total fuel balance</th>
+                        <th class="text-center p-2" style="background-color: blanchedalmond;">Vehicle running Hours</th>
+                        <th class="text-center p-2" style="background-color: blanchedalmond;">Kilometer run from running data</th>
+                        <th class="text-center p-2" style="background-color: blanchedalmond;">Kilometer run from refill data</th>
+                        <th class="text-center p-2" style="background-color: blanchedalmond;">Fuel refill</th>
+                        <th class="text-center p-2" style="background-color: blanchedalmond;">Fuel consumed</th>
+                        <th class="text-center p-2" style="background-color: blanchedalmond;">Fuel balance</th>
 
-                        <th class="text-center p-2">Total fuel consumed from refill</th>
-                        <th class="text-center p-2">Total fuel balance from refill</th>
+                        <th class="text-center p-2" style="background-color: blanchedalmond;">Fuel consumed from refill</th>
+                        <th class="text-center p-2" style="background-color: blanchedalmond;">Fuel balance from refill</th>
                        
                     
 
@@ -116,10 +119,17 @@
                         <th class="text-center p-2">Total overtime Hours</th>
                         <th class="text-center p-2">Total Fault Hours</th>                           
 
-                        <th class="text-center p-2">Total vehicle Rent Due</th>
-                        <th  class="text-center p-2">Total Driver Overtime Due</th>
-                        <th  class="text-center p-2">Total body Overtime Due</th>
-                        <th  class="text-center p-2">Total bill amount</th>
+                        <th class="text-center p-2" style="background-color: chartreuse;">Vehicle body Rent</th>
+                        <th  class="text-center p-2" style="background-color: chartreuse;" >Driver Overtime</th>
+                        <th  class="text-center p-2" style="background-color: chartreuse;">Body Overtime</th>
+                        <th  class="text-center p-2" style="background-color: chartreuse;">Total Vehicle bill amount</th>
+
+
+                        <th class="text-center p-2" style="background-color: aquamarine;">CNG run bill</th>
+                        <th  class="text-center p-2" style="background-color: aquamarine;">Gasoline run bill</th>
+                        <th  class="text-center p-2" style="background-color: aquamarine;" >Total Kilometer bill</th>
+
+                        <th  class="text-center p-2" style="background-color:bisque;">Grand total bill</th>
 
                         <th  class="text-center p-2">Click to pay</th>
 
@@ -139,47 +149,57 @@
                     {% for vehicle_reg_number, data in aggregated_data_page %}
                     <tr>
                       
-                        <td style="white-space: nowrap">
+                        <td class="text-center p-1" style="white-space: nowrap">
                             <a href="{% url 'vehicle:vehicle_detail' data.vehicle_id %}">View details</a>
-                        </td>                    
-                        
-                        <td class="text-center p-2" style="white-space: nowrap;">{{ vehicle_reg_number }}</td>
-                        <td class="text-center p-2" style="white-space: nowrap;">{{ data.zone }}</td>
-                        <td class="text-center p-2">{{ data.num_travel_dates }}</td>
-                        <td class="text-center p-2">{{ data.vehicle_rental_rate|first|floatformat:'2' }}</td>
-                    
-                        <td class="text-center p-2"> {{ data.vehicle_rental_category_info}}</td>
-                    
-                        <td class="text-center p-2">{{ data.driver_overtime_rate|first }}</td>
-                        <td class="text-center p-2">{{ data.vehicle_body_overtime_rate|first }}</td>
+                        </td>
+                        <td class="text-center p-1" style="white-space: nowrap">
+                            <a href="{% url 'vehicle:vehicle_overtime_calc'%}">View overtime</a>
+                        </td>                     
+                       
+                        <td class="text-center p-1" style="white-space: nowrap;">{{ vehicle_reg_number }}</td>
+                        <td class="text-center p-1" style="white-space: nowrap;">{{ data.vehicle_operational_mode }}</td>
+                        <td class="text-center p-1" style="white-space: nowrap;">{{ data.zone }}</td>
+                        <td class="text-center p-1">{{ data.num_travel_dates }}</td>
+                        <td class="text-center p-1">{{ data.vehicle_rental_rate|first|floatformat:'2' }}</td>                    
+                        <td class="text-center p-1"> {{ data.vehicle_rental_category_info}}</td>                    
+                        <td class="text-center p-1">{{ data.driver_overtime_rate|first }}</td>
+                        <td class="text-center p-1">{{ data.vehicle_body_overtime_rate|first }}</td>
 
-                        <td class="text-center p-2">{{ data.total_running_hours|floatformat:'2' }}</td>
-                        <td class="text-center p-2" style="background-color: burlywood;">{{ data.total_kilometer_run }}</td>
-                        <td class="text-center p-2" style="background-color: rgb(170, 234, 21);">{{ data.total_kilometer_run_from_refill}}</td>
-                        <td class="text-center p-2" style="background-color:rgb(228, 205, 205)">{{ data.total_fuel_refil}}</td>
-                        <td class="text-center p-2" style="background-color: burlywood;">{{ data.total_fuel_consumed }}</td>
-                        <td class="text-center p-2" style="background-color: burlywood;">{{ data.total_fuel_balance }}</td>
+                        <td class="text-center p-1">{{ data.total_running_hours|floatformat:'2' }}</td>
+                        <td class="text-center p-1" style="background-color: burlywood;">{{ data.total_kilometer_run }}</td>
+                        <td class="text-center p-1" style="background-color: rgb(170, 234, 21);">{{ data.total_kilometer_run_from_refill}}</td>
+                        <td class="text-center p-1" style="background-color:rgb(228, 205, 205)">{{ data.total_fuel_refil}}</td>
+                        <td class="text-center p-1" style="background-color: burlywood;">{{ data.total_fuel_consumed }}</td>
+                        <td class="text-center p-1" style="background-color: burlywood;">{{ data.total_fuel_balance }}</td>
 
-                        <td class="text-center p-2"style="background-color: rgb(170, 234, 21);">{{ data.total_fuel_consumed_from_refil }}</td>
-                        <td class="text-center p-2"style="background-color: rgb(170, 234, 21);">{{ data.total_fuel_balance_from_refil}}</td>
+                        <td class="text-center p-1"style="background-color: rgb(170, 234, 21);">{{ data.total_fuel_consumed_from_refil }}</td>
+                        <td class="text-center p-1"style="background-color: rgb(170, 234, 21);">{{ data.total_fuel_balance_from_refil}}</td>
                        
                 
 
-                        <td class="text-center p-2">{{ data.total_tickets_handle }}</td>
-                        <td class="text-center p-2">{{ data.total_pg_runhour_handle|floatformat:'2' }}</td>
-                        <td class="text-center p-2">{{ data.total_overtime_run_hours|floatformat:'2' }}</td>
-                        <td class="text-center p-2" style="background-color: rgb(241, 57, 57);">{{ data.total_fault_hours|floatformat:'2' }}</td>
+                        <td class="text-center p-1">{{ data.total_tickets_handle }}</td>
+                        <td class="text-center p-1">{{ data.total_pg_runhour_handle|floatformat:'2' }}</td>
+                        <td class="text-center p-1">{{ data.total_overtime_run_hours|floatformat:'2' }}</td>
+                        <td class="text-center p-1" style="background-color: rgb(241, 57, 57);">{{ data.total_fault_hours|floatformat:'2' }}</td>
 
-                        <td class="text-center p-2">{{ data.total_vehicle_rent_due|floatformat:'2' }}</td>
-                        <td class="text-center p-2">{{ data.total_overtime_cost|floatformat:'2' }}</td>
-                        <td class="text-center p-2">{{ data.vehicle_body_overtime_cost|floatformat:'2' }}</td>
 
-                        <td class="text-center p-2" style="background-color: aqua;">{{ data.total_vehicle_bill_amount|floatformat:'2' }}</td>
+                        <td class="text-center p-1">{{ data.total_vehicle_rent_due|floatformat:'2' }}</td>
+                        <td class="text-center p-1">{{ data.total_overtime_cost|floatformat:'2' }}</td>
+                        <td class="text-center p-1">{{ data.vehicle_body_overtime_cost|floatformat:'2' }}</td>
+                        <td class="text-center p-1" style="background-color: aqua;">{{ data.total_vehicle_bill_amount|floatformat:'2' }}</td>
+
+                        
+                        <td class="text-center p-1">{{ data.total_CNG_cost|floatformat:'2' }}</td>
+                        <td class="text-center p-1">{{ data.total_gasoline_cost|floatformat:'2' }}</td>
+                        <td class="text-center p-1">{{ data.total_kilometer_cost|floatformat:'2' }}</td>
+
+                        <td class="text-center p-1">{{ data.grand_total_bill_amount|floatformat:'2' }}</td>
+                 
 
                       
-                        <td class="text-center p-2" style="background-color: aqua; white-space: nowrap;" ><a href="{% url 'vehicle:create_vehicle_payment'%}">Click to pay</a></td>
+                        <td class="text-center p-1" style="background-color: aqua; white-space: nowrap;" ><a href="{% url 'vehicle:create_vehicle_payment'%}">Click to pay</a></td>
                      
-                        <td class="text-center p-2" style="background-color: aqua;">{{ data.total_bill_paid |floatformat:'2' }}</td>
+                        <td class="text-center p-1" style="background-color: aqua;">{{ data.total_bill_paid |floatformat:'2' }}</td>
                         
                        
                        

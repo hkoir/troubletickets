@@ -1,0 +1,216 @@
+{% extends "base.html" %}
+{% load static %}
+{% load duration_filters %}
+
+
+{% block content %}
+
+<title>View fuel refill</title>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+   
+<style>
+
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    
+    }
+    
+    th,td{
+        border: 1px solid black; /* Set border color for individual cells */
+        text-align: left;
+        padding: 0px;
+    }
+    
+    th {
+        background-color: rgb(38, 233, 129);
+        
+    }
+    
+    table thead th {
+    white-space: normal;
+    }
+    
+
+    .main-content {   
+    overflow-y: auto;
+    margin-left:0px;
+    position: absolute;
+    width: 100%;
+    left: 0;
+  
+}
+    
+    
+    </style>
+
+
+
+
+<div class="container-fluid main-content">
+    <div class="row">
+        <div class="col-xl-12">
+    <h4 class="text-center">Generator periodic service status</h4>  
+   
+    <form method="GET" action="{% url 'generator:view_gen_service' %}">
+        <div class="container-fluid main-content2">
+            <div class="row row-cols-2 row-cols-md-6">
+    
+            <div class="col" style="padding:5px;">  Start Date:  {{ form.start_date }} </div>
+            <div class="col" style="padding:5px;">  End Date:  {{ form.end_date }} </div>
+            <div class="col" style="padding:5px;"> No of days {{ form.days }} </div>
+            <div class="col" style="padding:5px;">  Region:{{ form.region }} </div>  
+            <div class="col" style="padding:5px;">  Zone:{{ form.zone }} </div>    
+            <div class="col" style="padding:5px;">  mp:{{ form.mp }} </div>  
+            <div class="col" style="padding:5px;"> <button type="submit" class='btn btn-primary'>Generate Data</button></div>
+            
+            </div>
+        </div>                    
+    </form>          
+
+        <h4 class="text-center">Data for
+            {% if days %}
+                the last {{ days }} days
+            {% elif start_date and end_date %}
+                from: {{ start_date }} to {{ end_date }}
+            {% endif %}
+        </h4>       
+
+    </div>
+   
+
+
+<div class="col-xl-12">
+    <table>
+        <thead>
+            <tr>
+
+                <th class="text-center p-2"> Generator number</th>
+                <th class="text-center p-2"> Gen Zone</th>
+                <th class="text-center p-2"> Gen Capacity</th>
+                <th class="text-center p-2"> Gen Brand</th>
+                <th class="text-center p-2"> Gen Owner</th>
+
+                <th class="text-center p-2"> Gen Deployment type</th>
+                <th class="text-center p-2"> Gen fixed site code</th>
+           
+                <th class="text-center p-2"> Total run hours</th>
+                <th class="text-center p-2"> Last service hours</th>
+                <th class="text-center p-2"> Hours since last service</th>
+                <th class="text-center p-2"> Date of last service</th>
+                <th class="text-center p-2"> Days since last service</th> 
+                <th class="text-center p-2"> Service Status</th> 
+                <th class="text-center p-2"> Lub-oil Capacity(litre)</th>            
+                
+         
+        
+             
+               
+              
+            </tr>
+        </thead>
+        <tbody>
+            {% for data in pgnumber_aggregates %}
+                <tr>
+                    <td class="text-center">{{ data.pgnumber }}</td>
+                    <td class="text-center">{{ data.gen_zone }}</td>
+                    <td class="text-center">{{ data.gen_capacity }}</td>
+                    <td class="text-center">{{ data.gen_brand }}</td>
+                    <td class="text-center">{{ data.gen_owner }}</td>
+                    <td class="text-center">{{ data.gen_deployment_type }}</td>
+                    <td class="text-center">{{ data.gen_fixed_site_code }}</td>
+                    <td class="text-center">{{ data.total_run_hours|floatformat:'2' }}</td>
+                    <td class="text-center">{{ data.total_service_hours }}</td>
+                    <td class="text-center">{{ data.total_service_hours_passed|floatformat:'2' }}</td>
+                    <td class="text-center">{{ data.date_of_last_service }}</td>
+                    <td class="text-center">{{ data.total_days_passed }}</td>
+                    {% if data.Service_status == 'Service Pending' %}
+                        <td class="text-center" style="background-color: rgb(244, 120, 26);">{{ data.Service_status }}</td>
+                    {% else %}
+                        <td class="text-center" style="background-color: rgb(15, 243, 8);">{{ data.Service_status }}</td>
+                    {% endif %}
+                    <td class="text-center">{{ data.luboil_capacity }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+        
+        
+        
+           
+    </table>
+</div>
+<div class="pagination">
+    <span class="step-links">
+        {% if pgnumber_aggregates.has_previous %}
+            <a href="?page=1">&laquo; first</a>
+            <a href="?page={{ pgnumber_aggregates.previous_page_number }}">previous</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ pgnumber_aggregates.number }} of {{ pgnumber_aggregates.paginator.num_pages }}.
+        </span>
+
+        {% if pgnumber_aggregates.has_next %}
+            <a href="?page={{ pgnumber_aggregates.next_page_number }}">next</a>
+            <a href="?page={{ pgnumber_aggregates.paginator.num_pages }}">last &raquo;</a>
+        {% endif %}
+    </span>
+</div>
+
+</div>
+</div>
+
+
+
+
+
+<div class="col" style="height:1200px"></div>
+
+
+
+
+
+
+<script>
+    $(document).ready(function() {
+
+        var regionZoneMapping = {
+            'Sylhet': ['', 'Sylhet', 'Moulovibazar', 'Mymensingh', 'Kisorganj', 'Tangail'],
+            'Rangpur': ['', 'Rangpur', 'Dinajpur', 'Bagura', 'Rajshahi']
+        };
+
+        var zoneMpMapping = {
+            'Sylhet': ['', 'Sylhet', 'Taherpur', 'Sunamganj', 'Bianibazar', 'Dorbhost', 'Dherai', 'Chatak'],
+            'Moulovibazar': ['', 'Moulovibazar', 'Saestaganj', 'Juri', 'Baniachong'],
+            'Mymensingh': ['', 'Mymensingh', 'Fulpur', 'Valuka'],
+            'Kisorganj': ['', 'Kisorganj', 'Katiadi', 'Netrokona', 'Mohonpur', 'Austogram'],
+            'Tangail': ['', 'Tangail', 'Madhupur', 'Jamalpur', 'Sherpur', 'Bakshihanj', 'Rowmari'],
+            'Rangpur': ['', 'Rangpur', 'Hatibandha', 'Gaibandha', 'Ulipur', 'Boropar', 'Polasbari'],
+            'Dinajpur': ['', 'Dinajpur', 'Panchghor', 'Jaldhaka', 'Thakurgaon'],
+            'Rajshahi': ['', 'Rajshahi', 'Bagura', 'Nachole', 'Natore', 'Chapai'],
+            'Bagura': ['', 'Bagura'],
+            '': ['']
+        };
+
+        $('#id_region').change(function() {
+            var selectedRegion = $(this).val();
+            var zoneChoices = regionZoneMapping[selectedRegion] || [];
+            $('#id_zone').empty().append($.map(zoneChoices, function(value) {
+                return $('<option>').text(value).attr('value', value);
+            })).trigger('change');
+        });
+
+        $('#id_zone').change(function() {
+            var selectedZone = $(this).val();
+            var mpChoices = zoneMpMapping[selectedZone] || [];
+            $('#id_mp').empty().append($.map(mpChoices, function(value) {
+                return $('<option>').text(value).attr('value', value);
+            }));
+        });
+    });
+</script>
+
+
+{% endblock %}

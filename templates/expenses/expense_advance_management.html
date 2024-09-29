@@ -42,57 +42,54 @@
 
 
  <div class="container-fluid">
-    <div class="row row-cols-3 row-cols-md-6 p-2">
-     
+    <div class="row row-cols-3 row-cols-md-6 p-2">    
 
-        <div class="card" style="background-color: white;">
+        <div class="card m-1" style="background-color: white;border:2px solid green;border-radius: 10px;">
             <a class="text-center" style="text-decoration: none;" href="{% url 'dailyexpense:money_requisition' %}">
-                <img class="rounded-pill" src="{% static 'images/money.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
+                <i class="fa fa-briefcase" aria-hidden="true"></i>
                 <br>Create Advance Requisition</a>
         </div>
     
-        <div class="card" style="background-color: white;">
+        <div class="card m-1" style="background-color: white;border:2px solid green;border-radius: 10px;">
             <a class="text-center" style="text-decoration: none;" href="{% url 'dailyexpense:all_approval_status' %}">
-                <img class="rounded-pill" src="{% static 'images/money.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
+                <i class="fa fa-briefcase" aria-hidden="true"></i>
                 <br>Advance Requisition Status</a>
         </div>
     
     
-        <div class="card" style="background-color: white;">
+        <div class="card m-1" style="background-color: white;border:2px solid green;border-radius: 10px;">
             <a class="text-center" style="text-decoration: none;" href="{% url 'dailyexpense:create_expense_requisition' %}">
-                <img class="rounded-pill" src="{% static 'images/expenses.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
+                <i class="fa fa-calculator" aria-hidden="true"></i>
                 <br>Create daily Expense Requisition</a>
         </div>
     
-        <div class="card" style="background-color: white;">
+        <div class="card m-1" style="background-color: white;border:2px solid green;border-radius: 10px;">
             <a class="text-center" style="text-decoration: none;" href="{% url 'dailyexpense:expense_approval_status' %}">
-                <img class="rounded-pill" src="{% static 'images/expenses.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
+                <i class="fa fa-calculator" aria-hidden="true"></i>
                 <br>Daily Expense Requisition Status</a>
         </div>
     
-        <div class="card" style="background-color: white;">
+        <div class="card m-1" style="background-color: white;border:2px solid green;border-radius: 10px;">
             <a class="text-center" style="text-decoration: none;" href="{% url 'dailyexpense:daily_expense_summary' %}">
-                <img class="rounded-pill" src="{% static 'images/expenses.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
+                <i class="fa fa-calculator" aria-hidden="true"></i>
                 <br>Daily Expense data analysis</a>
         </div>
     
     
         <!-- grand summary data compilation -->
        
-        <div class="card" style="background-color: white;">
+        <div class="card m-1" style="background-color: white;border:2px solid green;border-radius: 10px;">
             <a class="text-center" style="text-decoration: none;" href="{% url 'dailyexpense:summary_expenses_form_view' %}">
-                <img class="rounded-pill" src="{% static 'images/money.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
+                <i class="fa fa-briefcase" aria-hidden="true"></i>
                 <br>Create Grand Summary Expenses</a>
         </div>
-        <div class="card" style="background-color: white;">
+        <div class="card m-1" style="background-color: white;border:2px solid green;border-radius: 10px;">
             <a class="text-center" style="text-decoration: none;" href="{% url 'dailyexpense:zone_wise_expenses_view' %}">
-                <img class="rounded-pill" src="{% static 'images/money.png' %}" style="width:50px;height:50px" alt="Logo" id="logo"> 
+                <i class="fa fa-briefcase" aria-hidden="true"></i>
                 <br>View Grand summary Expenses</a>
         </div>
 
-
-
-       
+     
     
 
     </div>

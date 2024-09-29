@@ -78,7 +78,8 @@
         
         
         <div class="col-12">    
-            <a href="{% url 'vehicle:view_adhoc_attendance' %}">View details</a>
+            <a href="{% url 'vehicle:view_adhoc_attendance2' %}">View details</a>:
+            <a href="{% url 'vehicle:adhoc_approval_status2' %}">Approval & adhoc attendance</a>
             <table>
                 <thead>
                     <tr>
@@ -118,29 +119,29 @@
 
                     {% for summary in adhoc_summary %}
                     <tr>
-                        <td  class="text-center p-2" style="white-space: nowrap;">{{ summary.vehicle__vehicle_reg_number }}</td>
-                        <td  class="text-center p-2" style="white-space: nowrap;">{{ summary.vehicle__region }}</td>
-                        <td  class="text-center p-2" style="white-space: nowrap;">{{ summary.vehicle__zone }}</td>
-                        <td  class="text-center p-2" style="white-space: nowrap;">{{ summary.vehicle__mp }}</td>
+                        <td  class="text-center p-1" style="white-space: nowrap;">{{ summary.vehicle__vehicle_reg_number }}</td>
+                        <td  class="text-center p-1" style="white-space: nowrap;">{{ summary.vehicle__region }}</td>
+                        <td  class="text-center p-1" style="white-space: nowrap;">{{ summary.vehicle__zone }}</td>
+                        <td  class="text-center p-1" style="white-space: nowrap;">{{ summary.vehicle__mp }}</td>
 
-                        <td  class="text-center p-2" style="white-space: nowrap;">{{ summary.total_working_hours|floatformat:'2' }}</td>                        
-                        <td  class="text-center p-2" style="white-space: nowrap;">{{ summary.total_fault_hours|floatformat:'2' }}</td>
+                        <td  class="text-center p-1" style="white-space: nowrap;">{{ summary.total_working_hours|floatformat:'2' }}</td>                        
+                        <td  class="text-center p-1" style="white-space: nowrap;">{{ summary.total_fault_hours|floatformat:'2' }}</td>
                         
-                        <td  class="text-center p-2" style="white-space: nowrap;">{{ summary.total_base_bill_amount|floatformat:'2'}}</td>
-                        <td  class="text-center p-2" style="white-space: nowrap;">{{ summary.total_overtime_bill_amount|floatformat:'2'}}</td>
-                        <td  class="text-center p-2" style="white-space: nowrap;">{{ summary.total_adhoc_bill_amount|floatformat:'2'}}</td>
+                        <td  class="text-center p-1" style="white-space: nowrap;">{{ summary.total_base_bill_amount|floatformat:'2'}}</td>
+                        <td  class="text-center p-1" style="white-space: nowrap;">{{ summary.total_overtime_bill_amount|floatformat:'2'}}</td>
+                        <td  class="text-center p-1" style="white-space: nowrap;">{{ summary.total_adhoc_bill_amount|floatformat:'2'}}</td>
 
-                        <td  class="text-center p-2" style="white-space: nowrap;">{{ summary.total_kilometer_run}}</td>
-                        <td  class="text-center p-2" style="white-space: nowrap;">{{ summary.total_kilometer_cost_CNG|floatformat:'2'}}</td>
-                        <td  class="text-center p-2" style="white-space: nowrap;">{{ summary.total_kilometer_cost_gasoline|floatformat:'2'}}</td>
-                        <td  class="text-center p-2" style="white-space: nowrap;">{{ summary.total_kilometer_cost|floatformat:'2'}}</td>
+                        <td  class="text-center p-1" style="white-space: nowrap;">{{ summary.total_kilometer_run}}</td>
+                        <td  class="text-center p-1" style="white-space: nowrap;">{{ summary.total_kilometer_cost_CNG|floatformat:'2'}}</td>
+                        <td  class="text-center p-1" style="white-space: nowrap;">{{ summary.total_kilometer_cost_gasoline|floatformat:'2'}}</td>
+                        <td  class="text-center p-1" style="white-space: nowrap;">{{ summary.total_kilometer_cost|floatformat:'2'}}</td>
 
-                        <td  class="text-center p-2" style="white-space: nowrap;">{{ summary.grand_total_bill_amount|floatformat:'2'}}</td> 
-                        <td class="text-center p-2" style="white-space: nowrap;">{{ summary.adhoc_paid_amount|floatformat:'2'}}</td> 
-                        <td class="text-center p-2" style="white-space: nowrap;">{{ summary.adhoc_net_payment_due|floatformat:'2' }}</td>                     
+                        <td  class="text-center p-1" style="white-space: nowrap;">{{ summary.grand_total_bill_amount|floatformat:'2'}}</td> 
+                        <td class="text-center p-1" style="white-space: nowrap;">{{ summary.adhoc_paid_amount|floatformat:'2'}}</td> 
+                        <td class="text-center p-1" style="white-space: nowrap;">{{ summary.adhoc_net_payment_due|floatformat:'2' }}</td>                     
 
-                        <td  class="text-center p-2" style="white-space: nowrap;">{{ summary.total_TT_handle}}</td>
-                        <td  class="text-center p-2" style="white-space: nowrap;">{{ summary.total_PGRH|divide_by:3600|floatformat:'2'}}</td>
+                        <td  class="text-center p-1" style="white-space: nowrap;">{{ summary.total_TT_handle}}</td>
+                        <td  class="text-center p-1" style="white-space: nowrap;">{{ summary.total_PGRH|divide_by:3600|floatformat:'2'}}</td>
                                                                     
                       
                        

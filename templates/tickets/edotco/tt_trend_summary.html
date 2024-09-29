@@ -55,19 +55,19 @@
 
 
 
-<h4 style="margin-top:40px">Report for
-    {% if days %}
-        the last {{ days }} days
-    {% elif start_date and end_date %}
-        from: {{ start_date }} to {{ end_date }}
-    {% endif %}
-</h4>
 
 
 <div class="container-fluid" id =main-content>
     <div class="row">
         <div class="col-12 overflow-auto">
-            <h4>Grand Summary TT and Run Hour Trend</h4>
+            <h4 style="margin-top:20px">Grand Summary TT and Run Hour Trend
+                : Data for 
+                {% if days %}
+                the last {{ days }} days
+            {% elif start_date and end_date %}
+                from: {{ start_date }} to {{ end_date }}
+            {% endif %}
+            </h4>
             <div style="overflow-x: auto;">
                 <canvas class="overflow-auto" id="aggregate_charts" style="border: 1px solid green; height: 400px; width:100%;"></canvas>
             </div>
@@ -86,132 +86,132 @@
 </script>
 
 <script>
-
 const data = JSON.parse(document.getElementById('data-json').textContent);
 const dateMap = {};
 
-data.forEach(item => {
-    const date = item.created_at;
-    const troubleTickets = item.trouble_tickets;
-    const runHours = item.run_hours;
-    const avgRunHour = item.avg_run_hour_per_tt;
+        // Aggregate data by date
+        data.forEach(item => {
+            const date = item.created_at;
+            const troubleTickets = item.trouble_tickets;
+            const runHours = item.run_hours;
+            const avgRunHour = item.avg_run_hour_per_tt;
 
-    if (!dateMap[date]) {
-        dateMap[date] = {
-            troubleTickets: 0,
-            runHours: 0,          
-            avgRunHour: 0,
-            count: 0  
-        };
-    }
-
-    dateMap[date].troubleTickets += troubleTickets;
-    dateMap[date].runHours += runHours;    
-    dateMap[date].avgRunHour += avgRunHour * troubleTickets;
-
-    dateMap[date].count += troubleTickets;
-});
-
-const dates = Object.keys(dateMap);
-const aggregatedTroubleTickets = dates.map(date => dateMap[date].troubleTickets);
-const aggregatedRunHours = dates.map(date => dateMap[date].runHours);
-
-const aggregatedAvgRunHours = dates.map(date => {
-    const totalRunHours = dateMap[date].avgRunHour;
-    const count = dateMap[date].count;
-    return count > 0 ? totalRunHours / count : 0;
-});
-
-const ctx = document.getElementById('aggregate_charts').getContext('2d');
-const summaryChart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-        labels: dates,
-
-        datasets: [
-            {
-                label: 'Trouble Tickets',
-                data: aggregatedTroubleTickets,
-                backgroundColor: 'red',               
-              
-            },
-            {
-                label: 'Run Hours',
-                data: aggregatedRunHours,
-                backgroundColor: 'blue'
-            },
-            {
-                label: 'Avg Run Hour per Trouble Ticket',
-                data: aggregatedAvgRunHours,
-                backgroundColor: 'green'
+            if (!dateMap[date]) {
+                dateMap[date] = {
+                    troubleTickets: 0,
+                    runHours: 0,          
+                    avgRunHour: 0,
+                    count: 0  
+                };
             }
-        ],
-        
-    },
-    options: {
-        responsive: false,
-        scales: {
-            x: {
-                title: {
-                    display: true,
-                    text: 'Date',
-                    color: '#000578',
-                    font: {
-                        size: 25,
-                        weight: 'bold'
-                    }
-                },
-                ticks: {
-                    color: '#000578',
-                    font: {
-                        size: 16,
-                        weight: 'normal'
-                    }
-                }
-            },
-            y: {
-                beginAtZero: true,
-                title: {
-                    display: true,
-                    text: 'Value',
-                    color: '#000578',
-                    font: {
-                        size: 25,
-                        weight: 'bold'
-                    }
-                },
-                ticks: {
-                    color: '#000578',
-                    font: {
-                        size: 16,
-                        weight: 'normal'
-                    }
-                }
-            }
-        },
-        plugins: {
-            title: {
-                display: true,
-                text: 'Summary Chart',
-                color: '#000578',
-                font: {
-                    size: 25,
-                    weight: 'bold'
-                }
-            },
-            legend: {
-                labels: {
-                    font: {
-                        size: 16, 
-                        weight: 'normal',
-                        family: 'Arial' 
+
+            dateMap[date].troubleTickets += troubleTickets;
+            dateMap[date].runHours += runHours;    
+            dateMap[date].avgRunHour += avgRunHour * troubleTickets;
+            dateMap[date].count += troubleTickets;
+        });
+
+        // Get the dates and sort them
+        const dates = Object.keys(dateMap).sort((a, b) => new Date(a) - new Date(b));
+        const aggregatedTroubleTickets = dates.map(date => dateMap[date].troubleTickets);
+        const aggregatedRunHours = dates.map(date => dateMap[date].runHours);
+        const aggregatedAvgRunHours = dates.map(date => {
+            const totalRunHours = dateMap[date].avgRunHour;
+            const count = dateMap[date].count;
+            return count > 0 ? totalRunHours / count : 0;
+        });
+
+
+       
+
+        const ctx = document.getElementById('aggregate_charts').getContext('2d');
+        const summaryChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: dates,
+                datasets: [
+                    {
+                        label: 'Trouble Tickets',
+                        data: aggregatedTroubleTickets,
+                        backgroundColor: 'red',
                     },
-                    color: '#000578' 
+                    {
+                        label: 'Run Hours',
+                        data: aggregatedRunHours,
+                        backgroundColor: 'blue'
+                    },
+                    {
+                        label: 'Avg Run Hour per Trouble Ticket',
+                        data: aggregatedAvgRunHours,
+                        backgroundColor: 'green'
+                    }
+                ],
+            },
+            options: {
+                responsive: false,
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Date',
+                            color: '#000578',
+                            font: {
+                                size: 25,
+                                weight: 'bold'
+                            }
+                        },
+                        ticks: {
+                            color: '#000578',
+                            font: {
+                                size: 16,
+                                weight: 'normal'
+                            }
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Value',
+                            color: '#000578',
+                            font: {
+                                size: 25,
+                                weight: 'bold'
+                            }
+                        },
+                        ticks: {
+                            color: '#000578',
+                            font: {
+                                size: 16,
+                                weight: 'normal'
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Summary Chart',
+                        color: '#000578',
+                        font: {
+                            size: 25,
+                            weight: 'bold'
+                        }
+                    },
+                    legend: {
+                        labels: {
+                            font: {
+                                size: 16,
+                                weight: 'normal',
+                                family: 'Arial'
+                            },
+                            color: '#000578'
+                        }
+                    }
                 }
             }
-        }
-    }
-});
+        });
+
 
 </script>
 

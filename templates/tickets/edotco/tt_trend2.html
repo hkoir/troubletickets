@@ -15,18 +15,15 @@
 
 
 
-<p><h4>Individual zone summary chart</h4>(Select no of days or date range)</p>
-
 <form method="GET" action="{% url 'tickets:zone_wise_tt_run_hour_trend2' %}">
 
     <div class="container-fluid" style="margin-bottom:30px">
-        <div class="row row-cols-1 row-cols-md-3">
-
-            <div class="col">  Start Date:  {{ form.start_date }} </div>
-            <div class="col">  End Date:  {{ form.end_date }} </div>
-            <div class="col"> or Select no of days:  {{ form.days }}    </div>
-            <div class="col">  Region:{{ form.region }} </div>
-            <div class="col">  Zone:{{ form.zone }}    </div>
+        <div class="row row-cols-3 row-cols-md-6">
+            <div class="col"> Start Date:  {{ form.start_date }} </div>
+            <div class="col"> End Date:  {{ form.end_date }} </div>
+            <div class="col"> or Select no of days:  {{ form.days }}</div>
+            <div class="col"> Region:{{ form.region }} </div>
+            <div class="col"> Zone:{{ form.zone }}</div>
             <div class="col"><button type="submit" class='btn btn-primary'>Generate Data</button></div>
        
          </div>   
@@ -35,24 +32,17 @@
 
 
 
-
-
-<h4 style="margin-top:40px">Report for
+<h4 class="text-center">Individual Zone TT and Run Hour Trend:Data for
     {% if days %}
-        the last {{ days }} days
-    {% elif start_date and end_date %}
-        from: {{ start_date }} to {{ end_date }}
-    {% endif %}
+    the last {{ days }} days
+{% elif start_date and end_date %}
+    from: {{ start_date }} to {{ end_date }}
+{% endif %}
 </h4>
 
-
-
-
-
-
-<div class="container-fluid" style="margin-top: 80px;">
-    <div class="row">
-        <h4 class="text-center">Individual Zone TT and Run Hour Trend</h4>
+<div class="container-fluid" style="margin-top: 40px;">
+    <div class="row row-cols-3 row-cols-md-6">
+       
         <div class="col">
             <div id="individual_charts" style="height: 400px; width: 1200px;"></div>
         </div>
@@ -78,16 +68,13 @@
 
 <script>
 
-
-
-
 const data = JSON.parse(document.getElementById('data-json').textContent);
 
 const zoneDataMap = {};
 
 data.forEach(item => {
     const zone = item.zone;
-    const date = item.created_at;
+    const date = new Date(item.created_at).toISOString().split('T')[0];  // Normalize the date to YYYY-MM-DD format
     const troubleTickets = item.trouble_tickets;
     const runHours = item.run_hours;
 
@@ -116,6 +103,18 @@ data.forEach(item => {
     }
 });
 
+// Sort dates in ascending order for each zone
+for (const zone in zoneDataMap) {
+    const sortedIndices = zoneDataMap[zone].dates
+        .map((date, index) => ({ date, index }))
+        .sort((a, b) => new Date(a.date) - new Date(b.date))
+        .map(sortedObj => sortedObj.index);
+
+    zoneDataMap[zone].dates = sortedIndices.map(index => zoneDataMap[zone].dates[index]);
+    zoneDataMap[zone].troubleTickets = sortedIndices.map(index => zoneDataMap[zone].troubleTickets[index]);
+    zoneDataMap[zone].runHours = sortedIndices.map(index => zoneDataMap[zone].runHours[index]);
+    zoneDataMap[zone].avgRunHourPerTT = sortedIndices.map(index => zoneDataMap[zone].avgRunHourPerTT[index]);
+}
 
 const chartsContainer = document.getElementById('individual_charts');
 for (const zone in zoneDataMap) {
@@ -203,22 +202,19 @@ for (const zone in zoneDataMap) {
                     }
                 },
                 legend: {
-                labels: {
-                    font: {
-                        size: 16, // Adjust the font size here
-                        weight: 'normal',
-                        family: 'Arial' // Adjust the font family here if needed
-                    },
-                    color: '#000578' // Adjust the color here if needed
+                    labels: {
+                        font: {
+                            size: 16,
+                            weight: 'normal',
+                            family: 'Arial'
+                        },
+                        color: '#000578'
+                    }
                 }
-            }
             }
         }
     });
 }
-
-    
-
 
 </script>
 {% endblock %}

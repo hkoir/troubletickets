@@ -41,9 +41,6 @@
 
 </style>
 
-<h2 class= "text-center" style="margin-top:10px; margin-bottom:10px">Daily expense Approval Status</h2>
-<p class="text-center">select date range/ or no of days but not both</p>
-
 
 
 <div class="container-fluid main-content">
@@ -67,7 +64,7 @@
         </div>               
         <div class="col"></div>
             <div style="left:0px; margin-left:0px">
-                <h4 class="text-center">Data for
+                <h4 class="text-center">Requisition Approval status: Data for
                 {% if days %}
                     the last {{ days }} days
                 {% elif start_date and end_date %}
@@ -76,52 +73,64 @@
                 </h4>            
             </div>
         </div> 
-        <div class="col" style="margin-bottom:10px">                    
-            <!-- Region-wise summary -->                   
-            <table>
-                <thead>
-                    <tr>
-                        <th class="text-center p-2">Region</th>
-                        <th class="text-center p-2">Total Requisition Amount</th>
-                        <th class="text-center p-2">Total Approved Amount</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for region in region_approvals %}
-                    <tr>
-                        <td class="text-center p-2">{{ region.region }}</td>
-                        <td class="text-center p-2">{{ region.total_requisition|floatformat:"2" }}</td>
-                        <td class="text-center p-2">{{ region.total_approved|floatformat:"2" }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+        <div class="col">
+            <div class="container_fluid">
+                <div class="row row-cols-1 row-cols-md-2">
+                    <div class="col" style="margin-bottom:10px">                    
+                        <!-- Region-wise summary -->                   
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th class="text-center p-2">Region</th>
+                                    <th class="text-center p-2">Total Requisition Amount</th>
+                                    <th class="text-center p-2">Total Approved Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for region in region_approvals %}
+                                <tr>
+                                    <td class="text-center p-2">{{ region.region }}</td>
+                                    <td class="text-center p-2">{{ region.total_requisition|floatformat:"2" }}</td>
+                                    <td class="text-center p-2">{{ region.total_approved|floatformat:"2" }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col">                
+                        <!-- Zone-wise summary -->           
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th class="text-center p-2">Zone</th>
+                                    <th class="text-center p-2">Total Requisition Amount</th>
+                                    <th class="text-center p-2">Total Approved Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for zone in zone_approvals %}
+                                <tr>
+                                    <td class="text-center p-2">{{ zone.zone }}</td>
+                                    <td class="text-center p-2">{{ zone.total_requisition|floatformat:"2" }}</td>
+                                    <td class="text-center p-2">{{ zone.total_approved|floatformat:"2" }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>                
+                    </div>  
+
+                </div>
+
+            </div>
         </div>
-        <div class="col">                
-            <!-- Zone-wise summary -->           
-            <table>
-                <thead>
-                    <tr>
-                        <th class="text-center p-2">Zone</th>
-                        <th class="text-center p-2">Total Requisition Amount</th>
-                        <th class="text-center p-2">Total Approved Amount</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for zone in zone_approvals %}
-                    <tr>
-                        <td class="text-center p-2">{{ zone.zone }}</td>
-                        <td class="text-center p-2">{{ zone.total_requisition|floatformat:"2" }}</td>
-                        <td class="text-center p-2">{{ zone.total_approved|floatformat:"2" }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>                
-        </div>  
+        
         <div class="col">            
             <div class="container-fluid" >
-                <h4 style="margin-top:20px; margin-bottom:10px"> Details requisition and approval 
-                <a href="{% url 'dailyexpense:download_expense_requisition_data' %}">Download</a></h4>
+                <h4 style="margin-top:20px; margin-bottom:10px"> Details requisition and approval:
+                <a href="{% url 'dailyexpense:download_expense_requisition_data' %}">Download</a>:
+                <a href="{% url 'dailyexpense:create_expense_requisition' %}">Apply for expense</a>
+            </h4>
+                
     
                 <div class="row">
                     <div class="col-xl-12">
@@ -151,17 +160,17 @@
                             <tbody>
                                 {% for requisition in expense_requisitions %}
                                 <tr>
-                                    <td class="text-center p-2">{{ requisition.expense_requester }}</td>
-                                    <td class="text-center p-2" style="white-space:nowrap;">{{ requisition.created_at }}</td>
-                                    <td class="text-center p-2">{{ requisition.expense_requisition_number }}</td>
-                                    <td class="text-center p-2">{{ requisition.region }}</td>
-                                    <td class="text-center p-2">{{ requisition.zone }}</td>
-                                    <td class="text-center p-2" style="white-space: nowrap;">{{ requisition.purpose }}</td>
-                                    <td class="text-center p-2">{{ requisition.requisition_amount }}</td>
-                                    <td class="text-center p-2">{{ requisition.approved_amount }}</td>
+                                    <td class="text-center">{{ requisition.expense_requester }}</td>
+                                    <td class="text-center" style="white-space:nowrap;">{{ requisition.created_at }}</td>
+                                    <td class="text-center">{{ requisition.expense_requisition_number }}</td>
+                                    <td class="text-center">{{ requisition.region }}</td>
+                                    <td class="text-center">{{ requisition.zone }}</td>
+                                    <td class="text-center" style="white-space: nowrap;">{{ requisition.purpose }}</td>
+                                    <td class="text-center">{{ requisition.requisition_amount }}</td>
+                                    <td class="text-center">{{ requisition.approved_amount }}</td>
                             
                                     <!-- Level 1 Approval -->
-                                    <td class="text-center p-2">
+                                    <td class="text-center">
                                         {% if requisition.level1_approval_status == 'Approved' %}
                                             <span style="background-color: rgb(239, 235, 14); font-size: 20px;">Approved</span>
                                         {% elif requisition.level1_approval_status == 'Rejected' %}
@@ -173,10 +182,10 @@
                                             <span style="background: goldenrod; font-size: 20px;">Pending</span>
                                         {% endif %}
                                     </td>
-                                    <td class="text-center p-2" style="white-space: nowrap;">{{ requisition.level1_approval_date }}</td>
+                                    <td class="text-center" style="white-space: nowrap;">{{ requisition.level1_approval_date }}</td>
                             
                                     <!-- Level 2 Approval -->
-                                    <td class="text-center p-2">
+                                    <td class="text-center">
                                         {% if requisition.level2_approval_status == 'Approved' %}
                                             <span style="background: green; font-size: 20px;">Approved</span>
                                         {% elif requisition.level2_approval_status == 'Rejected' %}
@@ -188,7 +197,7 @@
                                         {% endif %}
                                     </td>
 
-                                    <td class="text-center p-2" style="white-space: nowrap;">{{ requisition.level2_approval_date }}</td>
+                                    <td class="text-center" style="white-space: nowrap;">{{ requisition.level2_approval_date }}</td>
                             
                                     <!-- Level 3 Approval -->
                                     <td class="text-center p-2">
@@ -202,10 +211,10 @@
                                             <span style="background: goldenrod; font-size: 20px;">Pending</span>
                                         {% endif %}
                                     </td>
-                                    <td class="text-center p-2" style="white-space: nowrap;">{{ requisition.level3_approval_date }}</td>
+                                    <td class="text-center" style="white-space: nowrap;">{{ requisition.level3_approval_date }}</td>
                                 
                                 
-                                    <td class="text-center p-2">
+                                    <td class="text-center">
                                         {% if requisition.receiving_status == 'Received' %}
                                             Received
                                         {% elif requisition.expense_requester == request.user %}
@@ -219,7 +228,7 @@
                                     </td>
 
 
-                                    <td class="text-center p-2" style="white-space:nowrap;">
+                                    <td class="text-center" style="white-space:nowrap;">
                                         {% if requisition.supporting_documents %}
                                             {% if requisition.supporting_documents.url|slice:'-3:' == 'pdf' %}
                                                 <a href="{{ requisition.supporting_documents.url }}" target="_blank">
@@ -230,7 +239,7 @@
                                                     <img 
                                                         src="{{ requisition.supporting_documents.url }}" 
                                                         alt="Supporting Docs" 
-                                                        style="cursor: pointer; width:50px;height:50px"
+                                                        style="cursor: pointer; width:50px;height:30px"
                                                     >
                                                 </a>
                                             {% endif %}

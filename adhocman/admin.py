@@ -2,10 +2,10 @@ from django.contrib import admin
 
 
 
-from .models import AdhocAttendance,AdhocPayment,AdhocRequisition
+from .models import AdhocAttendance,AdhocPayment,AdhocManRequisition
 
 
 
-admin.site.register(AdhocRequisition)
+admin.site.register(AdhocManRequisition)
 admin.site.register(AdhocAttendance)
 admin.site.register(AdhocPayment)

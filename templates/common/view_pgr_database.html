@@ -74,18 +74,18 @@ table {
             
           </form>
 
-          <h4 class="text-center">Data for
-            {% if days %}
-                the last {{ days }} days
-            {% elif start_date and end_date %}
-                from: {{ start_date }} to {{ end_date }}
-            {% endif %}
-        </h4> 
+         
     </div>
     <div class="col-xl-12">
       <table>
         <thead>
-          <h4> PGR database</h4>
+          <h4> PGR database: Data for
+            {% if days %}
+            the last {{ days }} days
+        {% elif start_date and end_date %}
+            from: {{ start_date }} to {{ end_date }}
+        {% endif %}
+          </h4>
           <tr>
             <th class="text-center p-2">Action</th>
             <th class="text-center p-2">Action</th>
@@ -98,6 +98,9 @@ table {
             <th class="text-center p-2">PGR Photo</th>
             <th class="text-center p-2">PGR Type</th>
             <th class="text-center p-2">PGR Phone</th>
+
+            <th class="text-center p-2">PGR payment mode</th>
+            <th class="text-center p-2">PGR pay rate</th>
 
             <th class="text-center p-2">PGTL Name</th>
             <th class="text-center p-2">PGTL Phone</th>
@@ -133,7 +136,7 @@ table {
                     <img 
                       src="{{ pgr.PGR_photo.url }}" 
                       alt="PGR_photo" 
-                      style="cursor: pointer; width:50px;height:50px">
+                      style="cursor: pointer; width:50px;height:20px">
                   </a>
                 {% else %}
                   No image available
@@ -142,15 +145,20 @@ table {
               <td class="text-center p-2" style="white-space: nowrap;">{{ pgr.PGR_category }}</td>
               <td class="text-center p-2" style="white-space: nowrap;">{{ pgr.phone }}</td>
 
+              <td class="text-center p-2" style="white-space: nowrap;">{{ pgr.PGR_payment_type }}</td>
+              <td class="text-center p-2" style="white-space: nowrap;">{{ pgr.PGR_pay_rate }}</td>
+
               <td class="text-center p-2" style="white-space: nowrap;">{{ pgr.pgtl.name }}</td>
               <td class="text-center p-2" style="white-space: nowrap;">{{ pgr.pgtl.phone }}</td>
+
+            
               <td class="text-center p-2" style="white-space: nowrap;">
                 {% if pgr.pgtl.PGTL_birth_certificate %}
                   <a href="{{ pgr.pgtl.PGTL_photo.url }}" target="_blank">
                     <img 
                       src="{{ pgr.pgtl.PGTL_photo.url }}" 
                       alt="PGR_birth_certificate" 
-                      style="cursor: pointer; width:50px;height:50px">
+                      style="cursor: pointer; width:50px;height:20px">
                   </a>
                 {% else %}
                   No file available
@@ -170,7 +178,7 @@ table {
                     <img 
                       src="{{ pgr.PGR_birth_certificate.url }}" 
                       alt="PGR_birth_certificate" 
-                      style="cursor: pointer; width:50px;height:50px">
+                      style="cursor: pointer; width:50px;height:20px">
                   </a>
                 {% else %}
                   No file available

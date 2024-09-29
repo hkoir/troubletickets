@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% load duration_filters %}
 
 
 {% block content %}
@@ -58,7 +59,7 @@ table {
     <div class="row">
 
         <div class="col-12">       
-            <form method="GET" action="{% url 'adhocman:view_adhoc_attendance' %}" style="margin-bottom:30px">        
+            <form method="GET" action="{% url 'adhocman:view_adhoc_attendance2' %}" style="margin-bottom:30px">        
             <div class="container-fluid">
                 <div class="row row-cols-2 row-cols-md-6">        
                     <div class="col" style="padding:5px;">  Start Date:  {{ form.start_date }} </div>
@@ -101,23 +102,24 @@ table {
                         <th class="text-center p-2">Out Time</th>
                         <th class="text-center p-2">Total working hours</th>
                         <th class="text-center p-2">Total PGRH</th>
+                        <th class="text-center p-2">Payment type</th>
                         <th class="text-center p-2">Pay rate</th>
                         <th class="text-center p-2">Total bill amount</th>
                         <th class="text-center p-2">Payment media</th>
                         <th class="text-center p-2">Payment number</th>
                         <th class="text-center p-2">Pay bill to this adhoc</th>
-                        <th class="text-center p-2">Payment amount</th>
+                        <th class="text-center p-2">Paid amount</th>
+                        <th class="text-center p-2">Due amount</th>
                         <th class="text-center p-2" style="white-space: normal;">Transaction ID</th>
                         <th class="text-center p-2">Payment Docs</th>
 
-                    
-                      
+                                        
                                         
                                 
                     </tr>
                 </thead>
                 <tbody>
-                    {% for adhoc in adhoc_attendance_data %}
+                    {% for adhoc in page_obj %}
                     <tr>
                     
                         <td class="text-center p-2" style="white-space: nowrap;">{{ adhoc.created_at}}</td>
@@ -182,18 +184,24 @@ table {
                             {% else %}
                                 {{ adhoc.adhoc_out_time }}
                             {% endif %}
-                        </td>
-                 
+                        </td>                 
                          <td class="text-center p-2">{{ adhoc.adhoc_working_hours|floatformat:'2'}}</td>
                          <td class="text-center p-2">{{ adhoc.adhoc_ticket.internal_generator_running_hours}}</td>
-                         <td class="text-center p-2">{{ adhoc.adhoc_pay_rate }}</td>
+                         <td class="text-center p-2">{{ adhoc.pgr.PGR_payment_type }}</td>
+                         <td class="text-center p-2">{{ adhoc.pgr.PGR_pay_rate }}</td>
                          <td class="text-center p-2">{{ adhoc.adhoc_bill_amount}}</td>
                          <td class="text-center p-2">{{ adhoc.pgr.payment_number_choice}}</td>
                          <td class="text-center p-2">{{ adhoc.pgr.payment_number}}</td>
 
+                         {% if adhoc.adhoc_due_amount <= 50 %}
+                         <td class="text-center p-2"><i class="fas fa-check" style="color:green">Full Paid</i> </td>
+                         {% else %}
                          <td class="text-center p-2" style="white-space: nowrap;"><a href="{% url 'adhocman:create_adhoc_payment' adhoc.id %}">Update Payment</a></td>
+                         {% endif %}
                        
                          <td class="text-center p-2">{{ adhoc.adhoc_payment.adhoc_paid_amount}}</td>
+                         
+                         <td class="text-center p-2">{{ adhoc.adhoc_due_amount}}</td>
 
                          <td class="text-center p-2">
                             {% if adhoc.adhoc_payment %}
@@ -252,7 +260,6 @@ table {
 <div class="col" style="height:1200px"></div>
 
 
-
 <script>
     $(document).ready(function() {
       $('.updateOutTimeBtn').click(function(e) {
@@ -264,7 +271,7 @@ table {
           var attendanceId = $(this).data('attendance-id');
   
           $.ajax({
-              url: "{% url 'adhocman:adhoc_outtime2' 0 %}".replace('0', attendanceId),
+              url: "{% url 'adhocman:adhoc_outtime_ajax' 0 %}".replace('0', attendanceId),
               type: 'POST',
               data: {
                   'adhoc_out_date': adhoc_out_date,

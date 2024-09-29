@@ -8,14 +8,10 @@ from tickets.mp_list import REGION_CHOICES,ZONE_CHOICES,MP_CHOICES
 
 
 
-
-
-
-
 class MoneyRequisitionForm(forms.ModelForm):
     class Meta:
         model = MoneyRequisition
-        fields = ['region', 'zone','purpose', 'requisition_amount', 'supporting_documents']
+        fields = ['region', 'zone','purpose','requisition_amount', 'supporting_documents']
  
     
 
@@ -135,11 +131,9 @@ class ZoneWiseExpensesForm(forms.Form):
 class ExpenseRequisitionForm(forms.ModelForm):
     class Meta:
         model = DailyExpenseRequisition
-        fields = ['region', 'zone','mp','purpose','pgnumber','vehicle', 'requisition_amount','from_address','to_address','mode_travel','supporting_documents','description']
- 
+        fields = ['region', 'zone','mp','user_type','user','pgtl','work_type','purpose','purpose_civil_power','pgnumber','vehicle', 'requisition_amount','from_address','to_address','mode_travel','supporting_documents','description']
  
    
-
 
 
 class ExpenseRequisitionStatusForm(forms.Form):
@@ -181,10 +175,6 @@ class AdhocRequisitionForm(forms.ModelForm):
         model = AdhocRequisition
         fields = ['region', 'zone','no_of_adhoc_man_day','no_of_adhoc_vehicle_day','purpose', 'requisition_amount', 'supporting_documents']
  
-
-
-
-
 
 class AdhocRequisitionStatusForm(forms.Form):
     start_date = forms.DateField(

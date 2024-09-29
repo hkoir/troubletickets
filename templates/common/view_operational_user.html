@@ -1,0 +1,270 @@
+{% extends "base.html" %}
+{% load static %}
+
+
+
+{% block content %}
+
+<title>View PGR database</title>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <style>
+
+
+table {
+            border-collapse: collapse;
+            width: 100%;
+        
+        }
+        
+        th, td {
+            border: 1px solid black; /* Set border color for individual cells */
+            vertical-align: middle;
+            padding: 0px;
+        }
+        
+        th {
+          background-color: rgb(177, 227, 187);
+           
+        }
+        
+        table thead th {
+        white-space: normal;
+        }
+        
+
+
+        
+.main-content {   
+    overflow-y: auto;
+    margin-left:0px;
+    position: absolute;
+    width: 100%;
+    left: 0;
+  
+}
+
+
+
+</style>
+
+
+<div class="container-fluid main-content">
+  <div class="row">
+
+    <div class="col-xl-12">     
+        <form method="GET" action="{% url 'common:view_operational_user' %}">
+
+          <div class="container-fluid">
+              <div class="row row-cols-1 row-cols-md-6">
+
+              <div class="col" style="padding:5px; margin:5px">  Start Date:  {{ form.start_date }} </div>
+              <div class="col" style="padding:5px; margin:5px">  End Date:  {{ form.end_date }} </div>
+              <div class="col" style="padding:5px; margin:5px"> No of days {{ form.days }} </div>
+              <div class="col" style="padding:5px; margin:5px">  Region:{{ form.region }} </div>  
+              <div class="col" style="padding:5px; margin:5px">  Zone:{{ form.zone }} </div>    
+              <div class="col" style="padding:5px; margin:5px">  mp:{{ form.mp }} </div>  
+             
+              <div class="col" style="padding:5px; margin:5px"> <button type="submit" class='btn btn-primary'>Generate Data</button></div>
+                
+              </div>
+          </div>
+            
+          </form>
+
+         
+    </div>
+    <div class="col-xl-12">
+      <table>
+        <thead>
+          <h4> Operational User database: Data for
+            {% if days %}
+            the last {{ days }} days
+        {% elif start_date and end_date %}
+            from: {{ start_date }} to {{ end_date }}
+        {% endif %}
+          </h4>
+          <tr>
+           
+            <th class="text-center p-2">Action</th> 
+            <th class="text-center p-2">Created at</th>
+            <th class="text-center p-2">Region</th>
+            <th class="text-center p-2">Zone</th>
+            <th class="text-center p-2">MP</th>
+
+            <th class="text-center p-2">User Name</th>      
+            <th class="text-center p-2">User Photo</th>
+            <th class="text-center p-2">User Type</th>
+            <th class="text-center p-2">User Designation</th>
+
+            <th class="text-center p-2">User Phone</th>
+            <th class="text-center p-2">User Email</th>
+            <th class="text-center p-2">UserAddress</th>
+
+            <th class="text-center p-2">User Reference Person</th>
+            <th class="text-center p-2">User Reference Phone</th>
+            <th class="text-center p-2">User Joining Date</th>
+            <th class="text-center p-2">User Birth certificate</th>
+           
+
+          </tr>
+        </thead>
+        <tbody>
+          {% for pgr in user_list %}
+            <tr>
+
+              <td class="text-center p-2" style="white-space: nowrap;">
+                <a href="{% url 'common:update_operational_user' pgr.id %}">Update</a>
+              </td>
+              <td class="text-center p-2" style="white-space: nowrap;">{{ pgr.created_at }}</td>
+              <td class="text-center p-2" style="white-space: nowrap;">{{ pgr.region }}</td>
+              <td class="text-center p-2" style="white-space: nowrap;">{{ pgr.zone }}</td>
+              <td class="text-center p-2" style="white-space: nowrap;">{{ pgr.mp }}</td>
+              <td class="text-center p-2" style="white-space: nowrap;">{{ pgr.user_name }}</td>
+              
+              <td class="text-center p-2" style="white-space: nowrap;">
+                {% if pgr.user_photo %}
+                  <a href="{{ pgr.user_photo.url }}" target="_blank">
+                    <img 
+                      src="{{ pgr.user_photo.url }}" 
+                      alt="User_photo" 
+                      style="cursor: pointer; width:20px;height:20px">
+                  </a>
+                {% else %}
+                  No image available
+                {% endif %}
+              </td>
+              <td class="text-center p-2" style="white-space: nowrap;">{{ pgr.user_type }}</td>
+              <td class="text-center p-2" style="white-space: nowrap;">{{ pgr.user_designation }}</td>
+              <td class="text-center p-2" style="white-space: nowrap;">{{ pgr.phone }}</td>       
+               <td class="text-center p-2" style="white-space: nowrap;">{{ pgr.email }}</td>
+              <td class="text-center p-2" style="white-space: nowrap;">{{ pgr.address }}</td>
+
+              <td class="text-center p-2" style="white-space: nowrap;">{{ pgr.reference_person_name }}</td>
+              <td class="text-center p-2" style="white-space: nowrap;">{{ pgr.reference_person_phone }}</td>
+              <td class="text-center p-2" style="white-space: nowrap;">{{ pgr.joining_date }}</td>
+              <td class="text-center p-2" style="white-space: nowrap;">
+                {% if pgr.user_birth_certificate %}
+                  <a href="{{ pgr.PGR_birth_certificate.url }}" target="_blank">
+                    <img 
+                      src="{{ pgr.user_birth_certificate.url }}" 
+                      alt="User_birth_certificate" 
+                      style="cursor: pointer; width:20px;height:20px">
+                  </a>
+                {% else %}
+                  No file available
+                {% endif %}
+              </td>
+                       
+              
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  
+  <div class="pagination" style="padding:10px">
+    {% if page_obj.has_previous %}
+      <a style="margin:10px; font-size: 14px;" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+    {% endif %}
+    
+    {% for num in page_obj.paginator.page_range %}
+      {% if page_obj.number == num %}
+        <span style="margin:10px; font-size:14px">{{ num }}</span>
+      {% else %}
+        <a style="margin:10px; font-size:14px" href="?page={{ num }}">{{ num }}</a>
+      {% endif %}
+    {% endfor %}
+    
+    {% if page_obj.has_next %}
+      <a style="margin:10px; font-size:14px" href="?page={{ page_obj.next_page_number }}">Next</a>
+    {% endif %}
+  </div>
+
+
+</div>
+
+
+  
+    
+    
+
+
+
+    <div class="col" style="height:900px"></div>
+        
+
+
+
+
+
+    
+    <script>
+
+
+        $(document).ready(function(){      
+            var regionZoneMapping = {
+                'Sylhet': ['','Sylhet', 'Moulovibazar','Mymensingh','Kisorganj','Tangail'], 
+                'Rangpur': ['','Rangpur', 'Dinajpur','Bagura','Rajshahi'] ,
+               
+                
+            };
+         
+            $('#id_region').change(function(){
+                var selectedRegion = $(this).val();
+                var zoneChoices = regionZoneMapping[selectedRegion];
+                $('#id_zone').empty();
+                $.each(zoneChoices, function(index, value){
+                    $('#id_zone').append($('<option>').text(value).attr('value', value));
+                });
+            });
+
+                  
+            var zoneMpMapping = {              
+                'Sylhet': ['','Sylhet','Taherpur','Sunamganj','Bianibazar','Dorbhost','Dherai','Chatak'], // Add more MPs for Sylhet zone
+                'Moulovibazar': ['','Moulovibazar', 'Saestaganj','Juri','Baniachong'],
+                'Mymensingh': ['','Mymensingh', 'Fulpur','Valuka'] ,
+                'Kisorganj': ['','Kisorganj','Katiadi','Netrokona','Mohonpur','Austogram'],
+                'Tangail': ['','Tangail','Madhupur','Jamalpur','Sherpur','Bakshihanj','Rowmari'],
+               
+                'Rangpur':['','Rangpur','Hatibandha','Gaibandha','Ulipur','Boropar','Polasbari'],
+                'Dinajpur':['','Dinajpur','Panchghor','Jaldhaka','Thakurgaon'],
+                'Rajshahi':['','Rajshahi','Bagura','Nachole','Natore','Chapai'],
+                'Bagura':['','Bagura']
+               
+            };
+
+
+
+       
+            $('#id_zone').change(function(){
+                var selectedZone = $(this).val();
+                var mpChoices = zoneMpMapping[selectedZone];
+                $('#id_mp').empty();
+                $.each(mpChoices, function(index, value){
+                    $('#id_mp').append($('<option>').text(value).attr('value', value));
+                });
+            });
+        });
+
+
+
+
+
+
+
+
+    
+    function zoomInOut(image) {   
+        var currentScale = parseFloat(image.style.transform.replace('scale(', '').replace(')', '')) || 1;
+           
+        var newScale = currentScale === 1 ? 1.5 : 1;       
+  
+        image.style.transform = 'scale(' + newScale + ')';
+    }
+
+    </script>
+{% endblock %}

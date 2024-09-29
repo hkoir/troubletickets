@@ -121,7 +121,8 @@
 
                         <th class="text-center p-2">Internal GRH</th>
                         <th class="text-center p-2">Customer GRH</th>
-                        <th class="text-center p-2">PGR Type</th>
+                        <th class="text-center p-2">PGR payment Type</th>
+                        <th class="text-center p-2">PGR pay rate</th>
                         <th class="text-center p-2">PGR Category</th>
                         <th class="text-center p-2">PGR Name</th>
                         <th class="text-center p-2">Team leader Name</th>     
@@ -156,16 +157,17 @@
                             <td class="text-center p-2">{{ ticket.internal_generator_running_hours }}</td>
                             <td class="text-center p-2">{{ ticket.customer_generator_running_hours }}</td>
 
-                            <td class="text-center p-2">{{ ticket.assigned_to.PGR_type }}</td>
+                            <td class="text-center p-2">{{ ticket.assigned_to.PGR_payment_type }}</td>
+                            <td class="text-center p-2">{{ ticket.assigned_to.PGR_pay_rate }}</td>
                             {% if ticket.assigned_to.PGR_category == "adhoc" %}
                             <td class="text-center p-2" style="background-color: red;">{{ ticket.assigned_to.PGR_category }}</td>
                             {% else %}
                             <td class="text-center p-2">{{ ticket.assigned_to.PGR_category }}</td>
                             {% endif %} 
                             <td class="text-center p-2">{{ ticket.assigned_to.name }}</td>
-                            <td class="text-center p-2">{{ ticket.team_leader_name.name }}</td>
+                            <td class="text-center p-2">{{ ticket.assigned_to.pgtl.name }}</td>
                             <td class="text-center p-2">{{ ticket.assigned_to.phone }}</td>
-                            <td class="text-center p-2">{{ ticket.team_leader_name.phone }}</td>
+                            <td class="text-center p-2">{{ ticket.assigned_to.pgtl.phone }}</td>
                            
                             <td class="text-center p-2">{{ ticket.ticket_status }}</td>
                             

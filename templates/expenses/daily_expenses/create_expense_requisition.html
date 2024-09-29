@@ -86,28 +86,61 @@
             // Toggle fields based on purpose
             function toggleFields() {
                 var purposeValue = $('#id_purpose').val();
-    
-                if (purposeValue === 'local_conveyance' || purposeValue === 'pg_carrying_cost') {
-                    $('#id_from_address, #id_to_address, #id_mode_travel').closest('.form-group').show();
+                var purposeCivilPowerValue = $('#id_purpose_civil_power').val();
+                var userTypeValue = $('#id_user_type').val();
+                var workTypeValue = $('#id_work_type').val();
+
+                if (userTypeValue === 'team_leader') {
+                    $('#id_pgtl').closest('.form-group').show();  // Show pgtl if team_leader
+                    $('#id_user').closest('.form-group').hide();  // Hide user
+                } else if (userTypeValue === 'CM_user' || userTypeValue === 'PM_user' || userTypeValue === 'general_user') {
+                    $('#id_user').closest('.form-group').show();  // Show user for other types
+                    $('#id_pgtl').closest('.form-group').hide();  // Hide pgtl
                 } else {
+                    // Hide both fields for any other userTypeValue
+                    $('#id_pgtl').closest('.form-group').hide();
+                    $('#id_user').closest('.form-group').hide();
+                }
+
+
+                if (workTypeValue === 'CM_work' || workTypeValue == 'PM_work'|| workTypeValue =='disaster_support') {
+                    $('#id_purpose').closest('.form-group').show();  // Show pgtl if team_leader
+                    $('#id_purpose_civil_power').closest('.form-group').hide();  // Hide user
+                } else if (workTypeValue === 'Civil_power') {
+                    $('#id_purpose').closest('.form-group').hide();  // Show user for other types
+                    $('#id_purpose_civil_power').closest('.form-group').show();  // Hide pgtl
+                } else {
+                    // Hide both fields for any other userTypeValue
+                    $('#id_purpose').closest('.form-group').hide();
+                    $('#id_purpose_civil_power').closest('.form-group').hide();
+                }
+
+
+                if (purposeValue === 'local_conveyance' || purposeValue === 'pg_carrying_cost' || purposeValue === 'long_distance_transport') {
+                    $('#id_from_address, #id_to_address, #id_mode_travel').closest('.form-group').show();
+                    $('#id_pgnumber, #id_vehicle').closest('.form-group').hide();  // Hide other fields
+                } else if (purposeValue === 'pg_local_fuel_purchase') {
+                    $('#id_pgnumber').closest('.form-group').show();
+                    $('#id_from_address, #id_to_address, #id_mode_travel, #id_vehicle').closest('.form-group').hide();  // Hide other fields
+                } else if (purposeValue === 'vehicle_local_fuel_purchase') {
+                    $('#id_vehicle').closest('.form-group').show();
+                    $('#id_from_address, #id_to_address, #id_mode_travel, #id_pgnumber').closest('.form-group').hide();  // Hide other fields
+                } else {
+                    // Hide all fields if none of the above conditions are met
+                    $('#id_from_address, #id_to_address, #id_mode_travel, #id_pgnumber, #id_vehicle').closest('.form-group').hide();
+                }
+
+                if (purposeCivilPowerValue === 'conveyance') {
+                    $('#id_from_address, #id_to_address, #id_mode_travel').closest('.form-group').show();                                  
+                } else {
+
                     $('#id_from_address, #id_to_address, #id_mode_travel').closest('.form-group').hide();
                 }
-    
-                if (purposeValue === 'pg_local_fuel_purchase') {
-                    $('#id_pgnumber').closest('.form-group').show();
-                } else {
-                    $('#id_pgnumber').closest('.form-group').hide();
-                }
-    
-                if (purposeValue === 'vehicle_local_fuel_purchase') {
-                    $('#id_vehicle').closest('.form-group').show();
-                } else {
-                    $('#id_vehicle').closest('.form-group').hide();
-                }
+
             }
     
             toggleFields();
-            $('#id_purpose').change(function() {
+            $('#id_purpose,#id_purpose_civil_power,#id_user_type,#id_work_type').change(function() {
                 toggleFields();
             });
     

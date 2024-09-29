@@ -81,6 +81,7 @@ table {
     
 <div class="container-fluid main-content">
   <div class="row">
+    
     <form method="GET" action="{% url 'tickets:view_all_parent_tickets_with_children' %}">        
       <button type="submit" name="download_csv" class="btn btn-primary">Export CSV</button>
     </form>
@@ -159,7 +160,7 @@ table {
                     <img 
                         src="{{ parent_ticket.assigned_to.PGR_photo.url }}" 
                         alt="PGR photo"
-                        style="cursor: pointer; width:50px;height:50px">
+                        style="cursor: pointer; width:40px;height:20px">
                 </a>
                 {% else %}
                 No file available
@@ -178,7 +179,7 @@ table {
                     <img 
                         src="{{ parent_ticket.assigned_to.pgtl.PGTL_photo.url }}" 
                         alt="PGTL photo"
-                        style="cursor: pointer; width:50px;height:50px">
+                        style="cursor: pointer; width:40px;height:20px">
                 </a>
                 {% else %}
                 No file available
@@ -207,7 +208,7 @@ table {
                       <img 
                         src="{{ child_ticket.child_tt_image.url }}" 
                         alt="Child Ticket Image" 
-                        style="cursor: pointer; width:50px;height:50px">
+                        style="cursor: pointer; width:40px;height:20px">
                     </a>
                   {% else %}
                     No image available

@@ -12,7 +12,7 @@ urlpatterns = [
      path('parent_ticket_status_update/<int:ticket_id>/',views.parent_ticket_status_update, name='parent_ticket_status_update'),
         
      path('create_child_ticket/<int:parent_ticket_id>/', views.create_child_ticket, name='create_child_ticket'),
-     path('create_child_ticke_mobile/<int:parent_ticket_id>/', views.create_child_ticke_mobile, name='create_child_ticke_mobile'),
+     path('create_child_ticket_mobile/<int:parent_ticket_id>/', views.create_child_ticket_mobile, name='create_child_ticket_mobile'),
      path('view_all_parent_tickets_with_children/', views.view_all_parent_tickets_with_children, name='view_all_parent_tickets_with_children'),
      path('view_child_tickets/<int:parent_ticket_id>/', views.view_child_tickets, name='view_child_tickets'),
      path('view_child_ticket_mobile/<int:parent_ticket_id>/', views.view_child_ticket_mobile, name='view_child_ticket_mobile'),
@@ -42,6 +42,7 @@ urlpatterns = [
      path('zone_wise_tt_run_hour_trend/', views.aggregated_tt_run_hour_trend, name='zone_wise_tt_run_hour_trend'),
      path('zone_wise_tt_run_hour_trend2/', views.individual_tt_run_hour_trend, name='zone_wise_tt_run_hour_trend2'),
      path('datewise_summary_edotco/', views.datewise_summary_edotco, name='datewise_summary_edotco'),
+   
 
      path('search_all/', views.search_all, name='search_all'),
      path('tt_management/', views.tt_management, name='tt_management'),

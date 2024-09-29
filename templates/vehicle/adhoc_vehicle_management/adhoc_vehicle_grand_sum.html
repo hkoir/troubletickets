@@ -159,6 +159,25 @@
 
             </div>
 
+                
+<div class="pagination" style="padding:10px">
+    {% if aggregated_data_page.has_previous %}
+        <a style="margin:10px; font-size: 14px;" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+    {% endif %}
+    
+    {% for num in aggregated_data_page.paginator.page_range %}
+        {% if aggregated_data_page.number == num %}
+            <span style="margin:10px; font-size:14px">{{ num }}</span>
+        {% else %}
+            <a style="margin:10px; font-size:14px" href="?page={{ num }}">{{ num }}</a>
+        {% endif %}
+    {% endfor %}
+    
+    {% if paggregated_data_page.has_next %}
+        <a style="margin:10px; font-size:14px" href="?page={{ page_obj.next_page_number }}">Next</a>
+    {% endif %}
+</div>
+
        
            </div>  
         </div>   

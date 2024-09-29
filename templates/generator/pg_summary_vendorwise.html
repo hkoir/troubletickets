@@ -64,10 +64,11 @@ white-space: normal;
                                 <th class="text-center p-2">Total PG count</th>
                                 <th class="text-center p-2">5kva</th>
                                 <th class="text-center p-2">8kva</th>
+                                <th class="text-center p-2">30kva</th>
                                 <th class="text-center p-2">Honda</th>
                                 <th class="text-center p-2">Mitsubishi</th>
-                                <th class="text-center p-2">Chinese</th>
-                             
+                                <th class="text-center p-2">Chinese</th>   
+                                <th class="text-center p-2">Mahindra</th>                            
                             </tr>
                         </thead>
                         <tbody>
@@ -78,9 +79,11 @@ white-space: normal;
                                     <td class="text-center p-2">{{ item.num_pg_count }}</td>
                                     <td class="text-center p-2">{{ item.num_5kva }}</td>
                                     <td class="text-center p-2">{{ item.num_8kva }}</td>
+                                    <td class="text-center p-2">{{ item.num_30kva }}</td>
                                     <td class="text-center p-2">{{ item.num_honda_brand }}</td>
                                     <td class="text-center p-2">{{ item.num_Mitshubishi_brand }}</td>
                                     <td class="text-center p-2">{{ item.num_chinese_brand }}</td>
+                                    <td class="text-center p-2">{{ item.num_mahindra_brand }}</td>
                                    
                                 </tr>
                             {% endfor %}

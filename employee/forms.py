@@ -48,12 +48,8 @@ class MonthYearForm(forms.Form):
 class CreateResurceForm(forms.ModelForm):    
     class Meta:
         model = Resource
-        fields = ['region','zone','mp','total_site','no_of_KPI_site','num_of_PG_repair_technician',
-            'num_of_DG_repair_technician','num_of_operational_executive',
-            'num_of_admin_account_executive',
-            'num_of_manager',
-            'num_of_other_staff'           
-            
+        fields = ['region','zone','mp','total_site','no_of_KPI_site'
+                
             ] 
  
 

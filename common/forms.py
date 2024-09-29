@@ -38,7 +38,7 @@ class PGRForm(forms.ModelForm):
     class Meta:
         model = PGRdatabase
         fields = [
-            'region', 'zone', 'mp', 'name', 'PGR_category', 'phone','payment_number','payment_number_choice', 'email',
+            'region', 'zone', 'mp', 'name', 'PGR_category','PGR_payment_type','PGR_pay_rate', 'phone','payment_number','payment_number_choice', 'email',
             'address', 'joining_date', 'pgtl', 'reference_person_name',
             'reference_person_phone', 'PGR_birth_certificate'
         ]
@@ -131,6 +131,13 @@ class PGRViewForm(forms.Form):
         required=False
     )
 
+    user_name = forms.CharField(
+        label='User Name',    
+        required=False
+    )
+
+   
+
     region = forms.ChoiceField(choices=REGION_CHOICES, required=False)
     zone = forms.ChoiceField(choices=ZONE_CHOICES, required=False)
     mp = forms.ChoiceField(choices=MP_CHOICES, required=False)
@@ -177,10 +184,18 @@ class FuelPumpSearchForm(forms.Form):
     end_date = forms.DateField(label='End Date', widget=forms.DateInput(attrs={'type': 'date'}))
 
 
-from.models import fuelPumpPayment
+from.models import fuelPumpPayment,OperationalUser
 
 class FuelPumpPaymentForm(forms.ModelForm):
     payment_date= forms.DateField(label='Payment date', required=False, widget=forms.DateInput(attrs={'type': 'date'}))
     class Meta:
         model = fuelPumpPayment
         exclude =['created_at','payment_id']    
+
+
+
+class OperationalUserForm(forms.ModelForm):
+    joining_date= forms.DateField(label='Joining date', required=False, widget=forms.DateInput(attrs={'type': 'date'}))
+    class Meta:
+        model = OperationalUser
+        exclude =['created_at']    

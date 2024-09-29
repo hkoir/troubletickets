@@ -66,13 +66,13 @@
                         the last {{ days }} days
                     {% elif start_date and end_date %}
                         from: {{ start_date }} to {{ end_date }}
-                    {% endif %}
+                    {% endif %}: Vehicle details for the vehicle:{{ vehicle_info.vehicle_reg_number }}
                 </h4>                
             </div>
         </div>
    
         <div class="col-xl-12">      
-            <h4 class="text-center" style="left:0; margin-bottom:20px" > Vehicle details for the vehicle:{{ vehicle_info.vehicle_reg_number }} </h4>
+          
             <h4>Basic Vehicle Information </h4>                    
             <table>
                 <thead>
@@ -80,7 +80,7 @@
                         <th class="text-center p-2">Vehicle ID</th>
                         <th class="text-center p-2">Owner Name</th>
                         <th class="text-center p-2">Owner Mobile Number</th>
-                        <th class="text-center p-2">Owner Address</th>
+                      
                         <th class="text-center p-2">Owner Company Name</th>
                         <th class="text-center p-2">Registration Number</th>
 
@@ -107,7 +107,7 @@
                         <td class="text-center p-2" style="white-space: nowrap;">{{ vehicle_info.vehicle_id }}</td>
                         <td class="text-center p-2"style="white-space: nowrap;">{{ vehicle_info.vehicle_owner_name }}</td>
                         <td class="text-center p-2"style="white-space: nowrap;">{{ vehicle_info.vehilce_owner_mobile_number }}</td>
-                        <td class="text-center p-2"style="white-space: nowrap;">{{ vehicle_info.vehicle_owner_address }}</td>
+                        
                         <td class="text-center p-2"style="white-space: nowrap;">{{ vehicle_info.vehicle_owner_company_name }}</td>
                         <td class="text-center p-2"style="white-space: nowrap;">{{ vehicle_info.vehicle_reg_number }}</td>
 
@@ -146,20 +146,22 @@
             <table>
                 <thead>
                     <tr>
-                        <th class="text-center p-2">Travel ID</th>
+
                         <th class="text-center p-2">Region</th>
                         <th class="text-center p-2">Zone</th>
-                        <th class="text-center p-2">MP</th>
-                        <th class="text-center p-2">Expense ID</th>
+                        <th class="text-center p-2">MP</th>                      
                         <th class="text-center p-2">User</th>
-                    
+                        <th class="text-center p-2">Travel ID</th>
+                        <th class="text-center p-2">Travel Date</th>
+                        <th class="text-center p-2">Weekend Status</th>    
+                        <th class="text-center p-2">Running Hours</th>                 
 
                         <th class="text-center p-2">Start Reading</th>
                         <th class="text-center p-2">Stop Reading</th>
                         <th class="text-center p-2">Start Location</th>
                         <th class="text-center p-2">End Location</th>
                         <th class="text-center p-2">Travel Purpose</th>
-                        <th class="text-center p-2">Travel Date</th>
+                     
                         <th class="text-center p-2">Total Kilometer Run</th>
                         <th class="text-center p-2">Total Fuel Consumed</th>
                         <th class="text-center p-2">Comments</th>
@@ -169,19 +171,23 @@
                 <tbody>
                     {% for running_data in vehicle_running_data %}
                         <tr>
-                            <td class="text-center p-2" style="white-space: nowrap;">{{ running_data.vehicle_expense_id }}</td>
+
                             <td class="text-center p-2" style="white-space: nowrap;">{{ running_data.region }}</td>
                             <td class="text-center p-2" style="white-space: nowrap;">{{ running_data.zone }}</td>
-                            <td class="text-center p-2" style="white-space: nowrap;">{{ running_data.mp }}</td>
-                            <td class="text-center p-2" style="white-space: nowrap;">{{ running_data.vehicle_expense_id }}</td>
+                            <td class="text-center p-2" style="white-space: nowrap;">{{ running_data.mp }}</td>                           
                             <td class="text-center p-2" style="white-space: nowrap;">{{ running_data.vehicle_expense_add_requester }}</td>
+                            <td class="text-center p-2" style="white-space: nowrap;">{{ running_data.vehicle_expense_id }}</td>
+                            <td class="text-center p-2" style="white-space: nowrap;">{{ running_data.travel_date }}</td>
+
+                            <td class="text-center p-2" style="white-space: nowrap;">{{ running_data.weekend_status}}</td>
+                            <td class="text-center p-2" style="white-space: nowrap;">{{ running_data.running_hours}}</td>
 
                             <td class="text-center p-2" style="white-space: nowrap;">{{ running_data.vehicle_start_reading }}</td>
                             <td class="text-center p-2" style="white-space: nowrap;">{{ running_data.vehicle_stop_reading }}</td>
                             <td class="text-center p-2" style="white-space: nowrap;">{{ running_data.vehicle_start_location }}</td>
                             <td class="text-center p-2" style="white-space: nowrap;">{{ running_data.vehicle_end_location }}</td>
                             <td class="text-center p-2" style="white-space: nowrap;">{{ running_data.travel_purpose }}</td>
-                            <td class="text-center p-2" style="white-space: nowrap;">{{ running_data.travel_date }}</td>
+
                             <td class="text-center p-2" style="white-space: nowrap;">{{ running_data.total_kilometer_run }}</td>
                             <td class="text-center p-2" style="white-space: nowrap;">{{ running_data.total_fuel_consumed }}</td>
                             <td class="text-center p-2" style="white-space: nowrap;">{{ running_data.comments }}</td>

@@ -8,7 +8,7 @@ app_name = 'adhocman'
 
 urlpatterns = [   
     path('create_adhoc_requisition/', views.create_adhoc_requisition, name='create_adhoc_requisition'),
-
+    path('edit_adhocman_requisition/<int:requisition_id>/', views.edit_adhocman_requisition, name='edit_adhocman_requisition'),
     path('adhoc_approval_status/', views.adhoc_approval_status, name='adhoc_approval_status'), 
     path('adhoc_approval_status2/', views.adhoc_approval_status2, name='adhoc_approval_status2'), 
     path('adhoc_management_approval/<int:requisition_id>/', views.adhoc_management_approval, name='adhoc_management_approval'),
@@ -17,10 +17,13 @@ urlpatterns = [
     path('adhoc_management_dashboard/', views.adhoc_management_dashboard, name='adhoc_management_dashboard'),  
 
 
-    path('adhoc_intime/', views.adhoc_intime, name='adhoc_intime'),  
+    path('adhoc_intime/', views.adhoc_intime, name='adhoc_intime'), 
+     path('adhoc_intime2/<int:requisition_id>/', views.adhoc_intime2, name='adhoc_intime2'),   
     path('fetch_requisitions/<int:pgr_id>/', views.fetch_requisitions, name='fetch_requisitions'),
     path('adhoc_outtime/<int:attendance_id>/', views.adhoc_outtime, name='adhoc_outtime'),  
-    path('adhoc_outtime2/<int:attendance_id>/', views.adhoc_outtime2, name='adhoc_outtime2'),    
+    path('adhoc_outtime2/<int:requisition_id>/', views.adhoc_outtime2, name='adhoc_outtime2'), 
+     path('adhoc_outtime_ajax/<int:attendance_id>/', views.adhoc_outtime_ajax, name='adhoc_outtime_ajax'),       
+   
     path('view_adhoc_attendance/', views.view_adhoc_attendance, name='view_adhoc_attendance'),
 
     path('view_adhoc_attendance2/', views.view_adhoc_attendance2, name='view_adhoc_attendance2'),
