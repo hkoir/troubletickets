@@ -35,49 +35,58 @@
     white-space: normal;
         }
 
+.main-content {   
+    overflow-y: auto;
+    margin-left:0px;
+    position: absolute;
+    width: 100%;
+    left: 0;
+        }
+ 
+
     </style>
 
 <h4 class=" text-center" style="margin-top:10px">DOPS DASHBOARD</h4>
 
 
 
- <div class="container-fluid">
-    <div class="row row-cols-3 row-cols-md-6 p-2">
+ <div class="container-fluid main-content">
+    <div class="row row-cols-3 row-cols-md-6">
      
  
-        <div class="card m-1 shadow" style="background-color: white; border-radius:20px;border:2px solid blue">
+        <div class="card shadow" style="background-color: white; border-radius:20px;border:2px solid blue;height:70px">
             <a class="text-center" style="text-decoration: none;color:black" href="{% url 'tickets:create_ticket_edotco' %}">
                 <i class="fa fa-eye" aria-hidden="true"></i>
                <br> Create Ticket</a>
         </div>
     
     
-        <div class="card m-1 shadow" style="background-color: white; border-radius:20px;border:2px solid blue">
+        <div class="card shadow" style="background-color: white; border-radius:20px;border:2px solid blue;height:70px">
             <a class="text-center" style="text-decoration: none;" href="{% url 'tickets:view_tt_edotco' %}">
                 <i class="fa fa-eye" aria-hidden="true"></i>
                 <br>View Tickets</a>
         </div>
 
-        <div class="card m-1 shadow" style="background-color: white; border-radius:20px;border:2px solid blue">
+        <div class="card shadow" style="background-color: white; border-radius:20px;border:2px solid blue">
             <a class="text-center" style="text-decoration: none;" href="{% url 'tickets:view_tt_start_stop' %}">
                 <i class="fa fa-eye" aria-hidden="true"></i>
                 <br>PG start Stop</a>
         </div>
 
-        <div class="card m-1 shadow" style="background-color: white;border-radius:20px;border:2px solid blue">
+        <div class="card shadow" style="background-color: white;border-radius:20px;border:2px solid blue">
             <a class="text-center" style="text-decoration: none;" href="{% url 'tickets:view_all_parent_tickets_with_children' %}">
                 <i class="fa fa-eye" aria-hidden="true"></i>
-                <br>View Tickets with children</a>
+                <br>View Tickets children</a>
         </div>
     
-        <div class="card m-1 shadow" style="background-color: white;border-radius:20px;border:2px solid blue">
+        <div class="card shadow" style="background-color: white;border-radius:20px;border:2px solid blue">
             <a class="text-center" style="text-decoration: none;" href="{% url 'tickets:summary_report_view' %}">
                 <i class="fa fa-eye" aria-hidden="true"></i>
-                <br>Overall Ticket Summary</a>
+                <br>Overall Summary</a>
         </div>
 
         
-        <div class="card m-1 shadow" style="background-color: white;border-radius:20px;border:2px solid blue">
+        <div class="cardshadow" style="background-color: white;border-radius:20px;border:2px solid blue">
             <a class="text-center" style="text-decoration: none;" href="{% url 'tickets:datewise_summary_edotco' %}">
                 <i class="fa fa-eye" aria-hidden="true"></i>
                 <br>Datewise TT</a>
@@ -85,56 +94,56 @@
 
 
 
-        <div class="card m-1 shadow" style="background-color: white;border-radius:20px;border:2px solid blue">
+        <div class="card shadow" style="background-color: white;border-radius:20px;border:2px solid blue">
             <a class="text-center" style="text-decoration: none;" href="{% url 'tickets:summary_report_view_customerwise' %}">
                 <i class="fa fa-eye" aria-hidden="true"></i>
                 <br>Summary by Customer</a>
         </div>
 
-        <div class="card m-1 shadow" style="background-color: white;border-radius:20px;border:2px solid blue">
+        <div class="card shadow" style="background-color: white;border-radius:20px;border:2px solid blue">
             <a class="text-center" style="text-decoration: none;" href="{% url 'tickets:summary_report_view_region' %}">
                 <i class="fa fa-eye" aria-hidden="true"></i>
                 <br>Summary by Region</a>
         </div>
 
-        <div class="card m-1 shadow" style="background-color: white; border-radius:20px;border:2px solid blue">
+        <div class="card shadow" style="background-color: white; border-radius:20px;border:2px solid blue">
             <a class="text-center" style="text-decoration: none;" href="{% url 'tickets:summary_report_view_hourly' %}">
                 <i class="fa fa-eye" aria-hidden="true"></i>
-                <br>Summary by region hour</a>
+                <br>Summary region hour</a>
         </div>
     
          
-        <div class="card m-1 shadow" style="background-color: white;border-radius:20px;border:2px solid blue">
+        <div class="card shadow" style="background-color: white;border-radius:20px;border:2px solid blue">
             <a class="text-center" style="text-decoration: none;" href="{% url 'tickets:zone_report_view' %}">
                 <i class="fa fa-eye" aria-hidden="true"></i>
                 <br>report by Zone</a>
         </div>
     
          
-        <div class="card m-1 shadow" style="background-color: white;border-radius:20px;border:2px solid blue">
+        <div class="card shadow" style="background-color: white;border-radius:20px;border:2px solid blue">
             <a class="text-center" style="text-decoration: none;" href="{% url 'tickets:mp_report_view' %}">
                 <i class="fa fa-eye" aria-hidden="true"></i>
                 <br>Report by MP</a>
         </div>  
                
     
-        <div class="card m-1 shadow" style="background-color: white; border-radius:20px;border:2px solid blue">
+        <div class="card shadow" style="background-color: white; border-radius:20px;border:2px solid blue">
             <a class="text-center" style="text-decoration: none;" href="{% url 'tickets:zone_wise_tt_run_hour_trend_summary' %}">
                 <i class="fa fa-eye" aria-hidden="true"></i>
-                <br>TT RH Trend Grand sum chart</a>
+                <br>TT Trend grand</a>
         </div>
     
-        <div class="card m-1 shadow" style="background-color: white; border-radius:20px;border:2px solid blue">
+        <div class="card shadow" style="background-color: white; border-radius:20px;border:2px solid blue">
             <a class="text-center" style="text-decoration: none;" href="{% url 'tickets:zone_wise_tt_run_hour_trend' %}">
                 <i class="fa fa-eye" aria-hidden="true"></i>
-                <br>TT RH Trend combined Zone chart</a>
+                <br>TT Trend all</a>
         </div>
     
     
-        <div class="card m-1 shadow" style="background-color: white;border-radius:20px;border:2px solid blue">
+        <div class="card shadow" style="background-color: white;border-radius:20px;border:2px solid blue;height:70px">
             <a class="text-center" style="text-decoration: none;" href="{% url 'tickets:zone_wise_tt_run_hour_trend2' %}">
                 <i class="fa fa-eye" aria-hidden="true"></i>
-                <br>TT RH Trend individual Zone chart </a>
+                <br>TT Trend zone </a>
         </div>
     
         <!-- <div class="card" style="background-color: white;">

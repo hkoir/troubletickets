@@ -29,7 +29,8 @@
     margin-left:0px;
     position: absolute;
     width: 100%;
-    left: 0;
+    left: 10;
+
   
 }
 </style>
@@ -38,9 +39,10 @@
 
 
 
- <div class="container-fluid">
-    <div class="row row-cols-3 row-cols-md-6 p-2">
-        <div class="card m-1 shadow rounded" style="background-color: white;border-radius:20px;border:2px solid blue">
+ <div class="container main-content">
+    <div class="row row-cols-3 row-cols-md-6 ">
+
+        <div class="card" style="background-color: white;border-radius:20px;border:2px solid blue; height:100px">
         <a class="text-center" style="text-decoration: none;" href="{% url 'tickets:tt_management' %}">
             <i class="fa fa-eye" aria-hidden="true"></i>
             <br>TT Manager</a>
@@ -48,7 +50,7 @@
 
         <!-- Vehicle management-->
 
-        <div class="card m-1 shadow rounded" style="background-color: white;border-radius:20px;border:2px solid blue">
+        <div class="card" style="background-color: white;border-radius:20px;border:2px solid blue; height:100px">
             <a class="text-center" style="text-decoration: none;" href="{% url 'vehicle:fleet_management' %}">
                 <i class="fas fa-truck-pickup"></i>
                 <br>Fleet Manager</a>
@@ -56,13 +58,13 @@
         
          <!-- PG management-->
     
-        <div class="card m-1 shadow rounded" style="background-color: white;border-radius:20px;border:2px solid blue">
+        <div class="card" style="background-color: white;border-radius:20px;border:2px solid blue; height:100px">
         <a class="text-center" style="text-decoration: none;" href="{% url 'generator:pg_management' %}">
             <i class="fa fa-cogs" aria-hidden="true"></i>
             <br>Generators Manager</a>
         </div>
             
-        <div class="card m-1 shadow rounded" style="background-color: white;border-radius:20px;border:2px solid blue">
+        <div class="card" style="background-color: white;border-radius:20px;border:2px solid blue; height:100px">
             <a class="text-center" style="text-decoration: none;" href="{% url 'adhocman:adhoc_management_dashboard' %}">
                 <i class="fas fa-user"></i>
                 <br>Adhoc man manager</a>
@@ -70,21 +72,21 @@
                   
     <!-- money_requisition -->
 
-    <div class="card m-1 shadow rounded" style="background-color: white;border-radius:20px;border:2px solid blue">
+    <div class="card" style="background-color: white;border-radius:20px;border:2px solid blue; height:100px">
             <a class="text-center" style="text-decoration: none;" href="{% url 'dailyexpense:expense_advance_management' %}">
                 <i class="fa fa-calculator" aria-hidden="true"></i>
                 <br>Expense & Advance</a>
         </div>
 
         
-        <div class="card m-1 shadow rounded" style="background-color: white;border-radius:20px;border:2px solid blue">
+        <div class="card" style="background-color: white;border-radius:20px;border:2px solid blue; height:100px">
             <a class="text-center" style="text-decoration: none;" href="{% url 'disaster:disaster_advance_management' %}">
                 <i class="fa fa-bolt" aria-hidden="true"></i>
                 <br>Disaster cash management</a>
         </div>
         
 
-        <div class="card m-1 shadow rounded" style="background-color: white;border-radius:20px;border:2px solid blue">
+        <div class="card" style="background-color: white;border-radius:20px;border:2px solid blue; height:100px">
             <a class="text-center" style="text-decoration: none;" href="{% url 'common:operational_resource_management' %}">
                 <i class="fas fa-tools"></i>
                 <br>Operational Resource</a>
@@ -93,21 +95,21 @@
 
 
     
-    <div class="card m-1 shadow rounded"  style="background-color: white;border-radius:20px;border:2px solid blue">
+    <div class="card"  style="background-color: white;border-radius:20px;border:2px solid blue; height:100px">
         <a class="text-center" style="text-decoration: none;" href="{% url 'billable:billable_dashboard' %}">
             <i class="fas fa-tools"></i>
             <br>Civil and Power work</a>
     </div>
     
     
-    <div class="card m-1 shadow rounded" style="background-color: white;border-radius:20px;border:2px solid blue">
+    <div class="card" style="background-color: white;border-radius:20px;border:2px solid blue; height:100px">
         <a class="text-center" style="text-decoration: none;" href="{% url 'employee:human_resource_management' %}">
             <i class="fa fa-users" aria-hidden="true"></i>
             <br>HR management</a>
     </div>
     
     
-    <div class="card m-1 shadow rounded" style="background-color: #07f3f3;border-radius:20px;border:2px solid rgb(0, 229, 255)">
+    <div class="card" style="background-color: #07f3f3;border-radius:20px;border:2px solid rgb(0, 229, 255); height:100px">
         <a class="text-center" style="text-decoration: none;" href="{% url 'common:all_expenditure' %}">
             <i class="fa fa-calculator" aria-hidden="true"></i>
             <br>All Expenses Summary</a>

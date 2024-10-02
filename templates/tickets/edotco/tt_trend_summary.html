@@ -11,7 +11,7 @@
     html, body {
         background-color: beige;        
     }
-    #main-content {   
+    .main-content {   
     overflow-y: auto;
     margin-left:0px;
     position: absolute;
@@ -57,9 +57,9 @@
 
 
 
-<div class="container-fluid" id =main-content>
+<div class="container-fluid main-content">
     <div class="row">
-        <div class="col-12 overflow-auto">
+        <div class="col-12 ">
             <h4 style="margin-top:20px">Grand Summary TT and Run Hour Trend
                 : Data for 
                 {% if days %}
@@ -68,8 +68,8 @@
                 from: {{ start_date }} to {{ end_date }}
             {% endif %}
             </h4>
-            <div style="overflow-x: auto;">
-                <canvas class="overflow-auto" id="aggregate_charts" style="border: 1px solid green; height: 400px; width:100%;"></canvas>
+            <div>
+                <canvas class="overflow-auto" id="aggregate_charts" style="border: 1px solid green; height: 400px; width:1200px;"></canvas>
             </div>
         </div>
     </div>

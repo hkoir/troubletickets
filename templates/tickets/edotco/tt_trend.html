@@ -12,7 +12,7 @@
         background-color: beige;
     }
 
-    #main-content {   
+    .main-content {   
     overflow-y: auto;
     margin-left:0px;
     position: absolute;
@@ -45,21 +45,23 @@
 
 
 
-<h4 style="margin-top:40px">Report for
-    {% if days %}
-        the last {{ days }} days
-    {% elif start_date and end_date %}
-        from: {{ start_date }} to {{ end_date }}
-    {% endif %}
-</h4>
 
+<div class="container-fluid  main-content" >
+    <div class="row">   
+        <div class="col-12">
+            <h4 style="margin-top:40px">Report for
+                {% if days %}
+                    the last {{ days }} days
+                {% elif start_date and end_date %}
+                    from: {{ start_date }} to {{ end_date }}
+                {% endif %}
+            </h4>
 
-
-
-<div class="container-fluid overflow-auto"  style="margin-top: 20px;">
-    <div class="row overflow-auto" id="main-content" style="white-space: nowrap">     
-        <div class="col" id="canvas-container"style="height: 800px; width:1200px;overflow-x: auto; white-space:nowrap">            
-        </div>
+            <div class="col-12 overflow-auto" id="canvas-container"style="height: 800px; width:800px; white-space:nowrap">            
+            </div>
+        </div>  
+      
+        
     </div>
 </div>
 
@@ -162,80 +164,84 @@ document.addEventListener('DOMContentLoaded', function() {
     const canvas = document.createElement('canvas');
     canvas.id = 'aggregate_charts';
     canvas.style.width = '100%';
-    canvas.style.height = '50%';
+    canvas.style.height = '60%';
     canvasContainer.appendChild(canvas);
 
     const ctx = canvas.getContext('2d');
     const summaryChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: uniqueSortedDates,
-            datasets: datasets
-        },
-        options: {
-            responsive: true,
-            scales: {
-                x: {
-                    title: {
-                        display: true,
-                        text: 'Date',
-                        color: '#000578',
-                        font: {
-                            size: 25,
-                            weight: 'bold'
-                        }
-                    },
-                    ticks: {
-                        color: '#000578',
-                        font: {
-                            size: 16,
-                            weight: 'normal'
-                        }
-                    }
-                },
-                y: {
-                    beginAtZero: true,
-                    title: {
-                        display: true,
-                        text: 'Value',
-                        color: '#000578',
-                        font: {
-                            size: 25,
-                            weight: 'bold'
-                        }
-                    },
-                    ticks: {
-                        color: '#000578',
-                        font: {
-                            size: 16,
-                            weight: 'normal'
-                        }
-                    }
-                }
-            },
-            plugins: {
+    type: 'bar',
+    data: {
+        labels: uniqueSortedDates,
+        datasets: datasets
+    },
+    options: {
+        responsive: true,
+        scales: {
+            x: {
                 title: {
                     display: true,
-                    text: 'Zone Summary Chart',
+                    text: 'Date',
                     color: '#000578',
                     font: {
                         size: 25,
                         weight: 'bold'
                     }
                 },
-                legend: {
-                    labels: {
-                        font: {
-                            size: 16,
-                            weight: 'normal',
-                            family: 'Arial'
-                        },
-                        color: '#000578'
+                ticks: {
+                    color: '#000578',
+                    font: {
+                        size: 16,
+                        weight: 'normal'
+                    }
+                },
+                // Control bar width
+                barThickness: 10,   // You can set a specific bar thickness here
+                
+            },
+            y: {
+                beginAtZero: true,
+                title: {
+                    display: true,
+                    text: 'Value',
+                    color: '#000578',
+                    font: {
+                        size: 25,
+                        weight: 'bold'
+                    }
+                },
+                ticks: {
+                    color: '#000578',
+                    font: {
+                        size: 16,
+                        weight: 'normal'
                     }
                 }
             }
+        },
+        plugins: {
+            title: {
+                display: true,
+                text: 'Zone Summary Chart',
+                color: '#000578',
+                font: {
+                    size: 25,
+                    weight: 'bold'
+                }
+            },
+            legend: {
+                labels: {
+                    font: {
+                        size: 16,
+                        weight: 'normal',
+                        family: 'Arial'
+                    },
+                    color: '#000578'
+                }
+            }
         }
-    });
+    }
+});
+
 });
 
 
